@@ -55,8 +55,10 @@
 	"keywords": [
 		"scrollbar",
 		"virtual",
+    "scroll",
 		"vue3",
 		"vue",
-		"hook"
+		"hook",
+    "directive"
 	]
 }
