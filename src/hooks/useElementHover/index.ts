@@ -1,8 +1,8 @@
-import { ref } from "vue";
-import { useEventListener } from "@vueuse/core";
+import { ref, watch } from "vue";
+import { useEventListener } from '@vueuse/core'
 
 import type { Ref } from "vue";
-import type { MaybeComputedRef } from '@vueuse/shared';
+import type { Fn, MaybeComputedRef } from '@vueuse/shared'
 
 export default function useElementHover(
   el: MaybeComputedRef<EventTarget | null | undefined>,
@@ -11,13 +11,22 @@ export default function useElementHover(
 ): Ref<boolean> {
   const isHovered = ref(false)
 
-  useEventListener(el, 'mouseenter', () => {
-    isHovered.value = true
-    cb1?.()
-  })
-  useEventListener(el, 'mouseleave', () => {
-    isHovered.value = false
-    cb2?.()
+  const cleanup = ref<Fn[]>([]);
+
+  el && watch(el, (target) => {
+    if (target) {
+      cleanup.value.map(stop => stop())
+      cleanup.value = [
+        useEventListener(el, 'mouseenter', () => {
+          isHovered.value = true
+          cb1?.()
+        }),
+        useEventListener(el, 'mouseleave', () => {
+          isHovered.value = false
+          cb2?.()
+        }),
+      ]
+    }
   })
 
   return isHovered
