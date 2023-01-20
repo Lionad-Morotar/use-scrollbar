@@ -2,12 +2,24 @@
 	"name": "use-scrollbar",
 	"version": "1.0.0",
 	"private": false,
+  "exports": {
+    ".": {
+      "import": "./dist/lib/index.esm.js",
+      "require": "./dist/lib/index.cjs.js",
+      "types": "./dist/types/index.d.ts"
+    }
+  },
 	"scripts": {
+    "dev": "vite ./play",
 		"clean": "rimraf dist",
 		"build": "pnpm clean  && pnpm check:type && vite build",
 		"check:type": "vue-tsc --noEmit",
 		"prepare": "husky install"
 	},
+  "dependencies": {
+    "@vueuse/core": "^9.11.0",
+		"@vueuse/shared": "^9.11.0"
+  },
 	"devDependencies": {
 		"@commitlint/cli": "^17.4.2",
 		"@commitlint/config-conventional": "^17.4.2",
@@ -34,6 +46,8 @@
 		"vue-tsc": "1.0.9"
 	},
 	"peerDependencies": {
+		"@vueuse/core": "^9.11.0",
+    "@vueuse/shared": "^9.11.0",
 		"vue": "^3.2.25"
 	},
 	"pnpm": {
@@ -55,10 +69,10 @@
 	"keywords": [
 		"scrollbar",
 		"virtual",
-    "scroll",
+		"scroll",
 		"vue3",
 		"vue",
 		"hook",
-    "directive"
+		"directive"
 	]
 }

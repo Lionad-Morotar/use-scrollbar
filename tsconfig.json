@@ -1,11 +1,11 @@
 {
   "compilerOptions": {
-    "target": "es2017",
+    "target": "esnext",
     "outDir": "dist",
     "module": "esnext",
     "lib": ["ESNext", "DOM", "DOM.Iterable"],
     "useDefineForClassFields": true,
-    "moduleResolution": "node",
+    "moduleResolution": "Node",
     "allowJs": false,
     "strict": true,
     "sourceMap": true,
@@ -21,7 +21,6 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "skipLibCheck": true,
-    "preserveSymlinks": true,
     "types": [
       "node"
     ],
@@ -29,5 +28,8 @@
       "@/*": ["./src/*"]
     }
   },
+  "includes": [
+    "env.d.ts"
+  ],
   "exclude": ["node_modules", "dist", "docs", "example", "test"]
 }

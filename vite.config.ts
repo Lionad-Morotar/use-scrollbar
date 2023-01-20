@@ -2,9 +2,10 @@ import path from 'path'
 import dts from 'vite-plugin-dts'
 import { defineConfig } from 'vite'
 
+import type { UserConfig } from 'vite'
+
 export default defineConfig(({ mode }) => {
-  console.log('[info] mode', mode)
-  return {
+  const config: UserConfig = {
     plugins: [
       dts({
         include: ['./src/hooks/**/*.ts'],
@@ -16,7 +17,7 @@ export default defineConfig(({ mode }) => {
       lib: {
         entry: path.resolve(__dirname, './src/hooks/index.ts'),
         name: 'UseHooks',
-        formats: ['es', 'cjs', 'iife'],
+        formats: ['es', 'cjs'],
         fileName: format => {
           return `lib/index.${format}.js`
         },
@@ -27,9 +28,15 @@ export default defineConfig(({ mode }) => {
         output: {
           globals: {
             vue: 'Vue',
+            '@vueuse/core': 'VueUseCore',
+            '@vueuse/shared': 'VueUseShared',
           },
         },
       },
     },
   }
+
+  console.log('[info] mode', mode)
+
+  return config;
 })
