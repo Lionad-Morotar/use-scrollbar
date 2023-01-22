@@ -1,0 +1,11 @@
+{
+  "name": "xe-utils",
+  "version": "1.0.0",
+  "main": "index.js",
+  "module": "index.js",
+  "scripts": {
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT"
+}

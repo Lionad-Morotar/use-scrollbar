@@ -9,5 +9,6 @@ types/
 !.test
 .temp
 play
+patch
 
 playground

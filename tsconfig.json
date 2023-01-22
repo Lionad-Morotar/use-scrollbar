@@ -6,7 +6,7 @@
     "lib": ["ESNext", "DOM", "DOM.Iterable"],
     "useDefineForClassFields": true,
     "moduleResolution": "Node",
-    "allowJs": false,
+    "allowJs": true,
     "strict": true,
     "sourceMap": true,
     "noUnusedLocals": true,

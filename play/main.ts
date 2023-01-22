@@ -1,4 +1,6 @@
 import { createApp } from "vue"
+import VXETable from 'vxe-table'
+import 'vxe-table/lib/style.css'
 
 // main
 ;(async () => {
@@ -13,6 +15,8 @@ import { createApp } from "vue"
   // @ts-ignore
   const App = (await file()).default
   const app = createApp(App)
+
+  app.use(VXETable)
 
   app.mount('#play')
 })()
