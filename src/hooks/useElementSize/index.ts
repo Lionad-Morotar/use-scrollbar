@@ -1,4 +1,4 @@
-import { ref, watch, computed } from "vue";
+import { ref, watch, computed } from "vue-demi";
 import { useResizeObserver } from "@vueuse/core";
 import { unrefElement } from "@vueuse/core";
 

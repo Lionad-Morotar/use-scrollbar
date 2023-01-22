@@ -1,0 +1,43 @@
+.c-scrollbar {
+  position: absolute;
+  border-radius: 9999px;
+  border: solid 2px transparent;
+  background-color: #909399;
+  background-clip: content-box;
+  opacity: 0.5;
+  cursor: pointer;
+  will-change: auto;
+  transition: opacity 0.1s;
+  z-index: 9;
+
+  &:hover {
+    opacity: 0.78;
+  }
+  &:active {
+    opacity: 0.88;
+  }
+
+  &.is-y {
+    width: 7px;
+    min-height: 30px;
+  }
+  &.is-x {
+    height: 7px;
+    min-width: 30px;
+  }
+}
+
+.scrollbar-fade-enter-active {
+  transition: opacity 0.25s ease-in;
+}
+.scrollbar-fade-leave-active {
+  transition: opacity 0.25s ease-out;
+}
+.scrollbar-fade-enter-from,
+.scrollbar-fade-leave-to {
+  opacity: 0;
+}
+.scrollbar-fade-enter-to,
+.scrollbar-fade-leave-from {
+  opacity: 0.5;
+}

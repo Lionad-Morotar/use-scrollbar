@@ -1,3 +1,4 @@
+import path from "node:path";
 import { defineConfig, loadEnv } from 'vite'
 import vue from '@vitejs/plugin-vue'
 
@@ -10,7 +11,7 @@ export default defineConfig(({ mode }) => {
       alias: [
         {
           find: /^@\/hooks$/,
-          replacement: '../src/hooks/index.ts',
+          replacement: path.join(__dirname, '../src/hooks/index.ts'),
         },
       ],
     },
@@ -20,7 +21,7 @@ export default defineConfig(({ mode }) => {
       https: !!env.HTTPS,
     },
     optimizeDeps: {
-      include: ['vue', '@vue/shared'],
+      include: ['vue', '@vue/shared', 'vue-demi'],
       exclude: ['vxe-table'],
     },
   }

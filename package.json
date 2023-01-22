@@ -18,7 +18,8 @@
 	},
 	"dependencies": {
 		"@vueuse/core": "^9.11.0",
-		"@vueuse/shared": "^9.11.0"
+		"@vueuse/shared": "^9.11.0",
+		"vue-demi": "^0.13.11"
 	},
 	"devDependencies": {
 		"@commitlint/cli": "^17.4.2",
@@ -50,7 +51,8 @@
 	"peerDependencies": {
 		"@vueuse/core": "^9.11.0",
 		"@vueuse/shared": "^9.11.0",
-		"vue": "^3.2.25"
+		"vue": "^3.2.25",
+    "vue-demi": "^0.13.11"
 	},
 	"pnpm": {
 		"peerDependencyRules": {
