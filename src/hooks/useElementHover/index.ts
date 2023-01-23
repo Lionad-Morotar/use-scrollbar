@@ -17,15 +17,15 @@ export default function useElementHover(
 
   watch(
     targetRef,
-    (value, oldValue) => {
-      if (value && !oldValue) {
-        cleanup.value.map((stop) => stop())
+    (value) => {
+      cleanup.value.map((stop) => stop())
+      if (value) {
         cleanup.value = [
-          useEventListener(unrefElement(value), 'mouseenter', () => {
+          useEventListener(() => unrefElement(value), 'mouseenter', () => {
             isHovered.value = true
             cb1?.()
           }),
-          useEventListener(unrefElement(value), 'mouseleave', () => {
+          useEventListener(() => unrefElement(value), 'mouseleave', () => {
             isHovered.value = false
             cb2?.()
           }),

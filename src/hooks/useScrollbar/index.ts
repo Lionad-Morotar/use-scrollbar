@@ -33,6 +33,8 @@ export default function useScrollbar() {
       max: 500,
     },
   };
+  const $mountOn = ref<HTMLElement>()
+  const instance = ref()
   // 空值滚动条显隐
   const inTrigger = ref({
     x: false,
@@ -101,7 +103,7 @@ export default function useScrollbar() {
     scrollLeft: 0,
     /* 将容器滚动到某处 */
     scrollTo: (() => {
-      throw new Error("uninitial");
+      throw new Error('uninitial')
     }) as (x: number, y: number) => void,
 
     visibleOnHover,
@@ -109,8 +111,22 @@ export default function useScrollbar() {
     init,
     onDragY,
     onDragX,
-    setOn,
-  });
+    mount,
+    destroy,
+  })
+
+  const stops = [] as (() => void)[]
+  function destroy() {
+    stops.map(s => s())
+    clean()
+    instance.value?.destroy?.()
+    // init() TODO
+  }
+  const watchEffectGathered = (...args: Parameter<typeof watchEffect>) => {
+    const stop = watchEffect(args)
+    stops.push(stop)
+    return stop
+  }
 
   // 监听元素的 hover 事件以改变滚动条的显示隐藏状态
   function visibleOnHover($hoverOn: MaybeComputedElementRef) {
@@ -130,12 +146,12 @@ export default function useScrollbar() {
     const $elms = [opts?.x?.left, opts?.x?.bottom, opts?.y?.right, opts?.y?.top].filter((x) => x);
     $elms.map(($elm) => {
       const { width, height } = useElementSize($elm);
-      watchEffect(() => {
-        if (opts?.x?.left === $elm) states.offset.x.left = Math.ceil(width.value + HALF_GAP);
-        if (opts?.x?.bottom === $elm) states.offset.x.bottom = Math.ceil(height.value + HALF_GAP);
-        if (opts?.y?.right === $elm) states.offset.y.right = Math.ceil(width.value + HALF_GAP);
-        if (opts?.y?.top === $elm) states.offset.y.top = Math.ceil(height.value + HALF_GAP);
-      });
+      watchEffectGathered(() => {
+        if (opts?.x?.left === $elm) states.offset.x.left = Math.ceil(width.value + HALF_GAP)
+        if (opts?.x?.bottom === $elm) states.offset.x.bottom = Math.ceil(height.value + HALF_GAP)
+        if (opts?.y?.right === $elm) states.offset.y.right = Math.ceil(width.value + HALF_GAP)
+        if (opts?.y?.top === $elm) states.offset.y.top = Math.ceil(height.value + HALF_GAP)
+      })
     });
   }
 
@@ -143,7 +159,7 @@ export default function useScrollbar() {
    * 滚动条计算初始化
    * @param opts.mount 滚动条 DOM 挂载的容器
    * @param opts.place 滚动容器，place element，通常是 opts.wrapper 中的一个
-   * @param opts.content 滚动子项，不应传入所有子项，而是传入所有子项的非定高父容器
+   * @param opts.content 滚动子项的非定高父容器
    * @param opts.wrapper 滚动容器，用于计算内容区的 scrollTop 等属性，不传则默认是 opts.content 的父容器
    */
   function init(opts: { mount: MaybeElem; place: MaybeElem; content: MaybeElem[]; wrapper: MaybeElem[] }) {
@@ -171,10 +187,10 @@ export default function useScrollbar() {
         ws.push(width);
         hs.push(height);
       });
-      watchEffect(() => {
+      watchEffectGathered(() => {
         contentW.value = Math.max(...ws.map(unref));
       });
-      watchEffect(() => {
+      watchEffectGathered(() => {
         contentH.value = Math.max(...hs.map(unref));
       });
     }
@@ -186,13 +202,13 @@ export default function useScrollbar() {
         tops.push(top);
         lefts.push(left);
       });
-      watchEffect(() => {
+      watchEffectGathered(() => {
         scrollTop.value = Math.max(...tops.map(unref));
       });
-      watchEffect(() => {
+      watchEffectGathered(() => {
         scrollLeft.value = Math.max(...lefts.map(unref));
       });
-      watchEffect(() => {
+      watchEffectGathered(() => {
         states.scrollTo = (x: number, y: number) => {
           opts.wrapper.map(($elm) => (unref($elm) as HTMLElement)?.scrollTo?.(x, y));
         };
@@ -201,10 +217,10 @@ export default function useScrollbar() {
 
     /* 计算滚动条的显隐状态 */
 
-    watchEffect(() => {
+    watchEffectGathered(() => {
       states.visible.x = states.isDragging.x || (!states.isHidden.x && inTrigger.value.x);
     });
-    watchEffect(() => {
+    watchEffectGathered(() => {
       states.visible.y = states.isDragging.y || (!states.isHidden.y && inTrigger.value.y);
     });
 
@@ -216,7 +232,7 @@ export default function useScrollbar() {
      * 3. 当内容超出更多，尺寸从 size.base 逼近 size.min
      */
 
-    watchEffect(() => {
+    watchEffectGathered(() => {
       let height = config.size.base;
       const hiddenY = contentH.value <= placeH.value;
       states.isHidden.y = hiddenY;
@@ -235,7 +251,7 @@ export default function useScrollbar() {
       const safeHeight = Math.min(Math.max(height, config.size.min), config.size.max);
       states.size.y.height = safeHeight;
     });
-    watchEffect(() => {
+    watchEffectGathered(() => {
       let width = config.size.base;
       const hiddenX = contentW.value <= placeW.value;
       states.isHidden.x = hiddenX;
@@ -257,7 +273,7 @@ export default function useScrollbar() {
 
     /* 滚动条轨道高度 */
 
-    watchEffect(() => {
+    watchEffectGathered(() => {
       states.size.y.path = placeH.value - states.size.y.height - SCROLLBAR_GAP * 2;
       states.size.x.path = placeW.value - states.size.x.width - SCROLLBAR_GAP * 2;
       // console.log("[debug] scrollbar path", placeH.value, states.size.y.height);
@@ -272,27 +288,27 @@ export default function useScrollbar() {
 
     /* 计算滚动条距边缘的距离 */
 
-    watchEffect(() => {
+    watchEffectGathered(() => {
       const top = states.size.y.path * scrollbarToEdgeRatio.value.y;
       const safeTop = Math.min(states.size.y.path, Math.max(top, 0));
       states.position.y.top = safeTop;
     });
-    watchEffect(() => {
+    watchEffectGathered(() => {
       const left = states.size.x.path * scrollbarToEdgeRatio.value.x;
       const safeLeft = Math.min(states.size.x.path, Math.max(left, 0));
       states.position.x.left = safeLeft;
     });
 
-    opts.mount && setOn(opts.mount);
+    opts.mount && mount(opts.mount);
 
     /* 将部分值代理为状态 */
 
-    watchEffect(() => (states.placeH = placeH.value));
-    watchEffect(() => (states.placeW = placeW.value));
-    watchEffect(() => (states.contentH = contentH.value));
-    watchEffect(() => (states.contentW = contentW.value));
-    watchEffect(() => (states.scrollTop = scrollTop.value));
-    watchEffect(() => (states.scrollLeft = scrollLeft.value));
+    watchEffectGathered(() => (states.placeH = placeH.value));
+    watchEffectGathered(() => (states.placeW = placeW.value));
+    watchEffectGathered(() => (states.contentH = contentH.value));
+    watchEffectGathered(() => (states.contentW = contentW.value));
+    watchEffectGathered(() => (states.scrollTop = scrollTop.value));
+    watchEffectGathered(() => (states.scrollLeft = scrollLeft.value));
   }
 
   /* 计算滚动条样式 */
@@ -400,10 +416,13 @@ export default function useScrollbar() {
 
   // 将滚动条挂载在某个 DOM 节点
   // TODO remove event
-  function setOn($elem: MaybeElem) {
-    const instance = createComponent(states);
-    unrefElement($elem as HTMLElement).appendChild(instance.$el);
+  function mount($elem: MaybeElem) {
+    instance.value = createComponent(states);
+    const $el = unrefElement($elem as HTMLElement);
+    $mountOn.value = $el
+    $el.appendChild(instance.value.$el)
   }
+  // onUnMounted(unmount)
 
   /* ----------------------------------------------------------- */
 

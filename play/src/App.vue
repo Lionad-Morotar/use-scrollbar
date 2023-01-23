@@ -1,13 +1,15 @@
 <template>
   <div class="play-container" ref="playRef">
     <div class="header">
-      <h4>## VXETable Example {{ isHover ? ' - Hovered' : '' }}</h4>
+      <h4>## VXETable with Virtual Scrollbars {{ isHover ? ' - Hovered' : '' }}</h4>
       <el-checkbox v-model="states.isVirtualScroll">表格虚拟滚动</el-checkbox>
+      <el-checkbox v-model="states.isVirtualScrollbar">表格虚拟滚动条</el-checkbox>
     </div>
     <vxe-table-virtual-scrollbar
       border
       stripe
-      :loading="states.loading"
+      :enable="states.isVirtualScrollbar"
+      :loading="states.isLoading"
       :tree-config="{transform: true}"
       :column-config="{resizable: true}"
       :row-config="{isHover: true}"
@@ -18,17 +20,9 @@
       >
       <vxe-column type="seq" :width="180" fixed="left" tree-node></vxe-column>
       <vxe-column type="checkbox" title="ID" :width="140"></vxe-column>
-      <vxe-column field="name" title="Name" sortable :width="140"></vxe-column>
-      <vxe-column field="sex" title="Sex" :filters="states.sexList" :filter-multiple="false" :formatter="formatterSex" :width="140">
-      </vxe-column>
-      <vxe-column
-        field="age"
-        title="Age"
-        sortable
-        :filters="[{label: '大于16岁', value: 16}, {label: '大于26岁', value: 26}, {label: '大于30岁', value: 30}]"
-        :filter-method="filterAgeMethod"
-        :width="120">
-      </vxe-column>
+      <vxe-column field="name" title="Name" :width="140"></vxe-column>
+      <vxe-column field="sex" title="Sex" :formatter="formatterSex" :width="140"></vxe-column>
+      <vxe-column field="age" title="Age" :width="120"></vxe-column>
       <vxe-column field="address" title="Address" show-overflow :min-width="300"></vxe-column>
       <vxe-column field="address" title="Address Another" :width="1000"></vxe-column>
       <vxe-column field="address" title="Address Another" :width="1000"></vxe-column>
@@ -47,8 +41,9 @@ const playRef = ref();
 const isHover = useElementHover(playRef);
 
  const states = reactive({
-  isVirtualScroll: false,
-  loading: false,
+  isVirtualScroll: true,
+  isVirtualScrollbar: true,
+  isLoading: false,
   tableData: [] as any[],
   sexList: [
     {
@@ -67,17 +62,21 @@ const formatterSex = ({ cellValue }: any) => {
   return item ? item.label : ''
 }
 
-const filterAgeMethod = ({ value, row }: any) => {
-  return row.age >= value
-}
-
 const refresh = async () => {
-  states.loading = true
+  states.isLoading = true
   setTimeout(() => {
     const itemCount = 500
     let parentId = 0
     states.tableData = Array(itemCount).fill(0).map((x, idx) => {
-      const res = { id: idx, parentId: null,  name: 'Test-' + (idx + 1), role: 'Develop', sex: '0', age: 28, address: Array(10).fill('long address long long long address').join(', ') }
+      const res = {
+        id: idx,
+        parentId: null,
+        name: 'Test-' + (idx + 1),
+        role: 'Develop',
+        sex: Math.random() < 0.5 ? '1' : '0',
+        age: 28,
+        address: Array(10).fill('long address long long long address').join(', ')
+      }
       if (Math.random() < 0.5) {
         parentId = idx
       }
@@ -86,12 +85,13 @@ const refresh = async () => {
       }
       return res
     })
-    states.loading = false
+    states.isLoading = false
   }, 300)
 }
 
 onMounted(refresh)
 watch(() => states.isVirtualScroll, refresh)
+watch(() => states.isVirtualScrollbar, refresh)
 </script>
 
 <style>

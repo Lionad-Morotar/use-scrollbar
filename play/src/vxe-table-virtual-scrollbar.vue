@@ -1,13 +1,22 @@
 <template>
-  <vxe-table ref="tableRef" height="100%" v-bind="$attrs">
+  <vxe-table
+    :class="props.enable ? 'is-virtual-scrollbar' : ''"
+    ref="tableRef"
+    height="100%"
+    v-bind="$attrs"
+  >
     <slot />
   </vxe-table>
 </template>
 
 <script setup lang="ts">
-import { useSlots, onMounted, nextTick, ref } from "vue";
+import { defineProps, useSlots, nextTick, ref, watch } from "vue";
 import { until } from "@vueuse/core";
 import { useScrollbar } from "@/hooks";
+
+const props = defineProps<{
+  enable: boolean
+}>();
 
 const slots = useSlots();
 if (!slots.default) {
@@ -15,32 +24,37 @@ if (!slots.default) {
 }
 
 const tableRef = ref<any | null>(null);
+const barStates = useScrollbar();
 
-onMounted(async () => {
-  await nextTick();
-  await until(tableRef.value).toMatch((x) => x?.$el?.parentElement);
-  try {
-    const barStates = useScrollbar();
+watch(() => props.enable, async (enable) => {
+  console.log('[info] 开启虚拟滚动条', enable)
+  if (enable) {
+    await nextTick();
+    await until(tableRef.value).toMatch((x) => x?.$el?.parentElement);
+    try {
+      const $parentElem = tableRef.value.$el.parentElement;
+      const $header = $parentElem.querySelector(".vxe-table--header-wrapper");
+      const $bodyWrapper = $parentElem.querySelector(".vxe-table--body-wrapper");
+      const $bodyContent = $parentElem.querySelector(".vxe-table--body");
+      const $bodyXSpace = $parentElem.querySelector(".vxe-body--x-space");
+      const $bodyYSpace = $parentElem.querySelector(".vxe-body--y-space");
 
-    const $parentElem = tableRef.value.$el.parentElement;
-    const $header = $parentElem.querySelector(".vxe-table--header-wrapper");
-    const $bodyWrapper = $parentElem.querySelector(".vxe-table--body-wrapper");
-    const $bodyContent = $parentElem.querySelector(".vxe-table--body");
-    const $bodyXSpace = $parentElem.querySelector(".vxe-body--x-space");
-    const $bodyYSpace = $parentElem.querySelector(".vxe-body--y-space");
-
-    barStates.visibleOnHover(tableRef);
-    barStates.traceOffsetOn({ y: { top: $header } });
-    barStates.init({
-      mount: tableRef,
-      place: $bodyWrapper,
-      content: [$bodyContent, $bodyWrapper, $bodyXSpace, $bodyYSpace],
-      wrapper: [$bodyContent, $bodyWrapper],
-    });
-
-  } catch (err) {
-    console.error("[ERR] error when init virtual scrollbar", err, tableRef);
+      barStates.visibleOnHover(tableRef);
+      barStates.traceOffsetOn({ y: { top: $header } });
+      barStates.init({
+        mount: tableRef,
+        place: $bodyWrapper,
+        content: [$bodyContent, $bodyWrapper, $bodyXSpace, $bodyYSpace],
+        wrapper: [$bodyContent, $bodyWrapper],
+      });
+    } catch (err) {
+      console.error("[ERR] error when init virtual scrollbar", err, tableRef);
+    }
+  } else {
+    barStates.destroy()
   }
+}, {
+  immediate: true,
 })
 </script>
 
@@ -64,7 +78,7 @@ onMounted(async () => {
   width: 100%;
   height: 100% !important;
 }
-.vxe-table--body-wrapper::-webkit-scrollbar {
+.vxe-table.is-virtual-scrollbar .vxe-table--body-wrapper::-webkit-scrollbar {
   width: 0;
   height: 0;
 }
