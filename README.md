@@ -36,7 +36,7 @@ import { useSrollbar } from 'use-scrollbar'
 const elementRef = ref(null);
 
 onMounted(() => {
-  const barStates = useScrollbars();
+  const barStates = useScrollbar();
   const $parent = elementRef.value.$el.parentElement;
 
   barStates.visibleOnHover($parent);
