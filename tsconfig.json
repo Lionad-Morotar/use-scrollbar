@@ -29,7 +29,8 @@
     }
   },
   "includes": [
-    "env.d.ts"
+    "env.d.ts",
+    "node_modules/element-plus/global.d.ts"
   ],
   "exclude": ["node_modules", "dist", "docs", "example", "test"]
 }

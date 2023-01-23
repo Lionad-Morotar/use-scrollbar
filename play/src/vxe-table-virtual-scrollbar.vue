@@ -57,7 +57,7 @@ onMounted(async () => {
 }
 .vxe-table--render-wrapper,
 .vxe-table--main-wrapper,
-.vxe-table--body-wrapper,
+.vxe-table--main-wrapper .vxe-table--body-wrapper,
 .vxe-table--fixed-left-wrapper,
 .vxe-table--fixed-right-wrapper {
   box-sizing: border-box;

@@ -1,18 +1,25 @@
 <template>
   <div class="play-container" ref="playRef">
-    <h4>## VXETable Example {{ isHover ? ' - Hovered' : '' }}</h4>
+    <div class="header">
+      <h4>## VXETable Example {{ isHover ? ' - Hovered' : '' }}</h4>
+      <el-checkbox v-model="states.isVirtualScroll">表格虚拟滚动</el-checkbox>
+    </div>
     <vxe-table-virtual-scrollbar
       border
       stripe
-      :loading="demo1.loading"
+      :loading="states.loading"
+      :tree-config="{transform: true}"
       :column-config="{resizable: true}"
       :row-config="{isHover: true}"
-      :checkbox-config="{labelField: 'id', highlight: true, range: true}"
-      :data="demo1.tableData">
-      <vxe-column type="seq" :width="60" fixed="left"></vxe-column>
+      :checkbox-config="{labelField: 'id', highlight: true}"
+      :data="states.tableData"
+      :scroll-x="{ enabled: states.isVirtualScroll }"
+      :scroll-y="{ enabled: states.isVirtualScroll }"
+      >
+      <vxe-column type="seq" :width="180" fixed="left" tree-node></vxe-column>
       <vxe-column type="checkbox" title="ID" :width="140"></vxe-column>
       <vxe-column field="name" title="Name" sortable :width="140"></vxe-column>
-      <vxe-column field="sex" title="Sex" :filters="demo1.sexList" :filter-multiple="false" :formatter="formatterSex" :width="140">
+      <vxe-column field="sex" title="Sex" :filters="states.sexList" :filter-multiple="false" :formatter="formatterSex" :width="140">
       </vxe-column>
       <vxe-column
         field="age"
@@ -32,14 +39,15 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, reactive, onMounted } from "vue";
+import { ref, reactive, watch, onMounted } from "vue";
 import { useElementHover } from "@/hooks";
 import VxeTableVirtualScrollbar from "./vxe-table-virtual-scrollbar.vue";
 
 const playRef = ref();
 const isHover = useElementHover(playRef);
 
- const demo1 = reactive({
+ const states = reactive({
+  isVirtualScroll: false,
   loading: false,
   tableData: [] as any[],
   sexList: [
@@ -55,7 +63,7 @@ const isHover = useElementHover(playRef);
 })
 
 const formatterSex = ({ cellValue }: any) => {
-  const item = demo1.sexList.find(item => item.value === cellValue)
+  const item = states.sexList.find(item => item.value === cellValue)
   return item ? item.label : ''
 }
 
@@ -63,15 +71,27 @@ const filterAgeMethod = ({ value, row }: any) => {
   return row.age >= value
 }
 
-onMounted(() => {
-  demo1.loading = true
+const refresh = async () => {
+  states.loading = true
   setTimeout(() => {
-    demo1.tableData = Array(300).fill(0).map((x, idx) => {
-      return { id: 10000 + idx, name: 'Test-' + (idx + 1), role: 'Develop', sex: '0', age: 28, address: Array(10).fill('long address long long long address').join(', ') }
+    const itemCount = 500
+    let parentId = 0
+    states.tableData = Array(itemCount).fill(0).map((x, idx) => {
+      const res = { id: idx, parentId: null,  name: 'Test-' + (idx + 1), role: 'Develop', sex: '0', age: 28, address: Array(10).fill('long address long long long address').join(', ') }
+      if (Math.random() < 0.5) {
+        parentId = idx
+      }
+      if (Math.random() < 0.5) {
+        res.parentId = parentId
+      }
+      return res
     })
-    demo1.loading = false
+    states.loading = false
   }, 300)
-})
+}
+
+onMounted(refresh)
+watch(() => states.isVirtualScroll, refresh)
 </script>
 
 <style>
@@ -83,7 +103,11 @@ onMounted(() => {
   border: solid 2px #eee;
   overflow: hidden;
 }
-h4 {
+.header {
+  display: flex;
+  gap: 1em;
+}
+.header h4 {
   margin: 0;
   padding: 0;
   width: 100%;
