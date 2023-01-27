@@ -21,19 +21,28 @@ export default function useElementHover(
       cleanup.value.map((stop) => stop())
       if (value) {
         cleanup.value = [
-          useEventListener(() => unrefElement(value), 'mouseenter', () => {
-            isHovered.value = true
-            cb1?.()
-          }),
-          useEventListener(() => unrefElement(value), 'mouseleave', () => {
-            isHovered.value = false
-            cb2?.()
-          }),
+          useEventListener(
+            () => unrefElement(value),
+            'mouseenter',
+            () => {
+              isHovered.value = true
+              cb1?.()
+            },
+          ),
+          useEventListener(
+            () => unrefElement(value),
+            'mouseleave',
+            () => {
+              isHovered.value = false
+              cb2?.()
+            },
+          ),
         ]
       }
     },
     {
       immediate: true,
+      flush: 'post',
     },
   )
 

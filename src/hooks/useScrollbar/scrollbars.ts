@@ -7,7 +7,7 @@ export function createComponent(states: ScrollbarStates) {
     name: "CScrollbars",
     setup() {
       return () => {
-        return h("div", { style: "display: contents" }, [
+        return h("div",{ class: "c-scrollbar-container", style: "display: contents" }, [
           createVNode(
             Transition,
             {

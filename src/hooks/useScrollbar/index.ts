@@ -1,9 +1,9 @@
-import { ref, unref, watchEffect, computed, reactive, onUnmounted } from "vue-demi";
+import { ref, unref, watchEffect, computed, watch, reactive, onUnmounted } from 'vue-demi'
 import { useEventListener, useScroll, unrefElement } from '@vueuse/core'
 import { useElementHover } from '@/hooks'
 import { useElementSize } from '@/hooks'
 import { createComponent } from "./scrollbars";
-import { safeRatio, SCROLLBAR_GAP } from "./utils";
+import { notEmpty, safeRatio, safePrecicion, SCROLLBAR_GAP } from './utils'
 
 import type { Ref, CSSProperties } from "vue-demi";
 import type { MaybeComputedElementRef, MaybeComputedRef, MaybeElement } from '@vueuse/core'
@@ -11,21 +11,21 @@ import type { MaybeComputedElementRef, MaybeComputedRef, MaybeElement } from '@v
 import "./index.less";
 
 type MaybeElem = MaybeComputedRef<MaybeElement>;
+type MaybeElemOrNumber = MaybeComputedRef<MaybeElement | number>
 type Direction = "x" | "y";
 
 const HALF_GAP = SCROLLBAR_GAP / 2;
 
-const safeToFixed = (n = 0) => n.toFixed(2);
-
 /**
- * 用于创建滚动条所需要的状态，从而可以在界面上根据状态生成非原生滚动条，
- * 目前有 x 轴、y 轴两种方向的滚动条，依赖不同的状态。
  * 一个滚动系统通常包含以下部分：
- * 1. 容器，以下称为 place element，用于包含大量子项，并通过 overflow 在界面上控制滚动显示
- * 2. 子项，以下统称子项为 content，通常子项的元素尺寸是确定的或至少是可估算的
+ * 1. 容器，用于包含大量子项，并通过 overflow 在界面上控制滚动显示
+ * 2. 子项，通常子项的元素尺寸是确定的或至少是可估算的
  * 3. 滚动条，虚拟滚动条 virtual scrollbar，或容器的原生滚动条 native scrollbar
+ * @return states
+ *         states.init 用于确定滚动系统的容器和子项，并将自定义滚动条挂载到 HTML 节点中
  */
-export default function useScrollbar() {
+
+export default function useScrollbar(initOn?: MaybeComputedElementRef) {
   const config = {
     size: {
       base: 280,
@@ -33,7 +33,7 @@ export default function useScrollbar() {
       max: 500,
     },
   }
-  const $mountOn = ref<HTMLElement>()
+  const mountOnRefStyles: Ref<CSSProperties> = ref({})
   const instance = ref()
   // 空值滚动条显隐
   const inTrigger = ref({
@@ -54,12 +54,12 @@ export default function useScrollbar() {
     // 滚动条的偏移量
     offset: {
       x: {
-        left: SCROLLBAR_GAP / 2,
-        bottom: SCROLLBAR_GAP,
+        left: HALF_GAP,
+        bottom: HALF_GAP,
       },
       y: {
-        top: SCROLLBAR_GAP / 2,
-        right: SCROLLBAR_GAP,
+        top: HALF_GAP,
+        right: HALF_GAP,
       },
     },
     // 滚动条的尺寸
@@ -92,9 +92,12 @@ export default function useScrollbar() {
       y: {} as CSSProperties,
       x: {} as CSSProperties,
     },
+    /* 挂载滚动条的容器的尺寸 */
+    mountOnW: 0,
+    mountOnH: 0,
     /* 容器的尺寸 */
-    placeW: 0,
-    placeH: 0,
+    viewportW: 0,
+    viewportH: 0,
     /* 子项的总尺寸 */
     contentW: 0,
     contentH: 0,
@@ -107,7 +110,7 @@ export default function useScrollbar() {
     }) as (x: number, y: number) => void,
 
     visibleOnHover,
-    traceOffsetOn,
+    setOffset,
     init,
     onDragY,
     onDragX,
@@ -139,18 +142,41 @@ export default function useScrollbar() {
 
   // 使用元素 x 的宽度作为滚动条的 offset.left 或 offset.right，
   // 使用元素 y 的高度作为滚动条的 offset.top 或 offset.bottom
-  function traceOffsetOn(opts: {
-    x?: { left?: MaybeElem; bottom?: MaybeElem }
-    y?: { right?: MaybeElem; top?: MaybeElem }
+  // TODO padding of opts.mount
+  function setOffset(opts: {
+    x?: {
+      left?: MaybeElemOrNumber
+      bottom?: MaybeElemOrNumber
+      top?: MaybeElemOrNumber
+      right?: MaybeElemOrNumber
+    }
+    y?: {
+      top?: MaybeElemOrNumber
+      right?: MaybeElemOrNumber
+      left?: MaybeElemOrNumber
+      bottom?: MaybeElemOrNumber
+    }
   }) {
-    const $elms = [opts?.x?.left, opts?.x?.bottom, opts?.y?.right, opts?.y?.top].filter((x) => x)
+    const gap = HALF_GAP
+    const args = [
+      opts?.x?.left,
+      opts?.x?.right,
+      opts?.x?.top,
+      opts?.x?.bottom,
+      opts?.y?.left,
+      opts?.y?.right,
+      opts?.y?.top,
+      opts?.y?.bottom,
+    ]
+    // TODO number
+    const $elms = args.filter(notEmpty)
     $elms.map(($elm) => {
-      const { width, height } = useElementSize($elm)
+      const { width, height } = useElementSize($elm, undefined, { box: 'border-box' })
       watchEffectGathered(() => {
-        if (opts?.x?.left === $elm) states.offset.x.left = Math.ceil(width.value + HALF_GAP)
-        if (opts?.x?.bottom === $elm) states.offset.x.bottom = Math.ceil(height.value + HALF_GAP)
-        if (opts?.y?.right === $elm) states.offset.y.right = Math.ceil(width.value + HALF_GAP)
-        if (opts?.y?.top === $elm) states.offset.y.top = Math.ceil(height.value + HALF_GAP)
+        if (opts?.x?.left === $elm) states.offset.x.left = safePrecicion(width.value + gap)
+        if (opts?.x?.bottom === $elm) states.offset.x.bottom = safePrecicion(height.value + gap)
+        if (opts?.y?.right === $elm) states.offset.y.right = safePrecicion(width.value + gap)
+        if (opts?.y?.top === $elm) states.offset.y.top = safePrecicion(height.value + gap)
       })
     })
   }
@@ -158,37 +184,58 @@ export default function useScrollbar() {
   /**
    * 滚动条计算初始化
    * @param opts.mount 滚动条 DOM 挂载的容器
-   * @param opts.place 滚动容器，place element，通常是 opts.wrapper 中的一个
+   * @param opts.wrapper 滚动容器，用于计算内容区的 scrollTop 等属性，默认为 opts.content 的父容器
    * @param opts.content 滚动子项的非定高父容器
-   * @param opts.wrapper 滚动容器，用于计算内容区的 scrollTop 等属性，不传则默认是 opts.content 的父容器
+   * @param opts.viewport
    */
   function init(opts: {
     mount: MaybeElem
-    place: MaybeElem
     content: MaybeElem[]
     wrapper: MaybeElem[]
   }) {
-    const { width: placeW, height: placeH } = useElementSize(opts.place)
+
+    /* Vars Gurad */
+
+    opts.content = Array.isArray(opts.content) ? opts.content : [opts.content]
+    opts.wrapper = opts.wrapper || opts.content.map((x) => x.parentElement)
+    opts.wrapper = Array.isArray(opts.wrapper) ? opts.wrapper : [opts.wrapper]
+    opts.viewport = Array.isArray(opts.viewport)
+      ? opts.viewport
+      : opts.viewport
+      ? [opts.viewport]
+      : opts.wrapper
+    console.log('[debug] init opts', opts)
+
+    const { width: mountOnW, height: mountOnH } = useElementSize(opts.mount, undefined, { box: 'content-box' })
+    const viewportW = ref(0)
+    const viewportH = ref(0)
     const contentW = ref(0)
     const contentH = ref(0)
     const scrollTop = ref(0)
     const scrollLeft = ref(0)
 
-    /* Vars Gurad */
-
-    opts.place = opts.place || opts.mount
-    opts.content = Array.isArray(opts.content) ? opts.content : [opts.content]
-    opts.wrapper = opts.wrapper || opts.content.map((x) => x.parentElement)
-    opts.wrapper = Array.isArray(opts.wrapper) ? opts.wrapper : [opts.wrapper]
-    console.log('[debug] init opts', opts)
-
     /* 初始化数据 */
 
+    if (opts.viewport.length) {
+      const ws = [] as Ref<number>[]
+      const hs = [] as Ref<number>[]
+      opts.viewport.map(($elm) => {
+        const { width, height } = useElementSize($elm, undefined, { box: 'border-box' })
+        ws.push(width)
+        hs.push(height)
+      })
+      watchEffectGathered(() => {
+        viewportW.value = Math.max(...ws.map(unref))
+      })
+      watchEffectGathered(() => {
+        viewportH.value = Math.max(...hs.map(unref))
+      })
+    }
     if (opts.content.length) {
       const ws = [] as Ref<number>[]
       const hs = [] as Ref<number>[]
       opts.content.map(($elm) => {
-        const { width, height } = useElementSize($elm)
+        const { width, height } = useElementSize($elm, undefined, { box: 'border-box' })
         ws.push(width)
         hs.push(height)
       })
@@ -235,60 +282,64 @@ export default function useScrollbar() {
      * 1. 当内容不超过一屏时，不显示滚动条
      * 2. 当内容超出一屏，但超出量在一屏以内时，尺寸从 size.max 逼近 size.base
      * 3. 当内容超出更多，尺寸从 size.base 逼近 size.min
+     * @FIXME 当容器尺寸大于滚动条尺寸时
      */
-
     watchEffectGathered(() => {
+      const base = Math.min(config.size.base, states.mountOnH)
+      const max = Math.min(config.size.max, states.mountOnH)
       let height = config.size.base
-      const hiddenY = contentH.value <= placeH.value
+      const hiddenY = contentH.value <= viewportH.value
       states.isHidden.y = hiddenY
 
-      const overflow = Math.abs(Math.ceil(contentH.value - placeH.value))
-      const isOnePage = overflow < placeH.value
+      const overflow = Math.abs(contentH.value - viewportH.value)
+      const isOnePage = overflow < viewportH.value
       if (isOnePage) {
-        const unset = config.size.max - config.size.base
-        const offset = (1 - overflow / placeH.value) * unset
+        const unset = max - base
+        const offset = (1 - overflow / viewportH.value) * unset
         height += offset
       } else {
-        const overflowSQRT = Math.min(Math.sqrt(overflow), placeH.value) * 10
-        const ratio = 1 - overflowSQRT / placeH.value
+        const overflowSQRT = Math.min(Math.sqrt(overflow), viewportH.value) * 10
+        const ratio = 1 - overflowSQRT / viewportH.value
         height *= safeRatio(ratio)
       }
-      const safeHeight = Math.min(Math.max(height, config.size.min), config.size.max)
+      const safeHeight = Math.min(Math.max(height, config.size.min), max)
       states.size.y.height = safeHeight
     })
     watchEffectGathered(() => {
+      const base = Math.min(config.size.base, states.mountOnW)
+      const max = Math.min(config.size.max, states.mountOnW)
       let width = config.size.base
-      const hiddenX = contentW.value <= placeW.value
+      const hiddenX = contentW.value <= viewportW.value
       states.isHidden.x = hiddenX
 
-      const overflow = Math.abs(Math.ceil(contentW.value - placeW.value))
-      const isOnePage = overflow < placeW.value
+      const overflow = Math.abs(contentW.value - viewportW.value)
+      const isOnePage = overflow < viewportW.value
       if (isOnePage) {
-        const unset = config.size.max - config.size.base
-        const offset = (1 - overflow / placeW.value) * unset
+        const unset = max - base
+        const offset = (1 - overflow / viewportW.value) * unset
         width += offset
       } else {
-        const overflowSQRT = Math.min(Math.sqrt(overflow), placeW.value) * 10
-        const ratio = 1 - overflowSQRT / placeW.value
+        const overflowSQRT = Math.min(Math.sqrt(overflow), viewportW.value) * 10
+        const ratio = 1 - overflowSQRT / viewportW.value
         width *= safeRatio(ratio)
       }
-      const safeWidth = Math.min(Math.max(width, config.size.min), config.size.max)
+      const safeWidth = Math.min(Math.max(width, config.size.min), max)
       states.size.x.width = safeWidth
     })
 
     /* 滚动条轨道高度 */
 
     watchEffectGathered(() => {
-      states.size.y.path = placeH.value - states.size.y.height - SCROLLBAR_GAP * 2
-      states.size.x.path = placeW.value - states.size.x.width - SCROLLBAR_GAP * 2
-      // console.log("[debug] scrollbar path", placeH.value, states.size.y.height);
+      states.size.y.path = viewportH.value - states.size.y.height - SCROLLBAR_GAP * 2
+      states.size.x.path = viewportW.value - states.size.x.width - SCROLLBAR_GAP * 2
+      // console.log("[debug] scrollbar path", viewportH.value, states.size.y.height);
     })
 
     /* 滚动条距离顶部的比例 */
 
     const scrollbarToEdgeRatio = computed(() => ({
-      y: safeRatio(scrollTop.value / (contentH.value - placeH.value)),
-      x: safeRatio(scrollLeft.value / (contentW.value - placeW.value)),
+      y: safeRatio(scrollTop.value / (contentH.value - viewportH.value)),
+      x: safeRatio(scrollLeft.value / (contentW.value - viewportW.value)),
     }))
 
     /* 计算滚动条距边缘的距离 */
@@ -304,12 +355,21 @@ export default function useScrollbar() {
       states.position.x.left = safeLeft
     })
 
-    opts.mount && mount(opts.mount)
+    watchEffectGathered(() => {
+      mount(opts.mount)
+      visibleOnHover(opts.mount)
+
+      const $elem = unrefElement(opts.mount)
+      const styles = getComputedStyle($elem)
+      mountOnRefStyles.value = styles
+    })
 
     /* 将部分值代理为状态 */
 
-    watchEffectGathered(() => (states.placeH = placeH.value))
-    watchEffectGathered(() => (states.placeW = placeW.value))
+    watchEffectGathered(() => (states.mountOnW = mountOnW.value))
+    watchEffectGathered(() => (states.mountOnH = mountOnH.value))
+    watchEffectGathered(() => (states.viewportH = viewportH.value))
+    watchEffectGathered(() => (states.viewportW = viewportW.value))
     watchEffectGathered(() => (states.contentH = contentH.value))
     watchEffectGathered(() => (states.contentW = contentW.value))
     watchEffectGathered(() => (states.scrollTop = scrollTop.value))
@@ -320,19 +380,19 @@ export default function useScrollbar() {
 
   watchEffect(() => {
     const style: CSSProperties = {}
-    style.top = safeToFixed(states.offset.y.top) + 'px'
-    style.right = safeToFixed(states.offset.y.right) + 'px'
-    style.height = safeToFixed(states.size.y.height) + 'px'
-    style.transform = `translateY(${safeToFixed(states.position.y.top) + 'px'})`
+    style.top = safePrecicion(states.offset.y.top) + 'px'
+    style.right = safePrecicion(states.offset.y.right) + 'px'
+    style.height = safePrecicion(states.size.y.height) + 'px'
+    style.transform = `translateY(${safePrecicion(states.position.y.top) + 'px'})`
     if (states.isDragging.x) style.opacity = '0.25'
     states.styles.y = style
   })
   watchEffect(() => {
     const style: CSSProperties = {}
-    style.left = safeToFixed(states.offset.x.left) + 'px'
-    style.bottom = safeToFixed(states.offset.x.bottom) + 'px'
-    style.width = safeToFixed(states.size.x.width) + 'px'
-    style.transform = `translateX(${safeToFixed(states.position.x.left) + 'px'})`
+    style.left = safePrecicion(states.offset.x.left) + 'px'
+    style.bottom = safePrecicion(states.offset.x.bottom) + 'px'
+    style.width = safePrecicion(states.size.x.width) + 'px'
+    style.transform = `translateX(${safePrecicion(states.position.x.left) + 'px'})`
     if (states.isDragging.y) style.opacity = '0.25'
     states.styles.x = style
   })
@@ -355,17 +415,17 @@ export default function useScrollbar() {
       const offset = mouseOffsetYCurrent.value - mouseOffsetYStart.value
       const top = Math.min(states.size.y.path, Math.max(lastPosition.value.top + offset, 0))
       const ratio = safeRatio(top / states.size.y.path)
-      const targetScroll = (states.contentH - states.placeH) * ratio
+      const targetScroll = (states.contentH - states.viewportH) * ratio
       states.scrollTo(states.scrollLeft, targetScroll)
     }
     if (direction.value === 'x') {
-      // console.log("[debug] on drag x", states.placeW, states.size.x.width);
+      // console.log("[debug] on drag x", states.viewportW, states.size.x.width);
       mouseOffsetXCurrent.value = e.clientX
       const offset = mouseOffsetXCurrent.value - mouseOffsetXStart.value
       const left = Math.min(states.size.x.path, Math.max(lastPosition.value.left + offset, 0))
       const ratio = safeRatio(left / states.size.x.path)
-      // console.log("ratio", ratio, states.contentW, states.placeW);
-      const targetScroll = (states.contentW - states.placeW) * ratio
+      // console.log("ratio", ratio, states.contentW, states.viewportW);
+      const targetScroll = (states.contentW - states.viewportW) * ratio
       states.scrollTo(targetScroll, states.scrollTop)
     }
   }
@@ -424,10 +484,37 @@ export default function useScrollbar() {
   function mount($elem: MaybeElem) {
     instance.value = createComponent(states)
     const $el = unrefElement($elem as HTMLElement)
-    $mountOn.value = $el
     $el.appendChild(instance.value.$el)
   }
   // onUnMounted(unmount)
+
+  if (initOn) {
+    const initOnRef = ref(initOn)
+    watch(
+      initOnRef,
+      (x) => {
+        const $elm = unrefElement(x)
+        if ($elm) {
+          try {
+            const $content = $elm.querySelector('*:first-child')
+            visibleOnHover($elm)
+            init({
+              mount: $elm,
+              place: $elm,
+              content: [$content],
+              wrapper: [$elm],
+            })
+          } catch (err) {
+            console.error('[ERR] error in init virtual scrollbar', x, err)
+          }
+        }
+      },
+      {
+        immediate: true,
+        flush: 'post',
+      },
+    )
+  }
 
   /* ----------------------------------------------------------- */
 

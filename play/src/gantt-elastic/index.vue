@@ -25,20 +25,18 @@ onMounted(async () => {
 
     const $parentElem = ganttRef.value.$el.parentElement;
     const $chart = $parentElem.querySelector(".gantt-elastic__chart");
-    const $place = $parentElem.querySelector(".gantt-elastic__chart-graph-container");
+    const $viewport = $parentElem.querySelector(".gantt-elastic__chart-graph-container");
     const $svg = $parentElem.querySelector(".gantt-elastic__chart-graph-svg");
     const $barX = $parentElem.querySelector(".gantt-elastic__chart-scroll-container--horizontal");
     const $barY = $parentElem.querySelector(".gantt-elastic__chart-scroll-container--vertical");
 
-    barStates.visibleOnHover($parentElem);
-    barStates.traceOffsetOn({
+    barStates.setOffset({
       y: { top: $parentElem.querySelector(".gantt-elastic__chart-calendar-container") }
     });
     barStates.init({
       mount: $chart,
-      place: $place,
       content: [$svg],
-      wrapper: [$barX, $barY],
+      wrapper: [$viewport, $barX, $barY],
     });
 
   } catch (err) {

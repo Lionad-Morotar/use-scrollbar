@@ -5,4 +5,14 @@ export const safeRatio = (n: number) => {
   return isNaN(nv) ? 0 : nv;
 };
 
-export const safePrecicion = (n = 0) => n.toFixed(2);
+export const safe = (n: number) => {
+  return isNaN(n) ? 0 : n < 0 ? 0 : n
+}
+
+export const notEmpty = (n: any) => {
+  const isUndefined = typeof n === 'undefined'
+  const isNull = typeof n === 'object' && !n
+  return !(isUndefined || isNull)
+}
+
+export const safePrecicion = (n = 0) => safe(n).toFixed(3)

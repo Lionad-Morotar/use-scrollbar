@@ -39,13 +39,10 @@ watch(() => props.enable, async (enable) => {
       const $bodyXSpace = $parentElem.querySelector(".vxe-body--x-space");
       const $bodyYSpace = $parentElem.querySelector(".vxe-body--y-space");
 
-      barStates.visibleOnHover(tableRef);
-      barStates.traceOffsetOn({ y: { top: $header } });
+      barStates.setOffset({ y: { top: $header } });
       barStates.init({
         mount: tableRef,
-        place: $bodyWrapper,
-        content: [$bodyContent, $bodyWrapper, $bodyXSpace, $bodyYSpace],
-        wrapper: [$bodyContent, $bodyWrapper],
+        content: [$bodyWrapper, $bodyContent, $bodyXSpace, $bodyYSpace],
       });
     } catch (err) {
       console.error("[ERR] error when init virtual scrollbar", err, tableRef);
