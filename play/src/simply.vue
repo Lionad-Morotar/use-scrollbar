@@ -202,7 +202,8 @@ watch(elemRef, async ($elm) => {
 }
 .complex-component-example .content {
   margin: 0;
-  padding: 8px;
+  padding: 12px;
+  width: max-content;
 }
 .complex-component-example.cutom-scrollbar .content-wrapper::-webkit-scrollbar {
   width: 0;
