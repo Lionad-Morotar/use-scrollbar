@@ -3,7 +3,8 @@ import { useEventListener, useScroll, unrefElement } from '@vueuse/core'
 import { useElementHover } from '@/hooks'
 import { useElementSize } from '@/hooks'
 import { createComponent } from "./scrollbars";
-import { notEmpty, safeRatio, safePrecicion, SCROLLBAR_GAP } from './utils'
+import { notEmpty, safeRatio, safePrecicion, SCROLLBAR_GAP, findScrollElement } from './utils'
+import defaultOpts from './states'
 
 import type { Ref, CSSProperties } from "vue-demi";
 import type { MaybeComputedElementRef, MaybeComputedRef, MaybeElement } from '@vueuse/core'
@@ -22,11 +23,16 @@ const HALF_GAP = SCROLLBAR_GAP / 2;
  * 1. 容器，用于包含大量子项，并通过 overflow 在界面上控制滚动显示
  * 2. 子项，通常子项的元素尺寸是确定的或至少是可估算的
  * 3. 滚动条，虚拟滚动条 virtual scrollbar，或容器的原生滚动条 native scrollbar
- * @return states
- *         states.init 用于确定滚动系统的容器和子项，并将自定义滚动条挂载到 HTML 节点中
+ * 确定好滚动系统的容器和子项，再把自定义滚动条挂载到 HTML 节点中，
+ * 再把滚动条的尺寸和位置计算出来，
+ * 最后把滚动条的拖动事件绑定到滚动条上，
+ * 就可以实现一个简单但完整的滚动系统
  */
-
-export default function useScrollbar(initOn?: MaybeComputedElementRef) {
+export default function useScrollbar(
+  initOn?: MaybeComputedElementRef,
+  // TODO DeepPartial<typeof defaultOpts>
+  passOpts: Partial<typeof defaultOpts> = {},
+) {
   const config = {
     size: {
       base: 280,
@@ -41,83 +47,21 @@ export default function useScrollbar(initOn?: MaybeComputedElementRef) {
     x: false,
     y: false,
   })
-  const states = reactive({
-    // 是否隐藏滚动条（优先级应当高于 visible）
-    isHidden: {
-      x: false,
-      y: false,
-    },
-    // 空值滚动条显隐
-    visible: {
-      x: false,
-      y: false,
-    },
-    // 滚动条的偏移量
-    offset: {
-      x: {
-        left: HALF_GAP,
-        bottom: HALF_GAP,
+  const states = reactive(
+    Object.assign(
+      {
+        visibleOnHover,
+        setOffset,
+        init,
+        onDragY,
+        onDragX,
+        mount,
+        destroy,
       },
-      y: {
-        top: HALF_GAP,
-        right: HALF_GAP,
-      },
-    },
-    // 滚动条的尺寸
-    size: {
-      x: {
-        width: 0,
-        path: 0,
-      },
-      y: {
-        height: 0,
-        path: 0,
-      },
-    },
-    // 滚动条距边缘（place element）的距离
-    position: {
-      x: {
-        left: 0,
-      },
-      y: {
-        top: 0,
-      },
-    },
-    // 滚动条的拖动状态
-    isDragging: {
-      x: false,
-      y: false,
-    },
-    // 滚动条样式
-    styles: {
-      y: {} as CSSProperties,
-      x: {} as CSSProperties,
-    },
-    /* 挂载滚动条的容器的尺寸 */
-    mountOnW: 0,
-    mountOnH: 0,
-    /* 容器的尺寸 */
-    viewportW: 0,
-    viewportH: 0,
-    /* 子项的总尺寸 */
-    contentW: 0,
-    contentH: 0,
-    /* 容器的滚动属性 */
-    scrollTop: 0,
-    scrollLeft: 0,
-    /* 将容器滚动到某处 */
-    scrollTo: (() => {
-      throw new Error('uninitial')
-    }) as (x: number, y: number) => void,
-
-    visibleOnHover,
-    setOffset,
-    init,
-    onDragY,
-    onDragX,
-    mount,
-    destroy,
-  })
+      defaultOpts,
+      passOpts,
+    ),
+  )
 
   const stops = [] as (() => void)[]
   function destroy() {
@@ -269,7 +213,9 @@ export default function useScrollbar(initOn?: MaybeComputedElementRef) {
       })
       watchEffectGathered(() => {
         states.scrollTo = (x: number, y: number) => {
-          (opts.wrapper as MaybeElem[]).map(($elm) => (unref($elm) as HTMLElement)?.scrollTo?.(x, y))
+          (opts.wrapper as MaybeElem[]).map(($elm) =>
+            (unref($elm) as HTMLElement)?.scrollTo?.(x, y),
+          )
         }
       })
     }
@@ -505,12 +451,13 @@ export default function useScrollbar(initOn?: MaybeComputedElementRef) {
         const $elm = unrefElement(x) as HTMLElement
         if ($elm) {
           try {
-            const $content = $elm.querySelector('*:first-child') as HTMLElement
+            const $wrapper = findScrollElement($elm) as HTMLElement
+            const $content = Array.from($wrapper.children) as HTMLElement[]
             visibleOnHover($elm)
             init({
               mount: $elm,
-              content: [$content!],
-              wrapper: [$elm],
+              wrapper: [$wrapper!],
+              content: $content,
             })
           } catch (err) {
             console.error('[ERR] error in init virtual scrollbar', x, err)
