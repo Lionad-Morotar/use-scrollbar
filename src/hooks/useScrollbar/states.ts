@@ -1,8 +1,11 @@
 import { SCROLLBAR_GAP } from './utils'
 
+import type { Theme } from './type'
+
 const HALF_GAP = SCROLLBAR_GAP / 2
 
 const states = {
+  theme: 'normal' as Theme,
   // 是否隐藏滚动条（优先级应当高于 visible）
   isHidden: {
     x: false,

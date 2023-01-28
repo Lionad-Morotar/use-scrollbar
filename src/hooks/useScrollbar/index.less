@@ -1,43 +1,130 @@
-.c-scrollbar {
-  position: absolute;
-  border-radius: 9999px;
-  border: solid 2px transparent;
-  background-color: #909399;
-  background-clip: content-box;
-  opacity: 0.5;
-  cursor: pointer;
-  will-change: auto;
-  transition: opacity 0.1s;
-  z-index: 9;
+@padding-border: 2px;
+@thick: 7px + @padding-border + @padding-border;
+@min-width: 30px;
 
-  &:hover {
-    opacity: 0.78;
-  }
-  &:active {
-    opacity: 0.88;
+.c-scrollbar-container {
+  display: contents;
+
+  /***************** tracks */
+
+  .c-scrollbar-track {
+    display: block;
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
   }
 
-  &.is-y {
-    width: 7px;
-    min-height: 30px;
-  }
-  &.is-x {
-    height: 7px;
-    min-width: 30px;
-  }
-}
+  /***************** thumbs */
 
-.scrollbar-fade-enter-active {
-  transition: opacity 0.25s ease-in;
-}
-.scrollbar-fade-leave-active {
-  transition: opacity 0.25s ease-out;
-}
-.scrollbar-fade-enter-from,
-.scrollbar-fade-leave-to {
-  opacity: 0;
-}
-.scrollbar-fade-enter-to,
-.scrollbar-fade-leave-from {
-  opacity: 0.5;
+  .c-scrollbar {
+    // hide scrollbar x when scrolling y
+    --prefer-opacity: 0.5;
+
+    position: absolute;
+    border-radius: 9999px;
+    // for better mouse dragging
+    border: solid @padding-border transparent;
+    background-color: #909399;
+    background-clip: content-box;
+    cursor: pointer;
+    will-change: auto;
+    z-index: 9;
+    pointer-events: all;
+
+    /* opcity animation */
+
+    opacity: var(--prefer-opacity, 0.5);
+    transition: opacity 0.1s;
+    &:hover {
+      opacity: 0.78;
+    }
+    &:active {
+      opacity: 0.88;
+    }
+    &.scrollbar-fade-enter-active {
+      transition: opacity 0.2s ease-in;
+    }
+    &.scrollbar-fade-leave-active {
+      transition: opacity 0.2s ease-out;
+    }
+    &.scrollbar-fade-enter-from,
+    &.scrollbar-fade-leave-to {
+      opacity: 0;
+    }
+    &.scrollbar-fade-enter-to,
+    &.scrollbar-fade-leave-from {
+      opacity: 0.5;
+    }
+
+    /* size */
+
+    &.is-y {
+      width: @thick - 2 * @padding-border;
+      min-height: @min-width;
+    }
+    &.is-x {
+      height: @thick - 2 * @padding-border;
+      min-width: @min-width;
+    }
+  }
+
+  /***************** themes */
+
+  &:not(.is-normal) .c-scrollbar-track .c-scrollbar {
+    opacity: 1;
+
+    &:hover {
+      opacity: 1;
+    }
+    &:active {
+      opacity: 1;
+    }
+  }
+  &.is-steam .c-scrollbar {
+    background: #606774;
+    &:hover {
+      background: #7b8392;
+    }
+    &:active {
+      background: #7b8392;
+      outline: solid 2px #7b8392;
+      border-color: #7b8392;
+    }
+    &.is-y {
+      width: 6px - 2 * @padding-border;
+    }
+    &.is-x {
+      height: 6px - 2 * @padding-border;
+    }
+  }
+  &.is-css-tricks .c-scrollbar-track {
+    background: linear-gradient(90deg,#434343,#434343 1px,#111 0,#111);
+    &.is-y {
+      inset: unset;
+      right: 0;
+      top: 0;
+      width: 19.5px;
+    }
+    &.is-x {
+      inset: unset;
+      left: 0;
+      bottom: 0;
+      height: 19.5px;
+    }
+  }
+  &.is-css-tricks .c-scrollbar {
+    display: block !important;
+    border: none;
+    border-radius: 16px;
+    background: #434343;
+    box-shadow: inset 2px 2px 2px rgba(255,255,255,0.25), inset -2px -2px 2px rgba(0,0,0, 0.25);
+    &.is-y {
+      width: 22 - 2 * @padding-border;
+    }
+    &.is-x {
+      height: 22 - 2 * @padding-border;
+    }
+  }
 }

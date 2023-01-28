@@ -11,6 +11,8 @@ import type { MaybeComputedElementRef, MaybeComputedRef, MaybeElement } from '@v
 
 import "./index.less";
 
+export * from './type';
+
 type MaybeElem = MaybeComputedRef<MaybeElement>;
 // TODO type MaybeElemOrNumber = MaybeComputedRef<MaybeElement | number>
 type MaybeElemOrNumber = MaybeComputedRef<MaybeElement>
@@ -138,6 +140,7 @@ export default function useScrollbar(
     content: MaybeElem | MaybeElem[] | null
     wrapper?: MaybeElem | MaybeElem[]
     viewport?: MaybeElem | MaybeElem[]
+    // TODO contents?: MaybeElem | MaybeElem[] | null
   }) {
     /* Vars Gurad */
 
@@ -339,7 +342,7 @@ export default function useScrollbar(
     style.right = safePrecicion(states.offset.y.right) + 'px'
     style.height = safePrecicion(states.size.y.height) + 'px'
     style.transform = `translateY(${safePrecicion(states.position.y.top) + 'px'})`
-    if (states.isDragging.x) style.opacity = '0.25'
+    if (states.isDragging.x) style[`--prefer-opacity`] = '0.25'
     states.styles.y = style
   })
   watchEffect(() => {
@@ -348,7 +351,7 @@ export default function useScrollbar(
     style.bottom = safePrecicion(states.offset.x.bottom) + 'px'
     style.width = safePrecicion(states.size.x.width) + 'px'
     style.transform = `translateX(${safePrecicion(states.position.x.left) + 'px'})`
-    if (states.isDragging.y) style.opacity = '0.25'
+    if (states.isDragging.y) style[`--prefer-opacity`] = '0.25'
     states.styles.x = style
   })
 
@@ -443,6 +446,8 @@ export default function useScrollbar(
   }
   // onUnMounted(unmount)
 
+  /* ----------------------------------------------------------- */
+
   if (initOn) {
     const initOnRef = ref(initOn)
     watch(
@@ -470,8 +475,6 @@ export default function useScrollbar(
       },
     )
   }
-
-  /* ----------------------------------------------------------- */
 
   return states
 }

@@ -7,44 +7,68 @@ export function createComponent(states: ScrollbarStates) {
     name: "CScrollbars",
     setup() {
       return () => {
-        return h("div",{ class: "c-scrollbar-container", style: "display: contents" }, [
+        return h('div', { class: `c-scrollbar-container is-${states.theme}` }, [
           createVNode(
-            Transition,
+            'div',
             {
-              name: "scrollbar-fade",
+              class: 'c-scrollbar-track is-y',
             },
-            {
-              default: withCtx(() => [
-                withDirectives(
-                  createVNode(
-                    "div",
-                    { class: "c-scrollbar is-y", style: states.styles.y, onMousedown: states.onDragY },
-                    []
-                  ),
-                  [[vShow, states.visible.y]]
-                ),
-              ]),
-            }
+            [
+              createVNode(
+                Transition,
+                {
+                  name: 'scrollbar-fade',
+                },
+                {
+                  default: withCtx(() => [
+                    withDirectives(
+                      createVNode(
+                        'div',
+                        {
+                          class: 'c-scrollbar is-y',
+                          style: states.styles.y,
+                          onMousedown: states.onDragY,
+                        },
+                        [],
+                      ),
+                      [[vShow, states.visible.y]],
+                    ),
+                  ]),
+                },
+              ),
+            ],
           ),
           createVNode(
-            Transition,
+            'div',
             {
-              name: "scrollbar-fade",
+              class: 'c-scrollbar-track is-x',
             },
-            {
-              default: withCtx(() => [
-                withDirectives(
-                  createVNode(
-                    "div",
-                    { class: "c-scrollbar is-x", style: states.styles.x, onMousedown: states.onDragX },
-                    []
-                  ),
-                  [[vShow, states.visible.x]]
-                ),
-              ]),
-            }
+            [
+              createVNode(
+                Transition,
+                {
+                  name: 'scrollbar-fade',
+                },
+                {
+                  default: withCtx(() => [
+                    withDirectives(
+                      createVNode(
+                        'div',
+                        {
+                          class: 'c-scrollbar is-x',
+                          style: states.styles.x,
+                          onMousedown: states.onDragX,
+                        },
+                        [],
+                      ),
+                      [[vShow, states.visible.x]],
+                    ),
+                  ]),
+                },
+              ),
+            ],
           ),
-        ]);
+        ])
       };
     },
   };

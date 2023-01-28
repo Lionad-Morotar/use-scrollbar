@@ -3,14 +3,15 @@
     <div class="header">
       <h4>## Principle（Simply Usage）</h4>
       <el-radio-group class="type-radio-group" v-model="states.type">
-        <el-radio :label="1">Normal</el-radio>
-        <el-radio :label="2">Steam</el-radio>
+        <el-radio label="normal">Normal</el-radio>
+        <el-radio label="steam">Steam</el-radio>
+        <el-radio label="css-tricks">CSS Tricks</el-radio>
       </el-radio-group>
     </div>
     <div class="compare-container">
 
       <!-- native-scrollbar -->
-      <div class="complex-component-example">
+      <div class="complex-component-example" :class="kls">
         <div class="content-wrapper">
           <pre class="content">
 // native-scrollbar
@@ -81,7 +82,7 @@ function world() {
       </div>
 
       <!-- custom-scrollbar -->
-      <div class="complex-component-example cutom-scrollbar" ref="elemRef">
+      <div class="complex-component-example cutom-scrollbar" :class="kls" ref="elemRef">
         <div class="content-wrapper">
           <pre class="content">
 // use-scrollbar
@@ -155,26 +156,48 @@ function world() {
 </template>
 
 <script lang="ts" setup>
-import { ref, reactive } from "vue";
+import { ref, computed, reactive, watchEffect } from "vue";
 import { useScrollbar } from "@/hooks";
 
+import type { Theme } from "@/hooks";
+
+const querys = new URLSearchParams(window.location.search);
 const states = reactive({
-  type: 1
+  type: (querys.get('type') || 'normal') as Theme
 });
+const kls = computed(() => ({
+  [`is-${states.type}`]: true,
+}))
 
 const elemRef = ref<HTMLElement>();
-const barStates = useScrollbar(elemRef, {
-  offset: {
-    x: {
-      left: 8 + 2,
-      bottom: 8 + 2,
-    },
-    y: {
-      top: 8 + 2,
-      right: 8 + 4,
-    },
+const barStates = useScrollbar(elemRef);
+
+watchEffect(() => {
+  barStates.theme = states.type
+})
+
+watchEffect(() => {
+  const offset = {
+      x: {
+        left: 8 + 2,
+        bottom: 8 + 2.5,
+      },
+      y: {
+        top: 8 + 2,
+        right: 8 + 2.5,
+      },
+    }
+  if (states.type === 'css-tricks') {
+    offset.x.left = 0
+    offset.x.left = 0
+    offset.y.top = 0
+    offset.y.right = 0
   }
-});
+  if (states.type === 'steam') {
+    offset.y.right = 8 + 2
+  }
+  barStates.offset = offset
+})
 
 console.log('[debug] barStates', barStates);
 </script>
@@ -219,5 +242,23 @@ console.log('[debug] barStates', barStates);
 .complex-component-example.cutom-scrollbar .content-wrapper::-webkit-scrollbar {
   width: 0;
   height: 0;
+}
+/* theme steam */
+.complex-component-example.is-steam .content-wrapper {
+  background: linear-gradient(45deg, #1c1f22, #2c313c);
+  color: #ccc;
+}
+.complex-component-example.is-steam .content-wrapper .content {
+  background: unset;
+}
+/* theme css-tricks */
+.complex-component-example.is-css-tricks {
+  border: none;
+  background: linear-gradient(13deg, #262626, #545454);
+  color: #ccc;
+}
+.complex-component-example.is-css-tricks .content-wrapper,
+.complex-component-example.is-css-tricks .content-wrapper .content {
+  background: unset;
 }
 </style>

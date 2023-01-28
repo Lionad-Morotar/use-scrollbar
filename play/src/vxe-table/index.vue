@@ -10,7 +10,7 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, useSlots, nextTick, ref, watch } from "vue";
+import { useSlots, nextTick, ref, watch } from "vue";
 import { until } from "@vueuse/core";
 import { useScrollbar } from "@/hooks";
 

@@ -1,7 +1,7 @@
 <template>
   <div class="play-container" ref="playRef">
     <div class="header">
-      <h4>## GanttElastic with Virtual Scrollbars {{ isHover ? ' - Hovered' : '' }}</h4>
+      <h4>## GanttElastic with Virtual Scrollbars</h4>
       <h5><a href="https://neuronet.io/gantt-elastic/#/">原版链接</a></h5>
     </div>
     <gantt-elastic v-if="states.tasks?.length" :tasks="states.tasks" :options="options">
@@ -30,7 +30,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, reactive, watch, onMounted } from "vue";
+import { ref, reactive, onMounted } from "vue";
 import dayjs from 'dayjs';
 import GanttElastic from "./gantt-elastic/index.vue";
 import { isEmptyOrFallback } from "./gantt-elastic/utils";

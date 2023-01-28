@@ -6,14 +6,15 @@
     </p>
     <h2>## examples</h2>
     <ol>
-      <li><a href="./compare-styles#type=1">Simply Usage</a></li>
+      <li><a href="./compare-styles?type=normal">Simply Usage</a></li>
       <li><a href="./vxe-table">VXETable + 虚拟滚动条</a></li>
       <li><a href="./gantt">GanttElastic + 虚拟滚动条</a></li>
     </ol>
     <h2>## styles</h2>
     <ol>
-      <li><a href="./compare-styles#type=1">Normal Style</a></li>
-      <li><a href="./compare-styles#type=2">Steam App Style</a></li>
+      <li><a href="./compare-styles?type=normal">Normal Style</a></li>
+      <li><a href="./compare-styles?type=steam">Steam App Style</a></li>
+      <li><a href="./compare-styles?type=css-tricks">CSS Tricks</a></li>
     </ol>
   </div>
 </template>
