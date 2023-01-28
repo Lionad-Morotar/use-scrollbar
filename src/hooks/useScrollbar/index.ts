@@ -11,7 +11,8 @@ import type { MaybeComputedElementRef, MaybeComputedRef, MaybeElement } from '@v
 import "./index.less";
 
 type MaybeElem = MaybeComputedRef<MaybeElement>;
-type MaybeElemOrNumber = MaybeComputedRef<MaybeElement | number>
+// TODO type MaybeElemOrNumber = MaybeComputedRef<MaybeElement | number>
+type MaybeElemOrNumber = MaybeComputedRef<MaybeElement>
 type Direction = "x" | "y";
 
 const HALF_GAP = SCROLLBAR_GAP / 2;
@@ -33,7 +34,7 @@ export default function useScrollbar(initOn?: MaybeComputedElementRef) {
       max: 500,
     },
   }
-  const mountOnRefStyles: Ref<CSSProperties> = ref({})
+  const mountOnRefStyles: Ref<CSSStyleDeclaration> = ref({} as CSSStyleDeclaration)
   const instance = ref()
   // 空值滚动条显隐
   const inTrigger = ref({
@@ -125,8 +126,8 @@ export default function useScrollbar(initOn?: MaybeComputedElementRef) {
     instance.value?.destroy?.()
     // init() TODO
   }
-  const watchEffectGathered = (...args: Parameter<typeof watchEffect>) => {
-    const stop = watchEffect(args)
+  const watchEffectGathered = (...args: Parameters<typeof watchEffect>) => {
+    const stop = watchEffect(...args)
     stops.push(stop)
     return stop
   }
@@ -190,23 +191,29 @@ export default function useScrollbar(initOn?: MaybeComputedElementRef) {
    */
   function init(opts: {
     mount: MaybeElem
-    content: MaybeElem[]
-    wrapper: MaybeElem[]
+    content: MaybeElem | MaybeElem[] | null
+    wrapper?: MaybeElem | MaybeElem[]
+    viewport?: MaybeElem | MaybeElem[]
   }) {
-
     /* Vars Gurad */
 
+    opts.mount = opts.mount!
     opts.content = Array.isArray(opts.content) ? opts.content : [opts.content]
-    opts.wrapper = opts.wrapper || opts.content.map((x) => x.parentElement)
+    opts.content = opts.content.filter(notEmpty) as MaybeElem[]
+    opts.wrapper = opts.wrapper || opts.content.map((x) => unrefElement(x)!.parentElement)
     opts.wrapper = Array.isArray(opts.wrapper) ? opts.wrapper : [opts.wrapper]
+    opts.wrapper = opts.wrapper.filter(notEmpty) as MaybeElem[]
     opts.viewport = Array.isArray(opts.viewport)
       ? opts.viewport
       : opts.viewport
       ? [opts.viewport]
       : opts.wrapper
-    console.log('[debug] init opts', opts)
+    opts.viewport = opts.viewport.filter(notEmpty) as MaybeElem[]
+    // console.log('[debug] init opts', opts)
 
-    const { width: mountOnW, height: mountOnH } = useElementSize(opts.mount, undefined, { box: 'content-box' })
+    const { width: mountOnW, height: mountOnH } = useElementSize(opts.mount, undefined, {
+      box: 'content-box',
+    })
     const viewportW = ref(0)
     const viewportH = ref(0)
     const contentW = ref(0)
@@ -262,7 +269,7 @@ export default function useScrollbar(initOn?: MaybeComputedElementRef) {
       })
       watchEffectGathered(() => {
         states.scrollTo = (x: number, y: number) => {
-          opts.wrapper.map(($elm) => (unref($elm) as HTMLElement)?.scrollTo?.(x, y))
+          (opts.wrapper as MaybeElem[]).map(($elm) => (unref($elm) as HTMLElement)?.scrollTo?.(x, y))
         }
       })
     }
@@ -292,8 +299,8 @@ export default function useScrollbar(initOn?: MaybeComputedElementRef) {
       states.isHidden.y = hiddenY
 
       const overflow = Math.abs(contentH.value - viewportH.value)
-      const isOnePage = overflow < viewportH.value
-      if (isOnePage) {
+      const isOnePageY = overflow < viewportH.value
+      if (isOnePageY) {
         const unset = max - base
         const offset = (1 - overflow / viewportH.value) * unset
         height += offset
@@ -313,8 +320,8 @@ export default function useScrollbar(initOn?: MaybeComputedElementRef) {
       states.isHidden.x = hiddenX
 
       const overflow = Math.abs(contentW.value - viewportW.value)
-      const isOnePage = overflow < viewportW.value
-      if (isOnePage) {
+      const isOnePageX = overflow < viewportW.value
+      if (isOnePageX) {
         const unset = max - base
         const offset = (1 - overflow / viewportW.value) * unset
         width += offset
@@ -360,8 +367,10 @@ export default function useScrollbar(initOn?: MaybeComputedElementRef) {
       visibleOnHover(opts.mount)
 
       const $elem = unrefElement(opts.mount)
-      const styles = getComputedStyle($elem)
-      mountOnRefStyles.value = styles
+      if ($elem) {
+        const styles = getComputedStyle($elem)
+        mountOnRefStyles.value = styles
+      }
     })
 
     /* 将部分值代理为状态 */
@@ -484,7 +493,7 @@ export default function useScrollbar(initOn?: MaybeComputedElementRef) {
   function mount($elem: MaybeElem) {
     instance.value = createComponent(states)
     const $el = unrefElement($elem as HTMLElement)
-    $el.appendChild(instance.value.$el)
+    $el && $el.appendChild(instance.value.$el)
   }
   // onUnMounted(unmount)
 
@@ -493,15 +502,14 @@ export default function useScrollbar(initOn?: MaybeComputedElementRef) {
     watch(
       initOnRef,
       (x) => {
-        const $elm = unrefElement(x)
+        const $elm = unrefElement(x) as HTMLElement
         if ($elm) {
           try {
-            const $content = $elm.querySelector('*:first-child')
+            const $content = $elm.querySelector('*:first-child') as HTMLElement
             visibleOnHover($elm)
             init({
               mount: $elm,
-              place: $elm,
-              content: [$content],
+              content: [$content!],
               wrapper: [$elm],
             })
           } catch (err) {

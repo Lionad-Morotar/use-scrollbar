@@ -15,4 +15,4 @@ export const notEmpty = (n: any) => {
   return !(isUndefined || isNull)
 }
 
-export const safePrecicion = (n = 0) => safe(n).toFixed(3)
+export const safePrecicion = (n = 0) => +(safe(+n).toFixed(3))
