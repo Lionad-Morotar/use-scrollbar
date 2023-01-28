@@ -12,65 +12,65 @@
 // native-scrollbar
 function hello() {
   console.log('hello world!')
-  console.log('i like cola and cola and longcola and longcola and longcola and longcola and longcola')
+  console.log('I like cola and cola and longcola and longcola and longcola and longcola and longcola')
   console.log('hello world!')
-  console.log('i like cola and cola')
+  console.log('I like cola and cola')
   console.log('hello world!')
-  console.log('i like cola and cola')
+  console.log('I like cola and cola')
   console.log('hello world!')
-  console.log('i like cola and cola')
+  console.log('I like cola and cola')
   console.log('hello world!')
-  console.log('i like cola and cola')
+  console.log('I like cola and cola')
   console.log('hello world!')
-  console.log('i like cola and cola')
+  console.log('I like cola and cola')
   console.log('hello world!')
-  console.log('i like cola and cola')
+  console.log('I like cola and cola')
   console.log('hello world!')
-  console.log('i like cola and cola')
+  console.log('I like cola and cola')
   console.log('hello world!')
-  console.log('i like cola and cola')
+  console.log('I like cola and cola')
 }
 
 function world() {
   console.log('hello world!')
-  console.log('i like cola and cola')
+  console.log('I like cola and cola')
   console.log('hello world!')
-  console.log('i like cola and cola')
+  console.log('I like cola and cola')
   console.log('hello world!')
-  console.log('i like cola and cola')
+  console.log('I like cola and cola')
   console.log('hello world!')
-  console.log('i like cola and cola')
+  console.log('I like cola and cola')
   console.log('hello world!')
-  console.log('i like cola and cola')
+  console.log('I like cola and cola')
   console.log('hello world!')
-  console.log('i like cola and cola')
+  console.log('I like cola and cola')
   console.log('hello world!')
-  console.log('i like cola and cola')
+  console.log('I like cola and cola')
   console.log('hello world!')
-  console.log('i like cola and cola')
+  console.log('I like cola and cola')
   console.log('hello world!')
-  console.log('i like cola and cola')
+  console.log('I like cola and cola')
 }
 
 function world() {
   console.log('hello world!')
-  console.log('i like cola and cola')
+  console.log('I like cola and cola')
   console.log('hello world!')
-  console.log('i like cola and cola')
+  console.log('I like cola and cola')
   console.log('hello world!')
-  console.log('i like cola and cola')
+  console.log('I like cola and cola')
   console.log('hello world!')
-  console.log('i like cola and cola')
+  console.log('I like cola and cola')
   console.log('hello world!')
-  console.log('i like cola and cola')
+  console.log('I like cola and cola')
   console.log('hello world!')
-  console.log('i like cola and cola')
+  console.log('I like cola and cola')
   console.log('hello world!')
-  console.log('i like cola and cola')
+  console.log('I like cola and cola')
   console.log('hello world!')
-  console.log('i like cola and cola')
+  console.log('I like cola and cola')
   console.log('hello world!')
-  console.log('i like cola and cola')
+  console.log('I like cola and cola')
 }
           </pre>
         </div>
@@ -83,65 +83,65 @@ function world() {
 // use-scrollbar
 function hello() {
   console.log('hello world!')
-  console.log('i like cola and cola and longcola and longcola and longcola and longcola and longcola')
+  console.log('I like cola and cola and longcola and longcola and longcola and longcola and longcola')
   console.log('hello world!')
-  console.log('i like cola and cola')
+  console.log('I like cola and cola')
   console.log('hello world!')
-  console.log('i like cola and cola')
+  console.log('I like cola and cola')
   console.log('hello world!')
-  console.log('i like cola and cola')
+  console.log('I like cola and cola')
   console.log('hello world!')
-  console.log('i like cola and cola')
+  console.log('I like cola and cola')
   console.log('hello world!')
-  console.log('i like cola and cola')
+  console.log('I like cola and cola')
   console.log('hello world!')
-  console.log('i like cola and cola')
+  console.log('I like cola and cola')
   console.log('hello world!')
-  console.log('i like cola and cola')
+  console.log('I like cola and cola')
   console.log('hello world!')
-  console.log('i like cola and cola')
+  console.log('I like cola and cola')
 }
 
 function world() {
   console.log('hello world!')
-  console.log('i like cola and cola')
+  console.log('I like cola and cola')
   console.log('hello world!')
-  console.log('i like cola and cola')
+  console.log('I like cola and cola')
   console.log('hello world!')
-  console.log('i like cola and cola')
+  console.log('I like cola and cola')
   console.log('hello world!')
-  console.log('i like cola and cola')
+  console.log('I like cola and cola')
   console.log('hello world!')
-  console.log('i like cola and cola')
+  console.log('I like cola and cola')
   console.log('hello world!')
-  console.log('i like cola and cola')
+  console.log('I like cola and cola')
   console.log('hello world!')
-  console.log('i like cola and cola')
+  console.log('I like cola and cola')
   console.log('hello world!')
-  console.log('i like cola and cola')
+  console.log('I like cola and cola')
   console.log('hello world!')
-  console.log('i like cola and cola')
+  console.log('I like cola and cola')
 }
 
 function world() {
   console.log('hello world!')
-  console.log('i like cola and cola')
+  console.log('I like cola and cola')
   console.log('hello world!')
-  console.log('i like cola and cola')
+  console.log('I like cola and cola')
   console.log('hello world!')
-  console.log('i like cola and cola')
+  console.log('I like cola and cola')
   console.log('hello world!')
-  console.log('i like cola and cola')
+  console.log('I like cola and cola')
   console.log('hello world!')
-  console.log('i like cola and cola')
+  console.log('I like cola and cola')
   console.log('hello world!')
-  console.log('i like cola and cola')
+  console.log('I like cola and cola')
   console.log('hello world!')
-  console.log('i like cola and cola')
+  console.log('I like cola and cola')
   console.log('hello world!')
-  console.log('i like cola and cola')
+  console.log('I like cola and cola')
   console.log('hello world!')
-  console.log('i like cola and cola')
+  console.log('I like cola and cola')
 }
           </pre>
         </div>
@@ -151,7 +151,7 @@ function world() {
 </template>
 
 <script lang="ts" setup>
-import { ref, reactive, watch, nextTick, onMounted } from "vue-demi";
+import { ref, reactive, watch, nextTick, onMounted } from "vue";
 import { useScrollbar } from "@/hooks";
 
 const elemRef = ref<HTMLElement>();
@@ -161,6 +161,7 @@ watch(elemRef, async ($elm) => {
   if ($elm) {
     const $content = $elm.querySelector('.content')
     barStates.offset.x.left = 8 + 2
+    barStates.offset.x.bottom = 8 + 4
     barStates.offset.y.top = 8 + 2
     barStates.offset.y.right = 8 + 4
     barStates.init({
@@ -193,7 +194,6 @@ watch(elemRef, async ($elm) => {
 }
 .content-wrapper {
   box-sizing: border-box;
-  padding: 12px;
   width: 100%;
   height: 100%;
   background: #f8f8f8;

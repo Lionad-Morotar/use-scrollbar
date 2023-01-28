@@ -1,6 +1,6 @@
 {
 	"name": "use-scrollbar",
-	"version": "1.0.0",
+	"version": "0.0.1",
 	"private": false,
 	"exports": {
 		".": {
@@ -56,6 +56,7 @@
 		"@vueuse/core": "^9.11.0",
 		"@vueuse/shared": "^9.11.0",
 		"vue": "^3.2.25",
+    "vue3": "npm:vue@3",
 		"vue-demi": "^0.13.11"
 	},
 	"pnpm": {

@@ -125,6 +125,7 @@ export default defineComponent({
   border-right: 1px solid #eee;
   overflow: hidden;
   user-select: none;
+  cursor: move;
 }
 .gantt-elastic__chart-graph {
   overflow: hidden;
