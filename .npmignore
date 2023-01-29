@@ -1,0 +1,14 @@
+.github
+.husky
+.vscode
+docs
+node_modules
+patch
+play
+src
+.editorconfig
+.eslintignore
+.eslintrf.js
+.prettierignore
+.prettierrc
+commitlint.config.js
