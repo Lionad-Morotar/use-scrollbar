@@ -3,14 +3,19 @@
 	"version": "0.1.0",
 	"private": false,
 	"main": "./dist/lib/index.cjs.js",
-	"types": "./dist/types/index.d.ts",
+	"typings": "./dist/types/index.d.ts",
 	"exports": {
 		".": {
 			"import": "./dist/lib/index.esm.js",
 			"require": "./dist/lib/index.cjs.js",
 			"types": "./dist/types/index.d.ts"
-		}
+		},
+    "./*": "./dist/*"
 	},
+  "sideEffects": [
+    "./dist/lib/*",
+    "./dist/style.less"
+  ],
 	"scripts": {
 		"dev": "vite ./play",
 		"serve": "pnpm dev",
@@ -56,11 +61,8 @@
 		"xe-utils": "link:./patch/xe-utils-esm"
 	},
 	"peerDependencies": {
-		"@vueuse/core": "^9.11.0",
-		"@vueuse/shared": "^9.11.0",
 		"vue": "^3.2.25",
-		"vue3": "npm:vue@3",
-		"vue-demi": "^0.13.11"
+		"vue3": "npm:vue@3"
 	},
 	"pnpm": {
 		"peerDependencyRules": {
