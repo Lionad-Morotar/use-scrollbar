@@ -1,18 +1,24 @@
-name: Node CI
+name: Check Build
 
 on: [push, pull_request]
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        node-version: [16]
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v3
-        with:
-          node-version: '16'
-      - name: Install
-        run: |
-          npx pnpm install --frozen-lockfile
-      - name: Build
-        run: |
-          npx pnpm build
+    - uses: actions/checkout@v3
+    - uses: pnpm/action-setup@v2
+      with:
+        version: 7
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'pnpm'
+    - name: Install Dependencies
+      run: pnpm install
+    - name: Build Module
+      run: pnpm build
