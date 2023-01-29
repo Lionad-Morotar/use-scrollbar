@@ -5,12 +5,6 @@ dist
 .temp
 coverage
 
-
-# lock
-package-lock.json
-yarn.lock
-pnpm-lock.yaml
-
 # local env files
 .local
 .env.local
