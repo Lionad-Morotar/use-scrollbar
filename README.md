@@ -58,19 +58,23 @@ Simple Example
 
 ```typescript
 import { onMounted, ref } from 'vue'
-import { useSrollbar } from 'use-scrollbar'
+import { useSrollbar } from 'use-scrollbars'
 
 const componentOrElementRef = ref(null);
 const barStates = useScrollbar(componentOrElementRef, {
   // override default options
 });
+
+// dont forget to import style.css
+// in your main.ts (or entry.ts anyway)
+import "use-scrollbars/dist/style.css"
 ```
 
 Another Example
 
 ```typescript
 import { watchEffect, onMounted, ref } from 'vue'
-import { useSrollbar } from 'use-scrollbar'
+import { useSrollbar } from 'use-scrollbars'
 
 const componentOrElementRef = ref(null);
 const barStates = useScrollbar(componentOrElementRef, {

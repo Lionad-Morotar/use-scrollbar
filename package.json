@@ -10,12 +10,8 @@
 			"require": "./dist/lib/index.cjs.js",
 			"types": "./dist/types/index.d.ts"
 		},
-		"./*": "./dist/*"
+		"./*": "./*"
 	},
-	"sideEffects": [
-		"./dist/lib/*",
-		"./dist/style.less"
-	],
 	"scripts": {
     "preinstall": "npx only-allow pnpm",
     "install": "pnpm install",
