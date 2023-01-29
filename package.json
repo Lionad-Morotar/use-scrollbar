@@ -1,5 +1,5 @@
 {
-	"name": "use-scrollbar",
+	"name": "use-scrollbars",
 	"version": "0.1.0",
 	"private": false,
 	"main": "./dist/lib/index.cjs.js",
@@ -77,6 +77,9 @@
 		]
 	},
 	"repository": "https://github.com/Lionad-Morotar/use-scrollbar",
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org"
+  },
 	"homepage": "https://github.com/Lionad-Morotar/use-scrollbar",
 	"author": "Lionad",
 	"license": "MIT",
