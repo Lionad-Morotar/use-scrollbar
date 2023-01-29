@@ -17,6 +17,8 @@
 		"./dist/style.less"
 	],
 	"scripts": {
+    "preinstall": "npx only-allow pnpm",
+    "install": "pnpm install",
 		"dev": "vite ./play",
 		"serve": "pnpm dev",
 		"clean": "rimraf dist",
