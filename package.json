@@ -1,6 +1,6 @@
 {
 	"name": "use-scrollbars",
-	"version": "0.1.0",
+	"version": "0.2.0",
 	"private": false,
 	"main": "./dist/lib/index.cjs.js",
 	"typings": "./dist/types/index.d.ts",
@@ -13,8 +13,8 @@
 		"./*": "./*"
 	},
 	"scripts": {
-    "preinstall": "npx only-allow pnpm",
-    "install": "pnpm install",
+		"preinstall": "npx only-allow pnpm",
+		"install": "pnpm install",
 		"dev": "vite ./play",
 		"serve": "pnpm dev",
 		"clean": "rimraf dist",
@@ -72,9 +72,9 @@
 			]
 		}
 	},
-  "resolutions": {
-    "xe-utils": "link:patch\\xe-utils-esm"
-  },
+	"resolutions": {
+		"xe-utils": "link:patch\\xe-utils-esm"
+	},
 	"lint-staged": {
 		"*.{js,ts,tsx,vue}": [
 			"eslint --fix"
