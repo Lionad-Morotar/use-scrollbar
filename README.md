@@ -85,7 +85,7 @@ watchEffect(() => {
 ## 📦 Install
 
 ```bash
-pnpm install use-scrollbar
+pnpm install use-scrollbars
 ```
 
 ## 🗂️ Simple Document
