@@ -74,6 +74,9 @@
 			]
 		}
 	},
+  "resolutions": {
+    "xe-utils": "link:patch\\xe-utils-esm"
+  },
 	"lint-staged": {
 		"*.{js,ts,tsx,vue}": [
 			"eslint --fix"

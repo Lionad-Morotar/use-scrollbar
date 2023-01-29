@@ -18,6 +18,10 @@ export default defineConfig(({ mode }) => {
           find: /^@\/hooks$/,
           replacement: path.join(__dirname, './src/hooks/index.ts'),
         },
+        {
+          find: /^@xe-utils$/,
+          replacement: path.join(__dirname, './patch/xe-utils-esm/index.js'),
+        },
       ],
     },
     build: {
@@ -35,9 +39,7 @@ export default defineConfig(({ mode }) => {
         external: ['vue'],
         output: {
           globals: {
-            vue: 'Vue',
-            '@vueuse/core': 'VueUseCore',
-            '@vueuse/shared': 'VueUseShared',
+            vue: 'Vue'
           },
         },
       },

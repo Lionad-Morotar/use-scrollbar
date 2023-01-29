@@ -172,6 +172,17 @@ barStates.setOffset({
 })
 ```
 
+## 🚩 Dev
+
+如果在开发环境遇到 `xe-utils` 没有 esm 格式导出的问题，需使用 `./patch/xe-utils-esm` 这个包作为替代：
+
+```bash
+# 1. 使用本地依赖安装 xe-utils
+pnpm link "link:./patch/xe-utils-esm"
+# 2. 然后强制重启本地服务器
+vite ./play --force
+```
+
 ## 📄 License
 
 MIT License
