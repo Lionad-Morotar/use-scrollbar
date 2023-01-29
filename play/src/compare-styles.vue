@@ -189,7 +189,7 @@ watchEffect(() => {
     }
   if (states.type === 'css-tricks') {
     offset.x.left = 0
-    offset.x.left = 0
+    offset.x.bottom = 0
     offset.y.top = 0
     offset.y.right = 0
   }

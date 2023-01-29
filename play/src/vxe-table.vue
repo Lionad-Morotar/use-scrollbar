@@ -70,7 +70,7 @@ const refresh = async () => {
     states.tableData = Array(itemCount).fill(0).map((x, idx) => {
       const res = {
         id: idx,
-        parentId: null,
+        parentId: null as number | null,
         name: 'Test-' + (idx + 1),
         role: 'Develop',
         sex: Math.random() < 0.5 ? '1' : '0',

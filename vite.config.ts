@@ -12,13 +12,21 @@ export default defineConfig(({ mode }) => {
         outputDir: path.resolve(__dirname, './dist/types/'),
       }),
     ],
+    resolve: {
+      alias: [
+        {
+          find: /^@\/hooks$/,
+          replacement: path.join(__dirname, './src/hooks/index.ts'),
+        },
+      ],
+    },
     build: {
       minify: true,
       lib: {
         entry: path.resolve(__dirname, './src/hooks/index.ts'),
         name: 'UseHooks',
         formats: ['es', 'cjs'],
-        fileName: format => {
+        fileName: (format) => {
           return `lib/index.${format}.js`
         },
       },

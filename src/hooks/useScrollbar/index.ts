@@ -1,7 +1,6 @@
 import { ref, unref, watchEffect, computed, watch, reactive, onUnmounted } from 'vue-demi'
 import { useEventListener, useScroll, unrefElement } from '@vueuse/core'
-import { useElementHover } from '@/hooks'
-import { useElementSize } from '@/hooks'
+import { useElementHover, useElementSize } from '@/hooks'
 import { createComponent } from "./scrollbars";
 import { notEmpty, safeRatio, safePrecicion, SCROLLBAR_GAP, findScrollElement } from './utils'
 import defaultOpts from './states'

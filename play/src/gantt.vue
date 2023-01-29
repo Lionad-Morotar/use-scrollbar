@@ -78,7 +78,6 @@ const refresh = async () => {
   states.tasks = []
   setTimeout(() => {
     const itemCount = 300
-    let parentId = 0
     states.tasks = Array(itemCount).fill(0).map((x, idx) => {
       return {
         id: idx,

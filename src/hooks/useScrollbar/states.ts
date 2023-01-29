@@ -4,6 +4,7 @@ import type { Theme } from './type'
 
 const HALF_GAP = SCROLLBAR_GAP / 2
 
+// TODO group by readonly states and mutable states
 const states = {
   theme: 'normal' as Theme,
   // 是否隐藏滚动条（优先级应当高于 visible）
@@ -11,7 +12,7 @@ const states = {
     x: false,
     y: false,
   },
-  // 空值滚动条显隐
+  // 控制滚动条显隐
   visible: {
     x: false,
     y: false,
