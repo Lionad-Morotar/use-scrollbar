@@ -43,6 +43,7 @@ watch(() => props.enable, async (enable) => {
       barStates.init({
         mount: tableRef,
         content: [$bodyWrapper, $bodyContent, $bodyXSpace, $bodyYSpace],
+        viewport: [$bodyWrapper]
       });
     } catch (err) {
       console.error("[ERR] error when init virtual scrollbar", err, tableRef);

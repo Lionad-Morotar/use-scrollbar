@@ -17,8 +17,6 @@ type MaybeElem = MaybeComputedRef<MaybeElement>;
 type MaybeElemOrNumber = MaybeComputedRef<MaybeElement>
 type Direction = "x" | "y";
 
-const HALF_GAP = SCROLLBAR_GAP / 2;
-
 /**
  * 一个滚动系统通常包含以下部分：
  * 1. 容器，用于包含大量子项，并通过 overflow 在界面上控制滚动显示
@@ -103,7 +101,7 @@ export default function useScrollbar(
       bottom?: MaybeElemOrNumber
     }
   }) {
-    const gap = HALF_GAP
+    const gap = SCROLLBAR_GAP
     const args = [
       opts?.x?.left,
       opts?.x?.right,
@@ -286,8 +284,11 @@ export default function useScrollbar(
 
     watchEffectGathered(() => {
       states.size.y.path = viewportH.value - states.size.y.height - SCROLLBAR_GAP * 2
+      // console.log("[debug] scrollbar y path", viewportH.value, states.size.y.height);
+    })
+    watchEffectGathered(() => {
       states.size.x.path = viewportW.value - states.size.x.width - SCROLLBAR_GAP * 2
-      // console.log("[debug] scrollbar path", viewportH.value, states.size.y.height);
+      // console.log("[debug] scrollbar x path", viewportW.value, states.size.x.width);
     })
 
     /* 滚动条距离顶部的比例 */
