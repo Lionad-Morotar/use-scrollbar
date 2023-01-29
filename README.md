@@ -25,31 +25,36 @@ Assuming a 400px height div, you can easily get a div with beautiful virtual scr
 
 ## ⚒️ Feature
 
-* [x] Customisable virtual scrollbars, so that you can create your own scrollbar styles, animations or user interactions
-* [x] Integrated with these style configurations: ElementPlus, Steam, CSS-Tricks ...
-* [x] Full Typed
-* [ ] WIP <del>Support Vue2 & Vue3</del>
-* [ ] WIP <del>Vue Directives</del>
-* [ ] WIP <del>Headless Component</del>
-* [ ] WIP <del>Github pages for document and preview</del>
+- [x] **Powerful API**, have ability to deal with complex components[^1], such as vxe-table
+- [x] **Customisable**, so that you can create your own scrollbar style, animation and user interaction
+- [x] **Theme**, integrated with these style configurations: ElementPlus, Steam, CSS-Tricks ...
+- [x] **Full Typed**, with the power of typescript
+- [ ] WIP <del>Support Vue2 & Vue3</del>
+- [ ] WIP <del>Vue Directives</del>
+- [ ] WIP <del>Headless Component</del>
+- [ ] WIP <del>Github pages for document and preview</del>
+
+[^1]: which is not possible with other libraries
 
 and PRs are welcom
 
 ## 📸 Preview
 
+<h4>1. Native Scrollbar <strong>VS</strong> Custom Scrollbar (theme: default)</h4>
+
 <p align="center">
-  <center>
-    <h4>1. Native Scrollbar <strong>VS</strong> Custom Scrollbar (theme: default)</h4>
-    <img width="555" alt="compare" src="./docs/assets/compare-1.png">
-    <br />
-    <h4>2. Native Scrollbar <strong>VS</strong> Custom Scrollbar (theme: css-tricks)</h4>
-    <img width="555" alt="compare" src="./docs/assets/compare-3.png">
-  </center>
+  <img width="555" alt="compare" src="./docs/assets/compare-1.png">
+</p>
+
+<h4>2. Native Scrollbar <strong>VS</strong> Custom Scrollbar (theme: css-tricks)</h4>
+
+<p align="center">
+  <img width="555" alt="compare" src="./docs/assets/compare-3.png">
 </p>
 
 ## 🤹‍♀️ Usage
 
-Simple Usage
+Simple Example
 
 ```typescript
 import { onMounted, ref } from 'vue'
@@ -61,7 +66,7 @@ const barStates = useScrollbar(componentOrElementRef, {
 });
 ```
 
-Another
+Another Example
 
 ```typescript
 import { watchEffect, onMounted, ref } from 'vue'
@@ -88,11 +93,11 @@ watchEffect(() => {
 pnpm install use-scrollbars
 ```
 
-## 🗂️ Simple Document
+## 🗂️ Document
 
-### States
+### 1. States
 
-##### barStates.theme
+#### 1.1. barStates.theme
 
 改变滚动条样式。
 
@@ -101,7 +106,7 @@ const theme = 'normal' // 'normal' | 'steam' | 'css-tricks'
 barStates.theme = theme
 ```
 
-##### barStates.offset
+#### 1.2. barStates.offset
 
 改变滚动条相对挂载元素的偏移量。
 
@@ -112,15 +117,15 @@ barStates.offset.x.left = 5 // px
 barStates.offset.x.bottom = 5 // px
 ```
 
-##### barStates.scrollTop
+#### 1.3. barStates.scrollTop
 
 如果传入多个 wrapper，那么 scrollTop 属性等同于这几个 wrapper 对应 DOM 元素的最大的哪个 scrollTop 属性。如果需要滚动 wrapper 中的内容，可以给 scrollTop 设置值，也可以使用 [barStates.scrollTo](#barStates-scrollTo) 方法。
 
-##### barStates.scrollLeft
+#### 1.4. barStates.scrollLeft
 
 类似 [barStates.scrollTop](#barStates-scrollTop)。
 
-##### barStates.isDragging
+#### 1.5. barStates.isDragging
 
 判断当前滚动条是否出于拖动状态。
 
@@ -128,9 +133,9 @@ barStates.offset.x.bottom = 5 // px
 console.log(barStates.isDragging.y)
 ```
 
-### Actions
+### 2. Actions
 
-##### barStates.init
+#### 2.1. barStates.init
 
 如果不是通过显式初始化（即 `useScrollbar(elem)`）的方式自动初始化滚动条，那么需要使用 init 方法手动初始化。init 方法提供了对控制滚动区（甚至多个滚动区）所需要的更细致的参数。
 
@@ -150,11 +155,11 @@ barStates.init({
 })
 ```
 
-##### barStates.visibleOnHover
+#### 2.2. barStates.visibleOnHover
 
 监听传入元素的鼠标事件，mouseenter 时显示滚动条，mouseleave 时隐藏滚动条。
 
-##### barStates.setOffset
+#### 2.3. barStates.setOffset
 
 根据传入元素的尺寸自动设置滚动条的偏移量。在某些场景非常有用，比如你想改变一个弹窗，其滚动区域为整个弹窗内容区域，但是内容区填充了一个 `position:sticky` 头部，此时，如果将滚动条直接挂载到弹窗的内容区域，那么 y 轴滚动条的上方偏移量应为头部的高度。你可以在 barStates.setOffset 中传入此头部元素或组件，动态跟踪其高度并自动设置偏移量。
 
