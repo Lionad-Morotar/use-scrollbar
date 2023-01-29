@@ -1,9 +1,9 @@
 {
 	"name": "use-scrollbar",
-	"version": "0.0.1",
+	"version": "0.1.0",
 	"private": false,
-  "main": "./dist/lib/index.cjs.js",
-  "types": "./dist/types/index.d.ts",
+	"main": "./dist/lib/index.cjs.js",
+	"types": "./dist/types/index.d.ts",
 	"exports": {
 		".": {
 			"import": "./dist/lib/index.esm.js",
@@ -13,7 +13,7 @@
 	},
 	"scripts": {
 		"dev": "vite ./play",
-    "serve": "pnpm dev",
+		"serve": "pnpm dev",
 		"clean": "rimraf dist",
 		"build": "pnpm clean  && pnpm check:type && vite build",
 		"check:type": "vue-tsc --noEmit",
@@ -59,7 +59,7 @@
 		"@vueuse/core": "^9.11.0",
 		"@vueuse/shared": "^9.11.0",
 		"vue": "^3.2.25",
-    "vue3": "npm:vue@3",
+		"vue3": "npm:vue@3",
 		"vue-demi": "^0.13.11"
 	},
 	"pnpm": {
