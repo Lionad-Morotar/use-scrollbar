@@ -1,4 +1,4 @@
-name: Build Module Check
+name: CI
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
 
 jobs:
   check:
-    name: Build Module Check
+    name: CI
     runs-on: ubuntu-latest
 
     steps:
