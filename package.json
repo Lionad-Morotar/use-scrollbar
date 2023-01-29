@@ -56,14 +56,14 @@
 		"vite": "2",
 		"vite-plugin-dts": "^1.7.1",
 		"vue": "^3.2.45",
+		"vue3": "npm:vue@3",
 		"vue-eslint-parser": "^9.1.0",
 		"vue-tsc": "1.0.9",
 		"vxe-table": "4.3.9",
 		"xe-utils": "link:patch\\xe-utils-esm"
 	},
 	"peerDependencies": {
-		"vue": "^3.2.25",
-		"vue3": "npm:vue@3"
+		"vue": "^3"
 	},
 	"pnpm": {
 		"peerDependencyRules": {
