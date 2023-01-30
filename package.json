@@ -1,10 +1,10 @@
 {
 	"name": "use-scrollbars",
-	"version": "0.3.0",
+	"version": "0.3.1",
 	"private": false,
 	"main": "./dist/lib/index.cjs.js",
-  "module": "./dist/lib/index.esm.js",
-  "types": "./dist/types/index.d.ts",
+	"module": "./dist/lib/index.esm.js",
+	"types": "./dist/types/index.d.ts",
 	"exports": {
 		".": {
 			"require": "./dist/lib/index.cjs.js",
