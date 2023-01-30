@@ -38,7 +38,7 @@ specifiers:
   vue-tsc: 1.0.9
   vue3: npm:vue@^3.2.45
   vxe-table: 4.3.9
-  xe-utils: link:patch\xe-utils-esm
+  xe-utils: link:patch/xe-utils-esm
 
 dependencies:
   '@vueuse/core': 9.12.0_vue@3.2.45
