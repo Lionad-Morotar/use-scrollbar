@@ -12,3 +12,4 @@ src
 .prettierignore
 .prettierrc
 commitlint.config.js
+postcss.config.js

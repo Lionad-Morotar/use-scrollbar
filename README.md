@@ -181,6 +181,22 @@ barStates.setOffset({
 })
 ```
 
+### 3. Hooks
+
+#### 4.1 useScrollbar
+
+等同于 useScrollbars，用于将一个已有的滚动系统的原生滚动条替换为虚拟滚动条，也是这个库最主要的功能。
+
+#### 4.2 useNativeScrollbar
+
+获取原生滚动条相关的一些信息，如宽度。
+
+```typescript
+const nativeBar = useNativeScrollbar()
+
+console.log(nativeBar.thick) // usually 17px in Windows
+```
+
 ## 🚩 Dev
 
 如果在开发环境遇到 `xe-utils` 没有 esm 格式导出的问题，需使用 `./patch/xe-utils-esm` 这个包作为替代：
