@@ -1,0 +1,33 @@
+name: CI on Dev
+
+on:
+  push:
+    branches:
+      - 'dev'
+
+jobs:
+  check:
+    name: CI on Dev
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: dev
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 7
+
+      - name: Setup node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build Module
+        run: pnpm build
