@@ -30,7 +30,7 @@ specifiers:
   resize-observer-polyfill: ^1.5.1
   rimraf: ^3.0.2
   typescript: ^4.9.4
-  vite: '2'
+  vite: ^2.9.15
   vite-plugin-dts: ^1.7.1
   vue: ^3.2.45
   vue-demi: ^0.13.11
@@ -38,7 +38,7 @@ specifiers:
   vue-tsc: 1.0.9
   vue3: npm:vue@^3.2.45
   vxe-table: 4.3.9
-  xe-utils: link:patch/xe-utils-esm
+  xe-utils: link:patch\xe-utils-esm
 
 dependencies:
   '@vueuse/core': 9.12.0_vue@3.2.45
@@ -576,14 +576,14 @@ packages:
       - supports-color
     dev: true
 
-  /@floating-ui/core/1.1.0:
-    resolution: {integrity: sha512-zbsLwtnHo84w1Kc8rScAo5GMk1GdecSlrflIbfnEBJwvTSj1SL6kkOYV+nHraMCPEy+RNZZUaZyL8JosDGCtGQ==}
+  /@floating-ui/core/1.1.1:
+    resolution: {integrity: sha512-PL7g3dhA4dHgZfujkuD8Q+tfJJynEtnNQSPzmucCnxMvkxf4cLBJw/ZYqZUn4HCh33U3WHrAfv2R2tbi9UCSmw==}
     dev: true
 
   /@floating-ui/dom/1.1.1:
     resolution: {integrity: sha512-TpIO93+DIujg3g7SykEAGZMDtbJRrmnYRCNYSjJlvIbGhBjRSNTLVbNeDQBrzy9qDgUbiWdc7KA0uZHZ2tJmiw==}
     dependencies:
-      '@floating-ui/core': 1.1.0
+      '@floating-ui/core': 1.1.1
     dev: true
 
   /@humanwhocodes/config-array/0.11.8:
