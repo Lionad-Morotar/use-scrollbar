@@ -3,11 +3,12 @@
 	"version": "0.3.0",
 	"private": false,
 	"main": "./dist/lib/index.cjs.js",
-	"typings": "./dist/types/index.d.ts",
+  "module": "./dist/lib/index.esm.js",
+  "types": "./dist/types/index.d.ts",
 	"exports": {
 		".": {
-			"import": "./dist/lib/index.esm.js",
 			"require": "./dist/lib/index.cjs.js",
+			"import": "./dist/lib/index.esm.js",
 			"types": "./dist/types/index.d.ts"
 		},
 		"./*": "./*"

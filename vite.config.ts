@@ -31,7 +31,8 @@ export default defineConfig(({ mode }) => {
         name: 'UseHooks',
         formats: ['es', 'cjs'],
         fileName: (format) => {
-          return `lib/index.${format}.js`
+          const postFix = format === 'cjs' ? 'cjs' : format === 'es' ? 'esm' : 'unknown'
+          return `lib/index.${postFix}.js`
         },
       },
       chunkSizeWarningLimit: 1000,
