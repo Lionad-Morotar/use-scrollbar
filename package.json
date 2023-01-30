@@ -20,7 +20,7 @@
 		"build": "pnpm clean  && pnpm check:type && vite build",
 		"check:type": "vue-tsc --noEmit",
 		"prepare": "husky install",
-		"auto:publish": "git checkout release | git merge dev | npm version patch | pnpm publish | git checkout dev"
+		"auto:publish": "git checkout dev | pnpm build | git branch -D release | git checkout -b release | git merge dev | npm version patch | pnpm publish | git checkout dev"
 	},
 	"dependencies": {
 		"@vueuse/core": "^9.12.0",
