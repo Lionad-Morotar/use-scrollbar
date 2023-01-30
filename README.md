@@ -183,11 +183,11 @@ barStates.setOffset({
 
 ### 3. Hooks
 
-#### 4.1 useScrollbar
+#### 3.1 useScrollbar
 
 等同于 useScrollbars，用于将一个已有的滚动系统的原生滚动条替换为虚拟滚动条，也是这个库最主要的功能。
 
-#### 4.2 useNativeScrollbar
+#### 3.2 useNativeScrollbar
 
 获取原生滚动条相关的一些信息，如宽度。
 
