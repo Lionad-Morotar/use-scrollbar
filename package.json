@@ -1,6 +1,6 @@
 {
 	"name": "use-scrollbars",
-	"version": "0.3.1",
+	"version": "0.3.2",
 	"private": false,
 	"main": "./dist/lib/index.cjs.js",
 	"module": "./dist/lib/index.esm.js",
@@ -18,7 +18,7 @@
 		"serve": "pnpm dev",
 		"clean": "rimraf dist",
 		"build": "pnpm clean  && pnpm check:types && vite build",
-    "build:watch": "pnpm clean  && pnpm check:types && vite build --watch",
+		"build:watch": "pnpm clean  && pnpm check:types && vite build --watch",
 		"check:types": "vue-tsc --noEmit",
 		"prepare": "husky install",
 		"auto:publish": "git checkout dev | pnpm build | git branch -D release | git checkout -b release | git merge dev | npm version patch | pnpm publish | git push --set-upstream origin release | git checkout dev | git merge release | git push origin dev"
