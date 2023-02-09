@@ -3,10 +3,11 @@ import { useEventListener, useScroll, unrefElement } from '@vueuse/core'
 import { useElementHover, useElementSize } from '@/hooks'
 import { createComponent } from "./scrollbars";
 import { notEmpty, safeRatio, safePrecicion, SCROLLBAR_GAP, findScrollElement } from './utils'
-import defaultOpts from './states'
+import getOpts from './states'
 
 import type { Ref, CSSProperties } from "vue-demi";
 import type { MaybeComputedElementRef, MaybeComputedRef, MaybeElement } from '@vueuse/core'
+import type { States } from './states'
 
 import "./index.less";
 
@@ -30,7 +31,7 @@ type Direction = "x" | "y";
 export default function useScrollbar(
   initOn?: MaybeComputedElementRef,
   // TODO DeepPartial<typeof defaultOpts>
-  passOpts: Partial<typeof defaultOpts> = {},
+  passOpts: Partial<States> = {},
 ) {
   const config = {
     size: {
@@ -57,10 +58,12 @@ export default function useScrollbar(
         mount,
         destroy,
       },
-      defaultOpts,
+      getOpts(),
       passOpts,
     ),
   )
+
+  console.log('states', states)
 
   const stops = [] as (() => void)[]
   function destroy() {
@@ -139,7 +142,7 @@ export default function useScrollbar(
     viewport?: MaybeElem | MaybeElem[]
     // TODO contents?: MaybeElem | MaybeElem[] | null
   }) {
-    /* Vars Gurad */
+    /* Guards */
 
     opts.mount = opts.mount!
     opts.content = Array.isArray(opts.content) ? opts.content : [opts.content]
@@ -171,6 +174,7 @@ export default function useScrollbar(
       const ws = [] as Ref<number>[]
       const hs = [] as Ref<number>[]
       opts.viewport.map(($elm) => {
+        // console.log('[debug] $elm', $elm)
         const { width, height } = useElementSize($elm, undefined, { box: 'border-box' })
         ws.push(width)
         hs.push(height)

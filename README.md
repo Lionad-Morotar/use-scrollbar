@@ -54,7 +54,7 @@ and PRs are welcom
 
 ## 🤹‍♀️ Usage
 
-Simple Example
+Simple example
 
 ```typescript
 import { onMounted, ref } from 'vue'
@@ -70,7 +70,7 @@ const barStates = useScrollbar(componentOrElementRef, {
 import "use-scrollbars/dist/style.css"
 ```
 
-Another Example
+Another example
 
 ```typescript
 import { watchEffect, onMounted, ref } from 'vue'
@@ -90,6 +90,8 @@ watchEffect(() => {
   }
 })
 ```
+
+More example on `pnpm dev`
 
 ## 📦 Install
 

@@ -5,7 +5,7 @@ import type { Theme } from './type'
 const HALF_GAP = SCROLLBAR_GAP / 2
 
 // TODO group by readonly states and mutable states
-const states = {
+const getOpts = () => ({
   theme: 'normal' as Theme,
   // 是否隐藏滚动条（优先级应当高于 visible）
   isHidden: {
@@ -74,8 +74,8 @@ const states = {
   scrollTo: (() => {
     throw new Error('uninitial')
   }) as (x: number, y: number) => void,
-}
+})
 
-type States = typeof states
+export type States = ReturnType<typeof getOpts>
 
-export default states as States
+export default getOpts

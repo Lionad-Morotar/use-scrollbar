@@ -8,6 +8,7 @@
     <ol>
       <li><a href="./compare-styles?type=normal">Simply Usage</a></li>
       <li><a href="./vxe-table">VXETable + 虚拟滚动条</a></li>
+      <li><a href="./vxe-table-multy">多表格 + 虚拟滚动条</a></li>
       <li><a href="./gantt">GanttElastic + 虚拟滚动条</a></li>
     </ol>
     <h2>## styles</h2>

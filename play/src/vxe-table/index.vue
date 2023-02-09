@@ -32,12 +32,12 @@ watch(() => props.enable, async (enable) => {
     await nextTick();
     await until(tableRef.value).toMatch((x) => x?.$el?.parentElement);
     try {
-      const $parentElem = tableRef.value.$el.parentElement;
-      const $header = $parentElem.querySelector(".vxe-table--header-wrapper");
-      const $bodyWrapper = $parentElem.querySelector(".vxe-table--body-wrapper");
-      const $bodyContent = $parentElem.querySelector(".vxe-table--body");
-      const $bodyXSpace = $parentElem.querySelector(".vxe-body--x-space");
-      const $bodyYSpace = $parentElem.querySelector(".vxe-body--y-space");
+      const $table = tableRef.value.$el;
+      const $header = $table.querySelector(".vxe-table--header-wrapper");
+      const $bodyWrapper = $table.querySelector(".vxe-table--body-wrapper");
+      const $bodyContent = $table.querySelector(".vxe-table--body");
+      const $bodyXSpace = $table.querySelector(".vxe-body--x-space");
+      const $bodyYSpace = $table.querySelector(".vxe-body--y-space");
 
       barStates.setOffset({ y: { top: $header } });
       barStates.init({
