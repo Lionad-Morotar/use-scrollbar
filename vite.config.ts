@@ -19,7 +19,7 @@ export default defineConfig(({ mode }) => {
           replacement: path.join(__dirname, './src/hooks/index.ts'),
         },
         {
-          find: /^@xe-utils$/,
+          find: /^xe-utils$/,
           replacement: path.join(__dirname, './patch/xe-utils-esm/index.js'),
         },
       ],

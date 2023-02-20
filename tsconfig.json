@@ -25,7 +25,8 @@
       "node"
     ],
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "xe-utils": ["patch/xe-utils.esm"]
     }
   },
   "includes": [

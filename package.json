@@ -14,6 +14,7 @@
 		"./*": "./*"
 	},
 	"scripts": {
+    "postinstall": "pnpm install xe-utils",
 		"dev": "vite ./play",
 		"serve": "pnpm dev",
 		"clean": "rimraf dist",
