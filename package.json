@@ -14,7 +14,6 @@
 		"./*": "./*"
 	},
 	"scripts": {
-		"postinstall": "pnpm install xe-utils",
 		"dev": "vite ./play",
 		"serve": "pnpm dev",
 		"clean": "rimraf dist",
@@ -61,7 +60,7 @@
 		"vue-tsc": "1.0.9",
 		"vue3": "npm:vue@^3.2.47",
 		"vxe-table": "4.3.9",
-		"xe-utils": "link:patch\\xe-utils-esm"
+		"xe-utils": "link:patch/xe-utils-esm"
 	},
 	"peerDependencies": {
 		"vue": "^3"
@@ -74,7 +73,7 @@
 		}
 	},
 	"resolutions": {
-		"xe-utils": "link:patch\\xe-utils-esm"
+		"xe-utils": "link:patch/xe-utils-esm"
 	},
 	"lint-staged": {
 		"*.{js,ts,tsx,vue}": [
