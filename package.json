@@ -18,7 +18,7 @@
 		"dev": "vite ./play",
 		"serve": "pnpm dev",
 		"clean": "rimraf dist",
-		"build": "pnpm clean  && pnpm check:types && vite build",
+		"build": "pnpm clean && vite build",
 		"build:watch": "pnpm clean  && pnpm check:types && vite build --watch",
 		"check:types": "vue-tsc --noEmit",
 		"prepare": "husky install",
