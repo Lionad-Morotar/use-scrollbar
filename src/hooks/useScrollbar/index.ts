@@ -367,6 +367,7 @@ export default function useScrollbar(
   const mouseOffsetXStart = ref(0)
   const mouseOffsetYCurrent = ref(0)
   const mouseOffsetXCurrent = ref(0)
+  const selectEventRaw = ref()
 
   const onMouseMove = (e: MouseEvent) => {
     // console.log("[debug] onMouseMove", e);
@@ -401,7 +402,12 @@ export default function useScrollbar(
     e.stopPropagation()
     e.stopImmediatePropagation()
     window.getSelection()?.removeAllRanges()
-    document.onselectstart = () => false
+
+    selectEventRaw.value = document.onselectstart
+    document.onselectstart = () => {
+      console.log('[info] temporarily disable select when dragging scrollbars')
+      return false
+    }
 
     states.isDragging[direction.value] = true
     mouseOffsetYStart.value = e.clientY
@@ -418,6 +424,8 @@ export default function useScrollbar(
     mouseOffsetYCurrent.value = 0
     mouseOffsetXStart.value = 0
     mouseOffsetXCurrent.value = 0
+
+    document.onselectstart = selectEventRaw.value
 
     while (clean.todos.length) {
       const cleanJob = clean.todos.pop()
