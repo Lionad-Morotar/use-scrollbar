@@ -1,6 +1,6 @@
 {
 	"name": "use-scrollbars",
-	"version": "0.4.0",
+	"version": "0.4.1",
 	"private": false,
 	"main": "./dist/lib/index.cjs.js",
 	"module": "./dist/lib/index.esm.js",
@@ -14,7 +14,7 @@
 		"./*": "./*"
 	},
 	"scripts": {
-    "postinstall": "pnpm install xe-utils",
+		"postinstall": "pnpm install xe-utils",
 		"dev": "vite ./play",
 		"serve": "pnpm dev",
 		"clean": "rimraf dist",
