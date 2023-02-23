@@ -63,7 +63,7 @@ export default function useScrollbar(
     ),
   )
 
-  console.log('states', states)
+  // console.log('states', states)
 
   const stops = [] as (() => void)[]
   function destroy() {
