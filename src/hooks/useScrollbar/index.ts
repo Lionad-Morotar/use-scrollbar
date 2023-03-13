@@ -242,11 +242,17 @@ export default function useScrollbar(
      * @FIXME 当容器尺寸大于滚动条尺寸时
      */
     watchEffectGathered(() => {
-      const base = Math.min(config.size.base, states.mountOnH)
-      const max = Math.min(config.size.max, states.mountOnH)
+      const top = states.offset.y.top || 0
+      const base = Math.min(config.size.base, states.mountOnH - top)
+      const max = Math.min(config.size.max, states.mountOnH - top)
       let height = config.size.base
       const hiddenY = contentH.value <= viewportH.value
       states.isHidden.y = hiddenY
+
+      const isBaseNearMax = Math.abs(base - max) / max < 0.1
+      if (isBaseNearMax) {
+        height *= 0.7
+      }
 
       const overflow = Math.abs(contentH.value - viewportH.value)
       const isOnePageY = overflow < viewportH.value
@@ -254,6 +260,7 @@ export default function useScrollbar(
         const unset = max - base
         const offset = (1 - overflow / viewportH.value) * unset
         height += offset
+        // console.log('[debug]', states.mountOnH, top, base, max, unset, height, overflow, offset)
       } else {
         const overflowSQRT = Math.min(Math.sqrt(overflow), viewportH.value) * 10
         const ratio = 1 - overflowSQRT / viewportH.value
@@ -263,11 +270,17 @@ export default function useScrollbar(
       states.size.y.height = safeHeight
     })
     watchEffectGathered(() => {
-      const base = Math.min(config.size.base, states.mountOnW)
-      const max = Math.min(config.size.max, states.mountOnW)
+      const left = states.offset.x.left || 0
+      const base = Math.min(config.size.base, states.mountOnW - left)
+      const max = Math.min(config.size.max, states.mountOnW - left)
       let width = config.size.base
       const hiddenX = contentW.value <= viewportW.value
       states.isHidden.x = hiddenX
+
+      const isBaseNearMax = Math.abs(base - max) / max < 0.1
+      if (isBaseNearMax) {
+        width *= 0.7
+      }
 
       const overflow = Math.abs(contentW.value - viewportW.value)
       const isOnePageX = overflow < viewportW.value

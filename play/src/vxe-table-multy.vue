@@ -1,12 +1,12 @@
 <template>
   <div class="play-container" ref="playRef">
     <div class="header">
-      <h4>## VXETable with Virtual Scrollbars {{ isHover ? ' - Hovered' : '' }}</h4>
+      <h4>## Multy VXETable with Virtual Scrollbars {{ isHover ? ' - Hovered' : '' }}</h4>
       <el-checkbox v-model="states.isVirtualScroll">表格虚拟滚动</el-checkbox>
       <el-checkbox v-model="states.isVirtualScrollbar">表格虚拟滚动条</el-checkbox>
     </div>
     <div class="table-cons">
-      <!-- <div class="padding" /> -->
+      <!-- first -->
       <vxe-table-virtual-scrollbar
         border
         stripe
@@ -31,6 +31,7 @@
         <vxe-column field="address" title="Address Another" :width="1000"></vxe-column>
         <vxe-column type="seq" :width="60" fixed="right"></vxe-column>
       </vxe-table-virtual-scrollbar>
+      <!-- first -->
       <vxe-table-virtual-scrollbar
         border
         stripe
@@ -55,30 +56,6 @@
         <vxe-column field="address" title="Address Another" :width="1000"></vxe-column>
         <vxe-column type="seq" :width="60" fixed="right"></vxe-column>
       </vxe-table-virtual-scrollbar>
-      <!-- <vxe-table-virtual-scrollbar
-        border
-        stripe
-        :enable="states.isVirtualScrollbar"
-        :loading="states.isLoading"
-        :tree-config="{transform: true}"
-        :column-config="{resizable: true}"
-        :row-config="{isHover: true}"
-        :checkbox-config="{labelField: 'id', highlight: true}"
-        :data="states.tableData"
-        :scroll-x="{ enabled: states.isVirtualScroll }"
-        :scroll-y="{ enabled: states.isVirtualScroll }"
-        >
-        <vxe-column type="seq" :width="180" fixed="left" tree-node></vxe-column>
-        <vxe-column type="checkbox" title="ID" :width="140"></vxe-column>
-        <vxe-column field="name" title="Name" :width="140"></vxe-column>
-        <vxe-column field="sex" title="Sex" :formatter="formatterSex" :width="140"></vxe-column>
-        <vxe-column field="age" title="Age" :width="120"></vxe-column>
-        <vxe-column field="address" title="Address" show-overflow :min-width="300"></vxe-column>
-        <vxe-column field="address" title="Address Another" :width="1000"></vxe-column>
-        <vxe-column field="address" title="Address Another" :width="1000"></vxe-column>
-        <vxe-column field="address" title="Address Another" :width="1000"></vxe-column>
-        <vxe-column type="seq" :width="60" fixed="right"></vxe-column>
-      </vxe-table-virtual-scrollbar> -->
     </div>
   </div>
 </template>
@@ -116,7 +93,7 @@ const formatterSex = ({ cellValue }: any) => {
 const refresh = async () => {
   states.isLoading = true
   setTimeout(() => {
-    const itemCount = 500
+    const itemCount = 15
     let parentId = 0
     states.tableData = Array(itemCount).fill(0).map((x, idx) => {
       const res = {
