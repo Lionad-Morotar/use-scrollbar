@@ -29,7 +29,7 @@ Assuming a 400px height div, you can easily get a div with beautiful virtual scr
 - [x] **Customisable**, so that you can create your own scrollbar style, animation and user interaction
 - [x] **Theme**, integrated with these style configurations: ElementPlus, Steam, CSS-Tricks ...
 - [x] **Full Typed**, with the power of typescript
-- [ ] WIP <del>Support Vue2 & Vue3</del>
+- [ ] Support Vue3 & <del>Vue2</del>
 - [ ] WIP <del>Vue Directives</del>
 - [ ] WIP <del>Headless Component</del>
 - [ ] WIP <del>Github pages for document and preview</del>
