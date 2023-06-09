@@ -4,6 +4,8 @@
       <h4>## VXETable with Virtual Scrollbars {{ isHover ? ' - Hovered' : '' }}</h4>
       <el-checkbox v-model="states.isVirtualScroll">表格虚拟滚动</el-checkbox>
       <el-checkbox v-model="states.isVirtualScrollbar">表格虚拟滚动条</el-checkbox>
+      <el-button type="primary" @click="refresh">刷新</el-button>
+      <el-button type="primary" @click="addMore">+{{ listCount }}条数据</el-button>
     </div>
     <vxe-table-virtual-scrollbar
       border
@@ -41,8 +43,8 @@ const playRef = ref();
 const isHover = useElementHover(playRef);
 
  const states = reactive({
-  isVirtualScroll: true,
-  isVirtualScrollbar: true,
+  isVirtualScroll: false,
+  isVirtualScrollbar: false,
   isLoading: false,
   tableData: [] as any[],
   sexList: [
@@ -62,29 +64,44 @@ const formatterSex = ({ cellValue }: any) => {
   return item ? item.label : ''
 }
 
+let count = 0
+let parentId = 0
+const listCount = 50
+const getTableData = () => {
+  const res = Array(listCount).fill(0).map((x) => {
+    const res = {
+      id: count++,
+      parentId: null as number | null,
+      name: 'Test-' + (count + 1),
+      role: 'Develop',
+      sex: Math.random() < 0.5 ? '1' : '0',
+      age: 28,
+      address: Array(10).fill('long address long long long address').join(', ')
+    }
+    if (Math.random() < 0.5) {
+      parentId = count
+    }
+    if (Math.random() < 0.5) {
+      res.parentId = parentId
+    }
+    return res
+  })
+  return res
+}
+
 const refresh = async () => {
   states.isLoading = true
+  states.tableData = []
   setTimeout(() => {
-    const itemCount = 500
-    let parentId = 0
-    states.tableData = Array(itemCount).fill(0).map((x, idx) => {
-      const res = {
-        id: idx,
-        parentId: null as number | null,
-        name: 'Test-' + (idx + 1),
-        role: 'Develop',
-        sex: Math.random() < 0.5 ? '1' : '0',
-        age: 28,
-        address: Array(10).fill('long address long long long address').join(', ')
-      }
-      if (Math.random() < 0.5) {
-        parentId = idx
-      }
-      if (Math.random() < 0.5) {
-        res.parentId = parentId
-      }
-      return res
-    })
+    states.tableData = getTableData()
+    states.isLoading = false
+  }, 300)
+}
+
+const addMore = async () => {
+  states.isLoading = true
+  setTimeout(() => {
+    states.tableData = states.tableData.concat(getTableData())
     states.isLoading = false
   }, 300)
 }

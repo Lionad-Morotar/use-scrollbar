@@ -25,13 +25,13 @@ export default defineConfig(({ mode }) => {
       ],
     },
     build: {
-      minify: true,
+      minify: false,
       lib: {
         entry: path.resolve(__dirname, './src/hooks/index.ts'),
         name: 'UseHooks',
-        formats: ['es', 'cjs'],
-        fileName: (format) => {
-          const postFix = format === 'cjs' ? 'cjs' : format === 'es' ? 'esm' : 'unknown'
+        formats: ['es', 'umd'],
+        fileName: (format: string) => {
+          const postFix = format === 'umd' ? 'umd' : format === 'es' ? 'esm' : 'unknown'
           return `lib/index.${postFix}.js`
         },
       },
@@ -40,7 +40,7 @@ export default defineConfig(({ mode }) => {
         external: ['vue'],
         output: {
           globals: {
-            vue: 'Vue'
+            vue: 'Vue',
           },
         },
       },
