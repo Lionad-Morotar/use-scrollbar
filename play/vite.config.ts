@@ -21,7 +21,7 @@ export default defineConfig(({ mode }) => {
       https: !!env.HTTPS,
     },
     optimizeDeps: {
-      include: ['vue', '@vue/shared'],
+      include: ['vue', '@vue/shared', 'xe-utils', 'element-plus'],
       exclude: ['vxe-table', 'vue-demi'],
     },
   }

@@ -1,13 +1,11 @@
 dist/
 node_modules
 node_modules/
-patches/
 types/
 !/.eslintrc.js
 !/rollup.config.js
 !.test
 .temp
 play
-patch
 
 playground

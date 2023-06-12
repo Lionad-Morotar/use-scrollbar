@@ -1,8 +1,5 @@
 lockfileVersion: 5.4
 
-overrides:
-  xe-utils: link:patch/xe-utils-esm
-
 specifiers:
   '@commitlint/cli': ^17.4.4
   '@commitlint/config-conventional': ^17.4.4
@@ -37,8 +34,8 @@ specifiers:
   vue-eslint-parser: ^9.1.0
   vue-tsc: 1.0.9
   vue3: npm:vue@^3.2.47
-  vxe-table: 4.3.9
-  xe-utils: link:patch/xe-utils-esm
+  vxe-table: ^4.3.9
+  xe-utils: ^3.5.7
 
 dependencies:
   '@vueuse/core': 9.13.0_vue@3.2.47
@@ -76,8 +73,8 @@ devDependencies:
   vue-eslint-parser: 9.1.0_eslint@8.34.0
   vue-tsc: 1.0.9_typescript@4.9.5
   vue3: /vue/3.2.47
-  vxe-table: 4.3.9_62nlccqlvf7jqcum4a5osibxki
-  xe-utils: link:patch/xe-utils-esm
+  vxe-table: 4.3.9_vue@3.2.47+xe-utils@3.5.11
+  xe-utils: 3.5.11
 
 packages:
 
@@ -4135,14 +4132,14 @@ packages:
       '@vue/server-renderer': 3.2.47_vue@3.2.47
       '@vue/shared': 3.2.47
 
-  /vxe-table/4.3.9_62nlccqlvf7jqcum4a5osibxki:
+  /vxe-table/4.3.9_vue@3.2.47+xe-utils@3.5.11:
     resolution: {integrity: sha512-Ns7Ooa7lOHBpks90i0k0BMNyxfMpUo39ryxTgKE41X3xVnI9tGQs2U6+klfDlsuqYfmG3ibyzHN3OCrWbbKo4Q==}
     peerDependencies:
       vue: ^3.2.28
       xe-utils: ^3.5.0
     dependencies:
       vue: 3.2.47
-      xe-utils: link:patch/xe-utils-esm
+      xe-utils: 3.5.11
     dev: true
 
   /which/2.0.2:
@@ -4178,6 +4175,10 @@ packages:
 
   /wrappy/1.0.2:
     resolution: {integrity: sha512-l4Sp/DRseor9wL6EvV2+TuQn63dMkPjZ/sp9XkghTEbV9KlPS1xUsZ3u7/IQO4wxtcFB4bgpQPRcR3QCvezPcQ==}
+    dev: true
+
+  /xe-utils/3.5.11:
+    resolution: {integrity: sha512-lyKc/lTBga1Zb63p+FED8mtxLnYIjSS8PVJM1N64NGdCu/3d1XubaVeke2p91RHssP0ExVAl2LUqZYperoz76Q==}
     dev: true
 
   /xml-name-validator/4.0.0:
