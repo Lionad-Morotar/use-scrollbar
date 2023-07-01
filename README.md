@@ -40,13 +40,13 @@ and PRs are welcom
 
 ## 📸 Preview
 
-<h4>1. Native Scrollbar <strong>VS</strong> Custom Scrollbar (theme: default)</h4>
+<h4>1. Native Scrollbar <strong>VS</strong> Customized Scrollbar (theme: default)</h4>
 
 <p align="center">
   <img width="555" alt="compare" src="./docs/assets/compare-1.png">
 </p>
 
-<h4>2. Native Scrollbar <strong>VS</strong> Custom Scrollbar (theme: css-tricks)</h4>
+<h4>2. Native Scrollbar <strong>VS</strong> Customized Scrollbar (theme: css-tricks)</h4>
 
 <p align="center">
   <img width="555" alt="compare" src="./docs/assets/compare-3.png">
