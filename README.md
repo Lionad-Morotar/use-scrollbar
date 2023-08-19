@@ -25,7 +25,7 @@ Assuming a 400px height div, you can easily get a div with beautiful virtual scr
 
 ## ⚒️ Feature
 
-- [x] **Powerful API**, have ability to deal with complex components[^1], such as vxe-table
+- [x] **Powerful API**, have ability to deal with complex components[^1], such as vxe-table、ant-vue-table
 - [x] **Customisable**, so that you can create your own scrollbar style, animation and user interaction
 - [x] **Theme**, integrated with these style configurations: ElementPlus, Steam, CSS-Tricks ...
 - [x] **Full Typed**, with the power of typescript

@@ -1,15 +1,19 @@
 <template>
   <div class="play-container">
     <h1># use-scrollbar</h1>
+    <p align="center">
+      <img width="555" alt="use-scrollbar" src="../../docs/assets/logo.png">
+    </p>
     <p class="intro">
-      `use-scrollbar` enables a component based on a native scrollbar to replace its native scrollbar with a virtual scrollbar, NOT virtual scroll.
+      `Use-Scrollbar` enables a component relies on a native scrollbar to replace its native scrollbar with a virtual scrollbar instead, NOT virtual scroll.
     </p>
     <h2>## examples</h2>
     <ol>
       <li><a href="./compare-styles?type=normal">Simply Usage</a></li>
-      <li><a href="./vxe-table">VXETable + 虚拟滚动条</a></li>
-      <li><a href="./vxe-table-multy">多表格 + 虚拟滚动条</a></li>
-      <li><a href="./gantt">GanttElastic + 虚拟滚动条</a></li>
+      <li><a href="./ant-vue-table">ant-design-vue table + use-scrollbars</a></li>
+      <li><a href="./vxe-table">VXETable + use-scrollbars</a></li>
+      <li><a href="./vxe-table-multy">VXETable 多表格 + use-scrollbars</a></li>
+      <li><a href="./gantt">GanttElastic + use-scrollbars</a></li>
     </ol>
     <h2>## styles</h2>
     <ol>

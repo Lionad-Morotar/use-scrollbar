@@ -39,6 +39,8 @@ watch(() => props.enable, async (enable) => {
       const $bodyXSpace = $table.querySelector(".vxe-body--x-space");
       const $bodyYSpace = $table.querySelector(".vxe-body--y-space");
 
+      console.log('barStates', barStates)
+
       barStates.setOffset({ y: { top: $header } });
       barStates.init({
         mount: tableRef,

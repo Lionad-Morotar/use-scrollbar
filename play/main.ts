@@ -1,7 +1,9 @@
 import { createApp } from "vue"
 import ElementPlus from 'element-plus'
+import {Table } from 'ant-design-vue'
 import VXETable from 'vxe-table'
 import 'vxe-table/lib/style.css'
+// import 'ant-design-vue/dist/antd.css'
 import 'element-plus/dist/index.css'
 
 // main
@@ -20,6 +22,7 @@ import 'element-plus/dist/index.css'
 
   app.use(VXETable)
   app.use(ElementPlus)
+  app.use(Table)
 
   app.mount('#play')
 })()
