@@ -1,6 +1,6 @@
 {
 	"name": "use-scrollbars",
-	"version": "0.4.6",
+	"version": "0.4.7",
 	"private": false,
 	"main": "./dist/lib/index.cjs.js",
 	"module": "./dist/lib/index.esm.js",
