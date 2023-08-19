@@ -23,6 +23,9 @@
 
 Assuming a 400px height div, you can easily get a div with beautiful virtual scrollbars by simply wrap the div with [ElementPlus Scrollbar](https://element-plus.gitee.io/zh-CN/component/scrollbar.html) scrollbars. But  none of the popular scrollbar components provide an interface for handling complex elements, that is to say, you cant wrap an complex component with [ElementPlus Scrollbar](https://element-plus.gitee.io/zh-CN/component/scrollbar.html) to have its internal native scrollbar replaced with beautiful virtual scrollbars. So you need `use-scrollbar`.
 
+* [vxe-table example](./play/src/vxe-table.vue)
+* [antd-vue-table example](./play/src/ant-vue-table.vue)
+
 ## ⚒️ Feature
 
 - [x] **Powerful API**, have ability to deal with complex components[^1], such as vxe-table、ant-vue-table
