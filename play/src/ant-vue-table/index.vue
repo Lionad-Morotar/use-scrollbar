@@ -35,7 +35,6 @@ watch(() => props.enable, async (enable) => {
     try {
       const $table = tableRef.value.$el;
       const $header = $table.querySelector(".ant-table-header");
-      const $bodyWrapper = $table.querySelector(".ant-table-body");
       const $bodyContent = $table.querySelector(".ant-table-body > table");
 
       console.log('barStates', barStates)
@@ -44,7 +43,6 @@ watch(() => props.enable, async (enable) => {
       barStates.init({
         mount: tableRef,
         content: [$bodyContent],
-        viewport: [$bodyWrapper]
       });
     } catch (err) {
       console.error("[ERR] error when init virtual scrollbar", err, tableRef);
