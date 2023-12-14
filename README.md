@@ -142,6 +142,14 @@ barStates.offset.x.bottom = 5 // px
 console.log(barStates.isDragging.y)
 ```
 
+#### 1.6. barStates.isScrolling
+
+获取当前滚动区域的滚动状态。
+
+```typescript
+console.log(barStates.isScrolling.x)
+```
+
 ### 2. Actions
 
 #### 2.1. barStates.init
@@ -208,6 +216,8 @@ console.log(nativeBar.thick) // usually 17px in Windows
 pnpm install
 pnpm serve
 ```
+
+近期开发路线：接下来会看一下性能方面的优化，以及如何在 Vue2/Vue3 中通用。
 
 ## 📄 License
 

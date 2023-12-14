@@ -44,7 +44,7 @@ const isHover = useElementHover(playRef);
 
  const states = reactive({
   isVirtualScroll: false,
-  isVirtualScrollbar: false,
+  isVirtualScrollbar: true,
   isLoading: false,
   tableData: [] as any[],
   sexList: [

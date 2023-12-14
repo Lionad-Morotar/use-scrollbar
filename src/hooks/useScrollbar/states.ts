@@ -53,6 +53,11 @@ const getOpts = () => ({
     x: false,
     y: false,
   },
+  // 滚动条的滚动状态
+  isScrolling: {
+    x: false,
+    y: false,
+  },
   // 滚动条样式
   styles: {
     y: {},

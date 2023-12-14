@@ -167,6 +167,15 @@ export default function useScrollbar(
     const contentH = ref(0)
     const scrollTop = ref(0)
     const scrollLeft = ref(0)
+    const directions = ref({
+      top: false,
+      bottom: false,
+      left: false,
+      right: false,
+    })
+    watchEffect(() => {
+      console.log(directions.value)
+    })
 
     /* 初始化数据 */
 
@@ -204,10 +213,28 @@ export default function useScrollbar(
     if (opts.wrapper.length) {
       const tops = [] as Ref<number>[]
       const lefts = [] as Ref<number>[]
-      opts.wrapper.map(($elm) => {
-        const { x: left, y: top } = useScroll($elm as HTMLElement)
+      const dss = Array.from({ length: opts.wrapper.length }).map(() => ref({
+        top: false,
+        bottom: false,
+        left: false,
+        right: false,
+      }))
+      opts.wrapper.map(($elm, idx) => {
+        const { x: left, y: top, directions: ds } = useScroll($elm as HTMLElement)
         tops.push(top)
         lefts.push(left)
+        watchEffect(() => {
+          dss[idx].value.bottom = unref(ds).bottom
+          dss[idx].value.top = unref(ds).top
+          dss[idx].value.left = unref(ds).left
+          dss[idx].value.right = unref(ds).right
+        })
+      })
+      watchEffect(() => {
+        directions.value.top = dss.map(unref).some(x => x.top)
+        directions.value.bottom = dss.map(unref).some(x => x.bottom)
+        directions.value.left = dss.map(unref).some(x => x.left)
+        directions.value.right = dss.map(unref).some(x => x.right)
       })
       watchEffectGathered(() => {
         scrollTop.value = Math.max(...tops.map(unref))
@@ -349,6 +376,8 @@ export default function useScrollbar(
     watchEffectGathered(() => (states.contentW = contentW.value))
     watchEffectGathered(() => (states.scrollTop = scrollTop.value))
     watchEffectGathered(() => (states.scrollLeft = scrollLeft.value))
+    watchEffectGathered(() => (states.isScrolling.x = directions.value.left || directions.value.right))
+    watchEffectGathered(() => (states.isScrolling.y = directions.value.top || directions.value.bottom))
   }
 
   /* 计算滚动条样式 */

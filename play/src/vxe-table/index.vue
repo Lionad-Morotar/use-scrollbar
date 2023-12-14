@@ -1,6 +1,11 @@
 <template>
   <vxe-table
-    :class="props.enable ? 'is-virtual-scrollbar' : ''"
+    :class="[
+      props.enable ? 'is-virtual-scrollbar' : '',
+      barStates.isScrolling.x ? 'is-scrolling-x' : '',
+      barStates.isScrolling.y ? 'is-scrolling-y' : '',
+      (!barStates.isScrolling.x && !barStates.isScrolling.y) ? 'is-no-scrolling' : '',
+    ]"
     ref="tableRef"
     height="100%"
     v-bind="$attrs"
@@ -25,6 +30,7 @@ if (!slots.default) {
 
 const tableRef = ref<any | null>(null);
 const barStates = useScrollbar();
+console.log('[info] barStates', barStates)
 
 watch(() => props.enable, async (enable) => {
   console.log('[info] 开启虚拟滚动条', enable)
@@ -58,7 +64,7 @@ watch(() => props.enable, async (enable) => {
 })
 </script>
 
-<style>
+<style lang="less">
 .vxe-table {
   box-sizing: border-box;
   border: solid 1px #333;
@@ -81,5 +87,43 @@ watch(() => props.enable, async (enable) => {
 .vxe-table.is-virtual-scrollbar .vxe-table--body-wrapper::-webkit-scrollbar {
   width: 0;
   height: 0;
+}
+
+/** test box-shadow on scroll */
+.vxe-table.vxe-table.vxe-table {
+  --color-1: rgb(0 0 0 / 5%);
+  --color-2: rgb(0 0 0 / 3%);
+  --color-3: rgb(0 0 0 / 8%);
+
+  .vxe-table--header-wrapper {
+    z-index: 9;
+  }
+
+  .vxe-table--header-wrapper,
+  .vxe-table--fixed-left-wrapper,
+  .vxe-table--fixed-right-wrapper {
+    box-shadow: 0 0 0 0 var(--color-1), 0 0 0 0 var(--color-2), 0 0 0 -8px var(--color-3);
+    transition: box-shadow 0.35s ease-out;
+    transition-delay: 0.5s;
+    will-change: box-shadow;
+  }
+  &.is-scrolling-x {
+    .vxe-table--header-wrapper {
+      z-index: unset;
+    }
+    .vxe-table--fixed-left-wrapper,
+    .vxe-table--fixed-right-wrapper {
+      box-shadow: 0 9px 28px 0 var(--color-1), 0 12px 48px 16px var(--color-2), 0 6px 16px -8px var(--color-3);
+      transition: box-shadow 0.25s ease-in;
+      transition-delay: 0.01s;
+    }
+  }
+  &.is-scrolling-y {
+    .vxe-table--header-wrapper {
+      box-shadow: 0 0 8px 0 var(--color-1), 0 0 12px 18px var(--color-2), 0 0 16px -8px var(--color-3);
+      transition: box-shadow 0.25s ease-in;
+      transition-delay: 0.01s;
+    }
+  }
 }
 </style>
