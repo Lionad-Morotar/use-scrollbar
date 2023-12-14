@@ -12,7 +12,7 @@
       :width="32"
       :height="32"
     >
-      <img class="prefix-image" :src="task.image" :title="task.imageTitle || ''" />
+      <img class="prefix-image" :src="task.image" :title="task.imageTitle || ''" :alt="task.imageTitle" />
     </foreignObject>
     <svg
       class="gantt-elastic__chart-row-bar gantt-elastic__chart-row-task"

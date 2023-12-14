@@ -10,7 +10,79 @@
     </div>
     <div class="compare-container">
 
+      <h4>use-scrollbars</h4>
+      <div class="complex-component-example cutom-scrollbar" :class="kls" ref="elemRef">
+        <div class="content-wrapper">
+          <pre class="content">
+// use-scrollbar
+function hello() {
+  console.log('hello world!')
+  console.log('I like cola and cola and longcola and longcola and longcola and longcola and longcola')
+  console.log('hello world!')
+  console.log('I like cola and cola')
+  console.log('hello world!')
+  console.log('I like cola and cola')
+  console.log('hello world!')
+  console.log('I like cola and cola')
+  console.log('hello world!')
+  console.log('I like cola and cola')
+  console.log('hello world!')
+  console.log('I like cola and cola')
+  console.log('hello world!')
+  console.log('I like cola and cola')
+  console.log('hello world!')
+  console.log('I like cola and cola')
+  console.log('hello world!')
+  console.log('I like cola and cola')
+}
+
+function world() {
+  console.log('hello world!')
+  console.log('I like cola and cola')
+  console.log('hello world!')
+  console.log('I like cola and cola')
+  console.log('hello world!')
+  console.log('I like cola and cola')
+  console.log('hello world!')
+  console.log('I like cola and cola')
+  console.log('hello world!')
+  console.log('I like cola and cola')
+  console.log('hello world!')
+  console.log('I like cola and cola')
+  console.log('hello world!')
+  console.log('I like cola and cola')
+  console.log('hello world!')
+  console.log('I like cola and cola')
+  console.log('hello world!')
+  console.log('I like cola and cola')
+}
+
+function world() {
+  console.log('hello world!')
+  console.log('I like cola and cola')
+  console.log('hello world!')
+  console.log('I like cola and cola')
+  console.log('hello world!')
+  console.log('I like cola and cola')
+  console.log('hello world!')
+  console.log('I like cola and cola')
+  console.log('hello world!')
+  console.log('I like cola and cola')
+  console.log('hello world!')
+  console.log('I like cola and cola')
+  console.log('hello world!')
+  console.log('I like cola and cola')
+  console.log('hello world!')
+  console.log('I like cola and cola')
+  console.log('hello world!')
+  console.log('I like cola and cola')
+}
+          </pre>
+        </div>
+      </div>
+
       <!-- native-scrollbar -->
+      <h4>native scrollbar</h4>
       <div class="complex-component-example" :class="kls">
         <div class="content-wrapper">
           <pre class="content">
@@ -81,11 +153,12 @@ function world() {
         </div>
       </div>
 
-      <!-- custom-scrollbar -->
-      <div class="complex-component-example cutom-scrollbar" :class="kls" ref="elemRef">
-        <div class="content-wrapper">
+      <!-- OverlayScrollbars -->
+      <h4>overlay-scrollbars-vue</h4>
+      <div class="complex-component-example" :class="kls">
+        <div class="content-wrapper" ref="overlayScrollbarDivRef">
           <pre class="content">
-// use-scrollbar
+// OverlayScrollbars
 function hello() {
   console.log('hello world!')
   console.log('I like cola and cola and longcola and longcola and longcola and longcola and longcola')
@@ -151,12 +224,14 @@ function world() {
           </pre>
         </div>
       </div>
+
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { ref, computed, reactive, watchEffect } from "vue";
+import { ref, computed, reactive, watchEffect, onMounted } from "vue";
+import { useOverlayScrollbars } from "overlayscrollbars-vue";
 import { useScrollbar } from "@/hooks";
 
 import type { Theme } from "@/hooks";
@@ -200,6 +275,15 @@ watchEffect(() => {
 })
 
 console.log('[debug] barStates', barStates);
+
+const overlayScrollbarDivRef = ref(null);
+const reactiveParams = reactive({ options: {}, events: {}, defer: false });
+const [initialize, instance] = useOverlayScrollbars(reactiveParams);
+
+onMounted(() => {
+  console.log('overlayScrollbarDivRef.value')
+  initialize({ target: overlayScrollbarDivRef.value! });
+})
 </script>
 
 <style scoped>
@@ -209,14 +293,20 @@ console.log('[debug] barStates', barStates);
 }
 .compare-container {
   display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 2em;
+  flex-direction: column;
+  gap: 1em;
   box-sizing: border-box;
   padding-bottom: 12vh;
   width: 100%;
-  height: 100%;
-  border: solid 1px #eee;
+  height: auto;
+  border: solid 1px var(--el-border-color-dark);
+  overflow: auto;
+
+  h4 {
+    margin: 1em 0 0 0;
+    font-size: 16px;
+    line-height: 1;
+  }
 }
 .complex-component-example {
   position: relative;
@@ -224,7 +314,7 @@ console.log('[debug] barStates', barStates);
   width: 600px;
   height: 372px;
   border: solid 2px black;
-  background: #eee;
+  background: solid 1px var(--el-border-color-dark);
 }
 .content-wrapper {
   box-sizing: border-box;
