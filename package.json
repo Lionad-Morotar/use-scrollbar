@@ -24,9 +24,9 @@
 		"auto:publish": "git checkout dev | pnpm build | git branch -D release | git checkout -b release | git merge dev | npm version patch | pnpm publish | git push --set-upstream origin release | git checkout dev | git merge release | git push origin dev"
 	},
 	"dependencies": {
-		"@vueuse/core": "^9.13.0",
-		"@vueuse/shared": "^9.13.0",
-		"vue-demi": "^0.13.11"
+		"@vueuse/core": "^10.7.0",
+		"@vueuse/shared": "^10.7.0",
+		"vue-demi": "^0.14.6"
 	},
 	"devDependencies": {
 		"@commitlint/cli": "^17.8.1",
@@ -48,6 +48,8 @@
 		"less": "^4.2.0",
 		"lint-staged": "^13.3.0",
 		"mitt": "^3.0.1",
+		"overlayscrollbars": "^2.4.4",
+		"overlayscrollbars-vue": "^0.5.6",
 		"postcss": "^8.4.31",
 		"postcss-preset-env": "^8.5.1",
 		"prettier": "^2.8.8",
@@ -57,9 +59,9 @@
 		"vite": "^4.5.0",
 		"vite-plugin-dts": "^1.7.3",
 		"vue": "^3.3.8",
-		"vue3": "npm:vue@^3.3.8",
 		"vue-eslint-parser": "^9.3.2",
 		"vue-tsc": "1.0.9",
+		"vue3": "npm:vue@^3.3.8",
 		"vxe-table": "^4.5.13",
 		"xe-utils": "^3.5.14"
 	},
