@@ -1,6 +1,6 @@
 {
 	"name": "use-scrollbars",
-	"version": "0.4.9",
+	"version": "0.4.10",
 	"private": false,
 	"main": "./dist/lib/index.cjs.js",
 	"module": "./dist/lib/index.esm.js",
@@ -29,7 +29,7 @@
 		"vue-demi": "^0.14.6"
 	},
 	"devDependencies": {
-    "@element-plus/icons-vue": "^2.3.1",
+		"@element-plus/icons-vue": "^2.3.1",
 		"@commitlint/cli": "^17.8.1",
 		"@commitlint/config-conventional": "^17.8.1",
 		"@types/node": "^17.0.45",
