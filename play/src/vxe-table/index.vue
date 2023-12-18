@@ -1,11 +1,6 @@
 <template>
   <vxe-table
-    :class="[
-      props.enable ? 'is-virtual-scrollbar' : '',
-      barStates.isScrolling.x ? 'is-scrolling-x' : '',
-      barStates.isScrolling.y ? 'is-scrolling-y' : '',
-      (!barStates.isScrolling.x && !barStates.isScrolling.y) ? 'is-no-scrolling' : '',
-    ]"
+    :class="kls"
     ref="vxeTableRef"
     height="100%"
     v-bind="$attrs"
@@ -15,8 +10,8 @@
 </template>
 
 <script setup lang="ts">
-import { watchEffect, useAttrs, useSlots, nextTick, ref, watch } from "vue";
-import { until, eagerComputed, useVModel } from "@vueuse/core";
+import { computed, watchEffect, useAttrs, useSlots, nextTick, ref, watch } from "vue";
+import { until, refDebounced, eagerComputed, useVModel } from "@vueuse/core";
 import { useScrollbar } from "@/hooks";
 import { useDefer } from "./hooks";
 
@@ -25,7 +20,7 @@ if (!slots.default) {
   throw new Error("[ERR] no default slot");
 }
 
-const attrs = useAttrs()
+const attrs = useAttrs() as any;
 const emits = defineEmits(["update:tableRef"]);
 const props = defineProps<{
   enable: boolean
@@ -39,9 +34,10 @@ watchEffect(async () => {
   if (!vxeTableRef.value) {
     return;
   }
-  if (!attrs.columns) {
-    return;
+  if (!attrs.data?.length) {
+    return
   }
+  console.log("[INFO] data", attrs.data?.length);
   await nextTick();
   try {
     const deferLeft = useDefer<HTMLElement>();
@@ -61,7 +57,6 @@ watchEffect(async () => {
       const width = leftFixed.clientWidth;
       leftFixedWidth.value = width;
     });
-
     const deferRight = useDefer<HTMLElement>();
     const tickRight = setInterval(() => {
       try {
@@ -128,6 +123,14 @@ watch(() => props.enable, async (enable) => {
 }, {
   immediate: true,
 })
+
+const kls = refDebounced(computed(() => [
+  props.enable ? 'is-virtual-scrollbar' : '',
+  barStates.isDragging.x ? 'is-dragging-x' : '',
+  barStates.isScrolling.x ? 'is-scrolling-x' : '',
+  barStates.isScrolling.y ? 'is-scrolling-y' : '',
+  (!barStates.isScrolling.x && !barStates.isScrolling.y) ? 'is-no-scrolling' : '',
+]), 17 * 3)
 </script>
 
 <style lang="less">
@@ -157,9 +160,9 @@ watch(() => props.enable, async (enable) => {
 
 /** test box-shadow on scroll */
 .vxe-table.vxe-table.vxe-table {
-  --color-1: rgb(0 0 0 / 5%);
-  --color-2: rgb(0 0 0 / 3%);
-  --color-3: rgb(0 0 0 / 8%);
+  --color-1: rgba(0, 0, 0, 0%);
+  --color-2: rgba(0, 0, 0, 0%);
+  --color-3: rgba(0, 0, 0, 0%);
   --left-col-width: v-bind(cssLeftFixedWidth);
   --right-col-width: v-bind(cssRightFixedWidth);
 
@@ -173,33 +176,39 @@ watch(() => props.enable, async (enable) => {
     z-index: 9;
   }
 
-  .vxe-table--header-wrapper.body--wrapper,
   .vxe-table--fixed-left-wrapper,
   .vxe-table--fixed-right-wrapper {
-    box-shadow: 0 0 0 0 var(--color-1), 0 0 0 0 var(--color-2), 0 0 0 -8px var(--color-3);
+    box-shadow: 0 0 8px 0 var(--color-1), 0 12px 48px 16px var(--color-2), 0 0 16px -8px var(--color-3);
     transition: box-shadow 0.35s ease-out;
     transition-delay: 0.5s;
     will-change: box-shadow;
   }
-  &.is-scrolling-x {
-    .vxe-table--fixed-left-wrapper,
-    .vxe-table--fixed-right-wrapper {
-      box-shadow: 0 9px 28px 0 var(--color-1), 0 12px 48px 16px var(--color-2), 0 6px 16px -8px var(--color-3);
-      transition: box-shadow 0.25s ease-in;
-      transition-delay: 0.01s;
-    }
+  .vxe-table--header-wrapper.body--wrapper {
+    box-shadow: 0 0 8px 0 var(--color-1), 0 0 18px 16px var(--color-2), 0 0 16px -8px var(--color-3);
+    transition: box-shadow 0.35s ease-out;
+    transition-delay: 0.5s;
+    will-change: box-shadow;
   }
-  &.is-scrolling-y {
-    .vxe-table--header-wrapper.body--wrapper {
-      box-shadow: 0 0 8px 0 var(--color-1), 0 0 12px 18px var(--color-2), 0 0 16px -8px var(--color-3);
-      transition: box-shadow 0.25s ease-in;
-      transition-delay: 0.01s;
+
+  &:not(.is-dragging-x) {
+    &.is-scrolling-x {
+      .vxe-table--fixed-left-wrapper,
+      .vxe-table--fixed-right-wrapper {
+        --color-1: rgba(0, 0, 0, 6%);
+        --color-2: rgba(0, 0, 0, 4%);
+        --color-3: rgba(0, 0, 0, 10%);
+        transition: box-shadow 0.25s ease-in;
+        transition-delay: 0.01s;
+      }
     }
-    .vxe-table--fixed-left-wrapper .vxe-table--header,
-    .vxe-table--fixed-right-wrapper .vxe-table--header {
-      box-shadow: 0 0 8px 0 var(--shadow-color-1), 0 0 12px 18px var(--shadow-color-2), 0 0 16px -8px var(--shadow-color-3);
-      transition: box-shadow 0.25s ease-in;
-      transition-delay: 0.01s;
+    &.is-scrolling-y {
+      .vxe-table--header-wrapper.body--wrapper {
+        --color-1: rgba(0, 0, 0, 6%);
+        --color-2: rgba(0, 0, 0, 4%);
+        --color-3: rgba(0, 0, 0, 10%);
+        transition: box-shadow 0.25s ease-in;
+        transition-delay: 0.01s;
+      }
     }
   }
 }

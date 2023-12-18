@@ -15,7 +15,7 @@
       :enable="states.isVirtualScrollbar"
       :loading="states.isLoading"
       :tree-config="{transform: true}"
-      :column-config="{resizable: true}"
+      :column-config="{resizable: true }"
       :row-config="{isHover: true}"
       :checkbox-config="{labelField: 'id', highlight: true}"
       :data="states.tableData"
@@ -27,79 +27,75 @@
       <vxe-column field="name" title="Name" :width="140"></vxe-column>
       <vxe-column field="sex" title="Sex" :formatter="formatterSex" :width="140"></vxe-column>
       <vxe-column field="address" title="Address" show-overflow :min-width="300"></vxe-column>
-      <vxe-column field="age" title="Age" :width="120"></vxe-column>
-      <vxe-column field="sex" title="Sex" :formatter="formatterSex" :width="140"></vxe-column>
-      <vxe-column field="age" title="Age" :width="120"></vxe-column>
-      <vxe-column field="sex" title="Sex" :formatter="formatterSex" :width="140"></vxe-column>
-      <vxe-column field="age" title="Age" :width="120"></vxe-column>
-      <vxe-column field="sex" title="Sex" :formatter="formatterSex" :width="140"></vxe-column>
-      <vxe-column field="age" title="Age" :width="120"></vxe-column>
-      <vxe-column field="sex" title="Sex" :formatter="formatterSex" :width="140"></vxe-column>
-      <vxe-column field="age" title="Age" :width="120"></vxe-column>
-      <vxe-column field="sex" title="Sex" :formatter="formatterSex" :width="140"></vxe-column>
-      <vxe-column field="age" title="Age" :width="120"></vxe-column>
-      <vxe-column field="sex" title="Sex" :formatter="formatterSex" :width="140"></vxe-column>
-      <vxe-column field="age" title="Age" :width="120"></vxe-column>
-      <vxe-column field="sex" title="Sex" :formatter="formatterSex" :width="140"></vxe-column>
-      <vxe-column field="age" title="Age" :width="120"></vxe-column>
-      <vxe-column field="sex" title="Sex" :formatter="formatterSex" :width="140"></vxe-column>
-      <vxe-column field="age" title="Age" :width="120"></vxe-column>
-      <vxe-column field="sex" title="Sex" :formatter="formatterSex" :width="140"></vxe-column>
-      <vxe-column field="age" title="Age" :width="120"></vxe-column>
-      <vxe-column field="sex" title="Sex" :formatter="formatterSex" :width="140"></vxe-column>
-      <vxe-column field="age" title="Age" :width="120"></vxe-column>
-      <vxe-column field="sex" title="Sex" :formatter="formatterSex" :width="140"></vxe-column>
-      <vxe-column field="age" title="Age" :width="120"></vxe-column>
-      <vxe-column field="sex" title="Sex" :formatter="formatterSex" :width="140"></vxe-column>
-      <vxe-column field="age" title="Age" :width="120"></vxe-column>
-      <vxe-column field="sex" title="Sex" :formatter="formatterSex" :width="140"></vxe-column>
-      <vxe-column field="age" title="Age" :width="120"></vxe-column>
-      <vxe-column field="sex" title="Sex" :formatter="formatterSex" :width="140"></vxe-column>
-      <vxe-column field="age" title="Age" :width="120"></vxe-column>
-      <vxe-column field="sex" title="Sex" :formatter="formatterSex" :width="140"></vxe-column>
-      <vxe-column field="age" title="Age" :width="120"></vxe-column>
-      <vxe-column field="sex" title="Sex" :formatter="formatterSex" :width="140"></vxe-column>
-      <vxe-column field="age" title="Age" :width="120"></vxe-column>
-      <vxe-column field="sex" title="Sex" :formatter="formatterSex" :width="140"></vxe-column>
-      <vxe-column field="age" title="Age" :width="120"></vxe-column>
-      <vxe-column field="sex" title="Sex" :formatter="formatterSex" :width="140"></vxe-column>
-      <vxe-column field="age" title="Age" :width="120"></vxe-column>
-      <vxe-column field="sex" title="Sex" :formatter="formatterSex" :width="140"></vxe-column>
-      <vxe-column field="age" title="Age" :width="120"></vxe-column>
-      <vxe-column field="sex" title="Sex" :formatter="formatterSex" :width="140"></vxe-column>
-      <vxe-column field="age" title="Age" :width="120"></vxe-column>
-      <vxe-column field="address" title="Address Another" :width="1000"></vxe-column>
-      <vxe-column field="address" title="Address Another" :width="1000"></vxe-column>
-      <vxe-column field="address" title="Address Another" :width="1000"></vxe-column>
+      <vxe-column field="age1" title="Age" :width="120"></vxe-column>
+      <vxe-column field="sex1" title="Sex" :formatter="formatterSex" :width="140"></vxe-column>
+      <vxe-column field="age2" title="Age" :width="120"></vxe-column>
+      <vxe-column field="sex2" title="Sex" :formatter="formatterSex" :width="140"></vxe-column>
+      <vxe-column field="age3" title="Age" :width="120"></vxe-column>
+      <vxe-column field="sex3" title="Sex" :formatter="formatterSex" :width="140"></vxe-column>
+      <vxe-column field="age4" title="Age" :width="120"></vxe-column>
+      <vxe-column field="sex4" title="Sex" :formatter="formatterSex" :width="140"></vxe-column>
+      <vxe-column field="age5" title="Age" :width="120"></vxe-column>
+      <vxe-column field="sex5" title="Sex" :formatter="formatterSex" :width="140"></vxe-column>
+      <vxe-column field="age6" title="Age" :width="120"></vxe-column>
+      <vxe-column field="sex6" title="Sex" :formatter="formatterSex" :width="140"></vxe-column>
+      <vxe-column field="age7" title="Age" :width="120"></vxe-column>
+      <vxe-column field="sex7" title="Sex" :formatter="formatterSex" :width="140"></vxe-column>
+      <vxe-column field="age8" title="Age" :width="120"></vxe-column>
+      <vxe-column field="sex8" title="Sex" :formatter="formatterSex" :width="140"></vxe-column>
+      <vxe-column field="age9" title="Age" :width="120"></vxe-column>
+      <vxe-column field="sex9" title="Sex" :formatter="formatterSex" :width="140"></vxe-column>
+      <vxe-column field="age10" title="Age" :width="120"></vxe-column>
+      <vxe-column field="sex10" title="Sex" :formatter="formatterSex" :width="140"></vxe-column>
+      <vxe-column field="age11" title="Age" :width="120"></vxe-column>
+      <vxe-column field="sex11" title="Sex" :formatter="formatterSex" :width="140"></vxe-column>
+      <vxe-column field="age12" title="Age" :width="120"></vxe-column>
+      <vxe-column field="sex12" title="Sex" :formatter="formatterSex" :width="140"></vxe-column>
+      <vxe-column field="age13" title="Age" :width="120"></vxe-column>
+      <vxe-column field="sex13" title="Sex" :formatter="formatterSex" :width="140"></vxe-column>
+      <vxe-column field="age14" title="Age" :width="120"></vxe-column>
+      <vxe-column field="sex14" title="Sex" :formatter="formatterSex" :width="140"></vxe-column>
+      <vxe-column field="age15" title="Age" :width="120"></vxe-column>
+      <vxe-column field="sex15" title="Sex" :formatter="formatterSex" :width="140"></vxe-column>
+      <vxe-column field="age16" title="Age" :width="120"></vxe-column>
+      <vxe-column field="sex16" title="Sex" :formatter="formatterSex" :width="140"></vxe-column>
+      <vxe-column field="age17" title="Age" :width="120"></vxe-column>
+      <vxe-column field="sex17" title="Sex" :formatter="formatterSex" :width="140"></vxe-column>
+      <vxe-column field="age18" title="Age" :width="120"></vxe-column>
+      <vxe-column field="sex18" title="Sex" :formatter="formatterSex" :width="140"></vxe-column>
+      <vxe-column field="age19" title="Age" :width="120"></vxe-column>
+      <vxe-column field="sex19" title="Sex" :formatter="formatterSex" :width="140"></vxe-column>
+      <vxe-column field="age20" title="Age" :width="120"></vxe-column>
+      <vxe-column field="sex20" title="Sex" :formatter="formatterSex" :width="140"></vxe-column>
       <vxe-column width="500" fixed="right">
-        <el-button size="small" type="text">
+        <el-button size="small" text>
           Upload<el-icon class="el-icon--right"><Upload /></el-icon>
         </el-button>
-        <el-button size="small" type="text">
+        <el-button size="small" text>
           Upload<el-icon class="el-icon--right"><Upload /></el-icon>
         </el-button>
-        <el-button size="small" type="text">
+        <el-button size="small" text>
           Upload<el-icon class="el-icon--right"><Upload /></el-icon>
         </el-button>
-        <el-button size="small" type="text">
+        <el-button size="small" text>
           Upload<el-icon class="el-icon--right"><Upload /></el-icon>
         </el-button>
-        <el-button size="small" type="text">
+        <el-button size="small" text>
           Upload<el-icon class="el-icon--right"><Upload /></el-icon>
         </el-button>
-        <el-button size="small" type="text">
+        <el-button size="small" text>
           Upload<el-icon class="el-icon--right"><Upload /></el-icon>
         </el-button>
-        <el-button size="small" type="text">
+        <el-button size="small" text>
           Upload<el-icon class="el-icon--right"><Upload /></el-icon>
         </el-button>
-        <el-button size="small" type="text">
+        <el-button size="small" text>
           Upload<el-icon class="el-icon--right"><Upload /></el-icon>
         </el-button>
-        <el-button size="small" type="text">
+        <el-button size="small" text>
           Upload<el-icon class="el-icon--right"><Upload /></el-icon>
         </el-button>
-        <el-button size="small" type="text">
+        <el-button size="small" text>
           Upload<el-icon class="el-icon--right"><Upload /></el-icon>
         </el-button>
       </vxe-column>
@@ -151,9 +147,13 @@ const getTableData = () => {
       parentId: null as number | null,
       name: 'Test-' + (count + 1),
       role: 'Develop',
-      sex: Math.random() < 0.5 ? '1' : '0',
-      age: 28,
-      address: Array(10).fill('long address long long long address').join(', ')
+      address: Array(10).fill('long address long long long address').join(', '),
+      // @ts-ignore
+      ...(Array.from({ length: 19 }).reduce((acc: any, _, idx) => {
+        acc[`sex${idx + 1}`] = Math.random() < 0.5 ? '1' : '0'
+        acc[`age${idx + 1}`] = Math.random() < 0.5 ? '1' : '0'
+        return acc
+      }, {} as Record<string, string>))
     }
     if (Math.random() < 0.5) {
       parentId = count
@@ -193,7 +193,7 @@ const measure = (async () => {
   }
   const startTime = performance.now()
 
-  await NativeBird.mapSeries(Array.from({ length: 5 }), async (_, idx) => {
+  await NativeBird.mapSeries(Array.from({ length: 20 }), async (_, idx) => {
     await vxeTableRef.value.scrollTo(0, idx * 30)
   })
 
