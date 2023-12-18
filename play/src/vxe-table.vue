@@ -4,10 +4,12 @@
       <h4>## VXETable with Virtual Scrollbars {{ isHover ? ' - Hovered' : '' }}</h4>
       <el-checkbox v-model="states.isVirtualScroll">表格虚拟滚动</el-checkbox>
       <el-checkbox v-model="states.isVirtualScrollbar">表格虚拟滚动条</el-checkbox>
+      <el-button type="primary" @click="measure">测试滚动性能</el-button>
       <el-button type="primary" @click="refresh">刷新</el-button>
       <el-button type="primary" @click="addMore">+{{ listCount }}条数据</el-button>
     </div>
     <vxe-table-virtual-scrollbar
+      v-model:tableRef="vxeTableRef"
       border
       stripe
       :enable="states.isVirtualScrollbar"
@@ -17,32 +19,107 @@
       :row-config="{isHover: true}"
       :checkbox-config="{labelField: 'id', highlight: true}"
       :data="states.tableData"
-      :scroll-x="{ enabled: states.isVirtualScroll }"
-      :scroll-y="{ enabled: states.isVirtualScroll }"
+      :scroll-x="{ enabled: states.isVirtualScroll, oSize: 0 }"
+      :scroll-y="{ enabled: states.isVirtualScroll, oSize: 0 }"
       >
       <vxe-column type="seq" :width="180" fixed="left" tree-node></vxe-column>
       <vxe-column type="checkbox" title="ID" :width="140"></vxe-column>
       <vxe-column field="name" title="Name" :width="140"></vxe-column>
       <vxe-column field="sex" title="Sex" :formatter="formatterSex" :width="140"></vxe-column>
-      <vxe-column field="age" title="Age" :width="120"></vxe-column>
       <vxe-column field="address" title="Address" show-overflow :min-width="300"></vxe-column>
+      <vxe-column field="age" title="Age" :width="120"></vxe-column>
+      <vxe-column field="sex" title="Sex" :formatter="formatterSex" :width="140"></vxe-column>
+      <vxe-column field="age" title="Age" :width="120"></vxe-column>
+      <vxe-column field="sex" title="Sex" :formatter="formatterSex" :width="140"></vxe-column>
+      <vxe-column field="age" title="Age" :width="120"></vxe-column>
+      <vxe-column field="sex" title="Sex" :formatter="formatterSex" :width="140"></vxe-column>
+      <vxe-column field="age" title="Age" :width="120"></vxe-column>
+      <vxe-column field="sex" title="Sex" :formatter="formatterSex" :width="140"></vxe-column>
+      <vxe-column field="age" title="Age" :width="120"></vxe-column>
+      <vxe-column field="sex" title="Sex" :formatter="formatterSex" :width="140"></vxe-column>
+      <vxe-column field="age" title="Age" :width="120"></vxe-column>
+      <vxe-column field="sex" title="Sex" :formatter="formatterSex" :width="140"></vxe-column>
+      <vxe-column field="age" title="Age" :width="120"></vxe-column>
+      <vxe-column field="sex" title="Sex" :formatter="formatterSex" :width="140"></vxe-column>
+      <vxe-column field="age" title="Age" :width="120"></vxe-column>
+      <vxe-column field="sex" title="Sex" :formatter="formatterSex" :width="140"></vxe-column>
+      <vxe-column field="age" title="Age" :width="120"></vxe-column>
+      <vxe-column field="sex" title="Sex" :formatter="formatterSex" :width="140"></vxe-column>
+      <vxe-column field="age" title="Age" :width="120"></vxe-column>
+      <vxe-column field="sex" title="Sex" :formatter="formatterSex" :width="140"></vxe-column>
+      <vxe-column field="age" title="Age" :width="120"></vxe-column>
+      <vxe-column field="sex" title="Sex" :formatter="formatterSex" :width="140"></vxe-column>
+      <vxe-column field="age" title="Age" :width="120"></vxe-column>
+      <vxe-column field="sex" title="Sex" :formatter="formatterSex" :width="140"></vxe-column>
+      <vxe-column field="age" title="Age" :width="120"></vxe-column>
+      <vxe-column field="sex" title="Sex" :formatter="formatterSex" :width="140"></vxe-column>
+      <vxe-column field="age" title="Age" :width="120"></vxe-column>
+      <vxe-column field="sex" title="Sex" :formatter="formatterSex" :width="140"></vxe-column>
+      <vxe-column field="age" title="Age" :width="120"></vxe-column>
+      <vxe-column field="sex" title="Sex" :formatter="formatterSex" :width="140"></vxe-column>
+      <vxe-column field="age" title="Age" :width="120"></vxe-column>
+      <vxe-column field="sex" title="Sex" :formatter="formatterSex" :width="140"></vxe-column>
+      <vxe-column field="age" title="Age" :width="120"></vxe-column>
+      <vxe-column field="sex" title="Sex" :formatter="formatterSex" :width="140"></vxe-column>
+      <vxe-column field="age" title="Age" :width="120"></vxe-column>
+      <vxe-column field="sex" title="Sex" :formatter="formatterSex" :width="140"></vxe-column>
+      <vxe-column field="age" title="Age" :width="120"></vxe-column>
+      <vxe-column field="sex" title="Sex" :formatter="formatterSex" :width="140"></vxe-column>
+      <vxe-column field="age" title="Age" :width="120"></vxe-column>
+      <vxe-column field="sex" title="Sex" :formatter="formatterSex" :width="140"></vxe-column>
+      <vxe-column field="age" title="Age" :width="120"></vxe-column>
       <vxe-column field="address" title="Address Another" :width="1000"></vxe-column>
       <vxe-column field="address" title="Address Another" :width="1000"></vxe-column>
       <vxe-column field="address" title="Address Another" :width="1000"></vxe-column>
-      <vxe-column type="seq" :width="60" fixed="right"></vxe-column>
+      <vxe-column width="500" fixed="right">
+        <el-button size="small" type="text">
+          Upload<el-icon class="el-icon--right"><Upload /></el-icon>
+        </el-button>
+        <el-button size="small" type="text">
+          Upload<el-icon class="el-icon--right"><Upload /></el-icon>
+        </el-button>
+        <el-button size="small" type="text">
+          Upload<el-icon class="el-icon--right"><Upload /></el-icon>
+        </el-button>
+        <el-button size="small" type="text">
+          Upload<el-icon class="el-icon--right"><Upload /></el-icon>
+        </el-button>
+        <el-button size="small" type="text">
+          Upload<el-icon class="el-icon--right"><Upload /></el-icon>
+        </el-button>
+        <el-button size="small" type="text">
+          Upload<el-icon class="el-icon--right"><Upload /></el-icon>
+        </el-button>
+        <el-button size="small" type="text">
+          Upload<el-icon class="el-icon--right"><Upload /></el-icon>
+        </el-button>
+        <el-button size="small" type="text">
+          Upload<el-icon class="el-icon--right"><Upload /></el-icon>
+        </el-button>
+        <el-button size="small" type="text">
+          Upload<el-icon class="el-icon--right"><Upload /></el-icon>
+        </el-button>
+        <el-button size="small" type="text">
+          Upload<el-icon class="el-icon--right"><Upload /></el-icon>
+        </el-button>
+      </vxe-column>
     </vxe-table-virtual-scrollbar>
   </div>
 </template>
 
 <script lang="ts" setup>
 import { ref, reactive, watch, onMounted } from "vue";
+import { ElButton, ElIcon } from "element-plus"
+import { Upload } from "@element-plus/icons-vue"
 import { useElementHover } from "@/hooks";
 import VxeTableVirtualScrollbar from "./vxe-table/index.vue";
+import NativeBird from "nativebird";
 
 const playRef = ref();
 const isHover = useElementHover(playRef);
 
- const states = reactive({
+const vxeTableRef = ref();
+const states = reactive({
   isVirtualScroll: true,
   isVirtualScrollbar: true,
   isLoading: false,
@@ -66,7 +143,7 @@ const formatterSex = ({ cellValue }: any) => {
 
 let count = 0
 let parentId = 0
-const listCount = 300
+const listCount = 2000
 const getTableData = () => {
   const res = Array(listCount).fill(0).map((x) => {
     const res = {
@@ -92,7 +169,7 @@ const getTableData = () => {
 const refresh = async () => {
   states.isLoading = true
   states.tableData = []
-  setTimeout(() => {
+  setTimeout(async () => {
     states.tableData = getTableData()
     states.isLoading = false
   }, 300)
@@ -109,4 +186,18 @@ const addMore = async () => {
 onMounted(refresh)
 watch(() => states.isVirtualScroll, refresh)
 watch(() => states.isVirtualScrollbar, refresh)
+
+const measure = (async () => {
+  if (!vxeTableRef.value) {
+    throw new Error('[ERR] no vxeTableRef')
+  }
+  const startTime = performance.now()
+
+  await NativeBird.mapSeries(Array.from({ length: 5 }), async (_, idx) => {
+    await vxeTableRef.value.scrollTo(0, idx * 30)
+  })
+
+  const endTime = performance.now()
+  console.log('[info] total time', endTime - startTime)
+})
 </script>

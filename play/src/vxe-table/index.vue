@@ -6,7 +6,7 @@
       barStates.isScrolling.y ? 'is-scrolling-y' : '',
       (!barStates.isScrolling.x && !barStates.isScrolling.y) ? 'is-no-scrolling' : '',
     ]"
-    ref="tableRef"
+    ref="vxeTableRef"
     height="100%"
     v-bind="$attrs"
   >
@@ -15,30 +15,96 @@
 </template>
 
 <script setup lang="ts">
-import { useSlots, nextTick, ref, watch } from "vue";
-import { until } from "@vueuse/core";
+import { watchEffect, useAttrs, useSlots, nextTick, ref, watch } from "vue";
+import { until, eagerComputed, useVModel } from "@vueuse/core";
 import { useScrollbar } from "@/hooks";
-
-const props = defineProps<{
-  enable: boolean
-}>();
+import { useDefer } from "./hooks";
 
 const slots = useSlots();
 if (!slots.default) {
   throw new Error("[ERR] no default slot");
 }
 
-const tableRef = ref<any | null>(null);
+const attrs = useAttrs()
+const emits = defineEmits(["update:tableRef"]);
+const props = defineProps<{
+  enable: boolean
+  tableRef: any
+}>();
+
+const vxeTableRef = useVModel(props, "tableRef", emits);
+const leftFixedWidth = ref(0);
+const rightFixedWidth = ref(0);
+watchEffect(async () => {
+  if (!vxeTableRef.value) {
+    return;
+  }
+  if (!attrs.columns) {
+    return;
+  }
+  await nextTick();
+  try {
+    const deferLeft = useDefer<HTMLElement>();
+    const tickLeft = setInterval(() => {
+      try {
+        const leftFixed = vxeTableRef.value.$el.querySelector(".vxe-table--fixed-left-wrapper");
+        if (leftFixed) {
+          deferLeft.resolve(leftFixed);
+          clearInterval(tickLeft);
+        }
+      } catch (err) {
+        clearInterval(tickLeft);
+        deferLeft.reject();
+      }
+    }, 17 * 5);
+    deferLeft.then((leftFixed: HTMLElement) => {
+      const width = leftFixed.clientWidth;
+      leftFixedWidth.value = width;
+    });
+
+    const deferRight = useDefer<HTMLElement>();
+    const tickRight = setInterval(() => {
+      try {
+        const rightFixed = vxeTableRef.value.$el.querySelector(".vxe-table--fixed-right-wrapper");
+        if (rightFixed) {
+          deferRight.resolve(rightFixed);
+          clearInterval(tickRight);
+        }
+      } catch (err) {
+        clearInterval(tickRight);
+        deferRight.reject();
+      }
+    }, 17 * 5);
+    deferRight.then((rightFixed: HTMLElement) => {
+      const width = rightFixed.clientWidth;
+      rightFixedWidth.value = width;
+    });
+  } catch (err) {
+    leftFixedWidth.value = 0;
+    rightFixedWidth.value = 0;
+    console.log("[ERR]", err);
+  }
+});
+const cssLeftFixedWidth = eagerComputed(() => {
+  console.log("[INFO] leftFixedWidth.value", leftFixedWidth.value);
+  return leftFixedWidth.value + "px";
+});
+const cssRightFixedWidth = eagerComputed(() => {
+  console.log("[INFO] rightFixedWidth.value", rightFixedWidth.value);
+  return rightFixedWidth.value + "px";
+});
+
 const barStates = useScrollbar();
+
 console.log('[info] barStates', barStates)
 
 watch(() => props.enable, async (enable) => {
   console.log('[info] 开启虚拟滚动条', enable)
   if (enable) {
     await nextTick();
-    await until(tableRef.value).toMatch((x) => x?.$el?.parentElement);
+    await until(vxeTableRef.value).toMatch((x) => x?.$el?.parentElement);
     try {
-      const $table = tableRef.value.$el;
+      const $table = vxeTableRef.value.$el;
       const $header = $table.querySelector(".vxe-table--header-wrapper");
       const $bodyWrapper = $table.querySelector(".vxe-table--body-wrapper");
       const $bodyContent = $table.querySelector(".vxe-table--body");
@@ -49,12 +115,12 @@ watch(() => props.enable, async (enable) => {
 
       barStates.setOffset({ y: { top: $header } });
       barStates.init({
-        mount: tableRef,
+        mount: vxeTableRef,
         content: [$bodyContent, $bodyXSpace, $bodyYSpace],
         viewport: [$bodyWrapper]
       });
     } catch (err) {
-      console.error("[ERR] error when init virtual scrollbar", err, tableRef);
+      console.error("[ERR] error when init virtual scrollbar", err, vxeTableRef);
     }
   } else {
     barStates.destroy()
@@ -94,6 +160,14 @@ watch(() => props.enable, async (enable) => {
   --color-1: rgb(0 0 0 / 5%);
   --color-2: rgb(0 0 0 / 3%);
   --color-3: rgb(0 0 0 / 8%);
+  --left-col-width: v-bind(cssLeftFixedWidth);
+  --right-col-width: v-bind(cssRightFixedWidth);
+
+  @table-header-column-height: 50px;
+  @header-with-shadow-height: @table-header-column-height + 50px;
+  .vxe-table--header-wrapper.body--wrapper {
+    clip-path: polygon(var(--left-col-width, 0) 0, calc(100% - var(--right-col-width, 0)) 0%, calc(100% - var(--right-col-width, 0)) @table-header-column-height, 100% @table-header-column-height, 100% calc(100% + @header-with-shadow-height), 0 calc(100% + @header-with-shadow-height), 0 @table-header-column-height, var(--left-col-width) @table-header-column-height);
+  }
 
   .vxe-table--header-wrapper {
     z-index: 9;
