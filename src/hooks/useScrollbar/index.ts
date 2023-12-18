@@ -6,16 +6,15 @@ import { notEmpty, safeRatio, safePrecicion, SCROLLBAR_GAP, findScrollElement } 
 import getOpts from './states'
 
 import type { Ref, CSSProperties } from "vue-demi";
-import type { MaybeComputedElementRef, MaybeComputedRef, MaybeElement } from '@vueuse/core'
+import type { MaybeComputedElementRef, MaybeRef, MaybeElement } from '@vueuse/core'
 import type { States } from './states'
 
 import "./index.less";
 
 export * from './type';
 
-type MaybeElem = MaybeComputedRef<MaybeElement>;
-// TODO type MaybeElemOrNumber = MaybeComputedRef<MaybeElement | number>
-type MaybeElemOrNumber = MaybeComputedRef<MaybeElement>
+type MaybeElem = MaybeRef<MaybeElement>;
+type MaybeElemOrNumber = MaybeRef<MaybeElement>
 type Direction = "x" | "y";
 
 /**
@@ -40,7 +39,6 @@ export default function useScrollbar(
       max: 500,
     },
   }
-  const mountOnRefStyles: Ref<CSSStyleDeclaration> = ref({} as CSSStyleDeclaration)
   const instance = ref()
   // 空值滚动条显隐
   const inTrigger = ref({
@@ -167,23 +165,13 @@ export default function useScrollbar(
     const contentH = ref(0)
     const scrollTop = ref(0)
     const scrollLeft = ref(0)
-    const directions = ref({
-      top: false,
-      bottom: false,
-      left: false,
-      right: false,
-    })
-    watchEffect(() => {
-      console.log(directions.value)
-    })
 
     /* 初始化数据 */
 
     if (opts.viewport.length) {
       const ws = [] as Ref<number>[]
       const hs = [] as Ref<number>[]
-      opts.viewport.map(($elm) => {
-        // console.log('[debug] $elm', $elm)
+      opts.viewport.forEach(($elm: MaybeElem) => {
         const { width, height } = useElementSize($elm, undefined, { box: 'border-box' })
         ws.push(width)
         hs.push(height)
@@ -198,7 +186,7 @@ export default function useScrollbar(
     if (opts.content.length) {
       const ws = [] as Ref<number>[]
       const hs = [] as Ref<number>[]
-      opts.content.map(($elm) => {
+      opts.content.forEach(($elm: MaybeElem) => {
         const { width, height } = useElementSize($elm, undefined, { box: 'border-box' })
         ws.push(width)
         hs.push(height)
@@ -213,28 +201,10 @@ export default function useScrollbar(
     if (opts.wrapper.length) {
       const tops = [] as Ref<number>[]
       const lefts = [] as Ref<number>[]
-      const dss = Array.from({ length: opts.wrapper.length }).map(() => ref({
-        top: false,
-        bottom: false,
-        left: false,
-        right: false,
-      }))
-      opts.wrapper.map(($elm, idx) => {
-        const { x: left, y: top, directions: ds } = useScroll($elm as HTMLElement)
+      opts.wrapper.forEach(($elm: MaybeElem) => {
+        const { x: left, y: top } = useScroll($elm as HTMLElement)
         tops.push(top)
         lefts.push(left)
-        watchEffect(() => {
-          dss[idx].value.bottom = unref(ds).bottom
-          dss[idx].value.top = unref(ds).top
-          dss[idx].value.left = unref(ds).left
-          dss[idx].value.right = unref(ds).right
-        })
-      })
-      watchEffect(() => {
-        directions.value.top = dss.map(unref).some(x => x.top)
-        directions.value.bottom = dss.map(unref).some(x => x.bottom)
-        directions.value.left = dss.map(unref).some(x => x.left)
-        directions.value.right = dss.map(unref).some(x => x.right)
       })
       watchEffectGathered(() => {
         scrollTop.value = Math.max(...tops.map(unref))
@@ -358,26 +328,85 @@ export default function useScrollbar(
     watchEffectGathered(() => {
       mount(opts.mount)
       visibleOnHover(opts.mount)
-
-      const $elem = unrefElement(opts.mount)
-      if ($elem) {
-        const styles = getComputedStyle($elem)
-        mountOnRefStyles.value = styles
-      }
     })
+
+    const scrollXTick = ref(0);
+    const scrollYTick = ref(0);
+    watch(
+      scrollLeft,
+      () => {
+        if (scrollXTick.value) {
+          clearTimeout(scrollXTick.value);
+        }
+        scrollXTick.value = setTimeout(() => {
+          scrollXTick.value = 0;
+        }, 17 * 6) as unknown as number;
+      }
+    );
+    watch(
+      scrollTop,
+      () => {
+        if (scrollYTick.value) {
+          clearTimeout(scrollYTick.value);
+        }
+        scrollYTick.value = setTimeout(() => {
+          scrollYTick.value = 0;
+        }, 17 * 3) as unknown as number;
+      }
+    );
 
     /* 将部分值代理为状态 */
 
-    watchEffectGathered(() => (states.mountOnW = mountOnW.value))
-    watchEffectGathered(() => (states.mountOnH = mountOnH.value))
-    watchEffectGathered(() => (states.viewportH = viewportH.value))
-    watchEffectGathered(() => (states.viewportW = viewportW.value))
-    watchEffectGathered(() => (states.contentH = contentH.value))
-    watchEffectGathered(() => (states.contentW = contentW.value))
-    watchEffectGathered(() => (states.scrollTop = scrollTop.value))
-    watchEffectGathered(() => (states.scrollLeft = scrollLeft.value))
-    watchEffectGathered(() => (states.isScrolling.x = directions.value.left || directions.value.right))
-    watchEffectGathered(() => (states.isScrolling.y = directions.value.top || directions.value.bottom))
+    watchEffectGathered(() => {
+      if (states.mountOnW !== mountOnW.value) {
+        states.mountOnW = mountOnW.value
+      }
+    })
+    watchEffectGathered(() => {
+      if (states.mountOnH !== mountOnH.value) {
+        states.mountOnH = mountOnH.value
+      }
+    })
+    watchEffectGathered(() => {
+      if (states.viewportH !== viewportH.value) {
+        states.viewportH = viewportH.value
+      }
+    })
+    watchEffectGathered(() => {
+      if (states.viewportW !== viewportW.value) {
+        states.viewportW = viewportW.value
+      }
+    })
+    watchEffectGathered(() => {
+      if (states.contentH !== contentH.value) {
+        states.contentH = contentH.value
+      }
+    })
+    watchEffectGathered(() => {
+      if (states.contentW !== contentW.value) {
+        states.contentW = contentW.value
+      }
+    })
+    watchEffectGathered(() => {
+      if (states.scrollTop !== scrollTop.value) {
+        states.scrollTop = scrollTop.value
+      }
+    })
+    watchEffectGathered(() => {
+      if (states.scrollLeft !== scrollLeft.value) {
+        states.scrollLeft = scrollLeft.value
+      }
+    })
+    watchEffectGathered(() => {
+      if (states.isScrolling.x !== Boolean(scrollXTick.value)) {
+        states.isScrolling.x = Boolean(scrollXTick.value)
+      }
+    })
+    watchEffectGathered(() => {
+      if (states.isScrolling.y !== Boolean(scrollYTick.value)) {
+        states.isScrolling.y = Boolean(scrollYTick.value)
+      }
+    })
   }
 
   /* 计算滚动条样式 */
@@ -507,7 +536,7 @@ export default function useScrollbar(
     watch(
       initOnRef,
       (x) => {
-        const $elm = unrefElement(x) as HTMLElement
+        const $elm = unrefElement(x as any) as HTMLElement
         if ($elm) {
           try {
             const $wrapper = findScrollElement($elm) as HTMLElement

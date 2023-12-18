@@ -45,7 +45,7 @@ watch(() => props.enable, async (enable) => {
       const $bodyXSpace = $table.querySelector(".vxe-body--x-space");
       const $bodyYSpace = $table.querySelector(".vxe-body--y-space");
 
-      console.log('barStates', barStates)
+      // console.log('barStates', barStates)
 
       barStates.setOffset({ y: { top: $header } });
       barStates.init({
@@ -99,7 +99,7 @@ watch(() => props.enable, async (enable) => {
     z-index: 9;
   }
 
-  .vxe-table--header-wrapper,
+  .vxe-table--header-wrapper.body--wrapper,
   .vxe-table--fixed-left-wrapper,
   .vxe-table--fixed-right-wrapper {
     box-shadow: 0 0 0 0 var(--color-1), 0 0 0 0 var(--color-2), 0 0 0 -8px var(--color-3);
@@ -108,9 +108,6 @@ watch(() => props.enable, async (enable) => {
     will-change: box-shadow;
   }
   &.is-scrolling-x {
-    .vxe-table--header-wrapper {
-      z-index: unset;
-    }
     .vxe-table--fixed-left-wrapper,
     .vxe-table--fixed-right-wrapper {
       box-shadow: 0 9px 28px 0 var(--color-1), 0 12px 48px 16px var(--color-2), 0 6px 16px -8px var(--color-3);
@@ -119,8 +116,14 @@ watch(() => props.enable, async (enable) => {
     }
   }
   &.is-scrolling-y {
-    .vxe-table--header-wrapper {
+    .vxe-table--header-wrapper.body--wrapper {
       box-shadow: 0 0 8px 0 var(--color-1), 0 0 12px 18px var(--color-2), 0 0 16px -8px var(--color-3);
+      transition: box-shadow 0.25s ease-in;
+      transition-delay: 0.01s;
+    }
+    .vxe-table--fixed-left-wrapper .vxe-table--header,
+    .vxe-table--fixed-right-wrapper .vxe-table--header {
+      box-shadow: 0 0 8px 0 var(--shadow-color-1), 0 0 12px 18px var(--shadow-color-2), 0 0 16px -8px var(--shadow-color-3);
       transition: box-shadow 0.25s ease-in;
       transition-delay: 0.01s;
     }
