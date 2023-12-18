@@ -50,7 +50,7 @@ watch(() => props.enable, async (enable) => {
       barStates.setOffset({ y: { top: $header } });
       barStates.init({
         mount: tableRef,
-        content: [$bodyWrapper, $bodyContent, $bodyXSpace, $bodyYSpace],
+        content: [$bodyContent, $bodyXSpace, $bodyYSpace],
         viewport: [$bodyWrapper]
       });
     } catch (err) {

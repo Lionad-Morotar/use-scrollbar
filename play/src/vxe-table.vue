@@ -43,7 +43,7 @@ const playRef = ref();
 const isHover = useElementHover(playRef);
 
  const states = reactive({
-  isVirtualScroll: false,
+  isVirtualScroll: true,
   isVirtualScrollbar: true,
   isLoading: false,
   tableData: [] as any[],
@@ -66,7 +66,7 @@ const formatterSex = ({ cellValue }: any) => {
 
 let count = 0
 let parentId = 0
-const listCount = 50
+const listCount = 300
 const getTableData = () => {
   const res = Array(listCount).fill(0).map((x) => {
     const res = {
