@@ -139,7 +139,7 @@ const formatterSex = ({ cellValue }: any) => {
 
 let count = 0
 let parentId = 0
-const listCount = 2000
+const listCount = 500
 const getTableData = () => {
   const res = Array(listCount).fill(0).map((x) => {
     const res = {

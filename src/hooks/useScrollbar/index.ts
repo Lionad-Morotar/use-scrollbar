@@ -1,6 +1,7 @@
 import { ref, unref, watchEffect, computed, watch, reactive, onUnmounted } from 'vue-demi'
-import { useEventListener, useScroll, unrefElement } from '@vueuse/core'
-import { useElementHover, useElementSize } from '@/hooks'
+import { useEventListener, unrefElement } from '@vueuse/core'
+import { tryOnScopeDispose } from '@vueuse/shared'
+import { useElementHover, useElementSize, useScroll } from '@/hooks'
 import { createComponent } from "./scrollbars";
 import { notEmpty, safeRatio, safePrecicion, SCROLLBAR_GAP, findScrollElement } from './utils'
 import getOpts from './states'
@@ -63,18 +64,11 @@ export default function useScrollbar(
 
   // console.log('states', states)
 
-  const stops = [] as (() => void)[]
   function destroy() {
-    stops.map((s) => s())
-    clean()
     instance.value?.destroy?.()
-    // init() TODO
   }
-  const watchEffectGathered = (...args: Parameters<typeof watchEffect>) => {
-    const stop = watchEffect(...args)
-    stops.push(stop)
-    return stop
-  }
+  tryOnScopeDispose(destroy)
+
 
   // 监听元素的 hover 事件以改变滚动条的显示隐藏状态
   function visibleOnHover($hoverOn: MaybeComputedElementRef) {
@@ -117,7 +111,7 @@ export default function useScrollbar(
     const $elms = args.filter(notEmpty)
     $elms.map(($elm) => {
       const { width, height } = useElementSize($elm, undefined, { box: 'border-box' })
-      watchEffectGathered(() => {
+      watchEffect(() => {
         if (opts?.x?.left === $elm) states.offset.x.left = safePrecicion(width.value + gap)
         if (opts?.x?.bottom === $elm) states.offset.x.bottom = safePrecicion(height.value + gap)
         if (opts?.y?.right === $elm) states.offset.y.right = safePrecicion(width.value + gap)
@@ -176,10 +170,10 @@ export default function useScrollbar(
         ws.push(width)
         hs.push(height)
       })
-      watchEffectGathered(() => {
+      watchEffect(() => {
         viewportW.value = Math.max(...ws.map(unref))
       })
-      watchEffectGathered(() => {
+      watchEffect(() => {
         viewportH.value = Math.max(...hs.map(unref))
       })
     }
@@ -191,10 +185,10 @@ export default function useScrollbar(
         ws.push(width)
         hs.push(height)
       })
-      watchEffectGathered(() => {
+      watchEffect(() => {
         contentW.value = Math.max(...ws.map(unref))
       })
-      watchEffectGathered(() => {
+      watchEffect(() => {
         contentH.value = Math.max(...hs.map(unref))
       })
     }
@@ -206,13 +200,13 @@ export default function useScrollbar(
         tops.push(top)
         lefts.push(left)
       })
-      watchEffectGathered(() => {
+      watchEffect(() => {
         scrollTop.value = Math.max(...tops.map(unref))
       })
-      watchEffectGathered(() => {
+      watchEffect(() => {
         scrollLeft.value = Math.max(...lefts.map(unref))
       })
-      watchEffectGathered(() => {
+      watchEffect(() => {
         states.scrollTo = (x: number, y: number) => {
           (opts.wrapper as MaybeElem[]).map(($elm) =>
             (unref($elm) as HTMLElement)?.scrollTo?.(x, y),
@@ -223,10 +217,10 @@ export default function useScrollbar(
 
     /* 计算滚动条的显隐状态 */
 
-    watchEffectGathered(() => {
+    watchEffect(() => {
       states.visible.x = states.isDragging.x || (!states.isHidden.x && inTrigger.value.x)
     })
-    watchEffectGathered(() => {
+    watchEffect(() => {
       states.visible.y = states.isDragging.y || (!states.isHidden.y && inTrigger.value.y)
     })
 
@@ -238,7 +232,7 @@ export default function useScrollbar(
      * 3. 当内容超出更多，尺寸从 size.base 逼近 size.min
      * @FIXME 当容器尺寸大于滚动条尺寸时
      */
-    watchEffectGathered(() => {
+    watchEffect(() => {
       const top = states.offset.y.top || 0
       const base = Math.min(config.size.base, states.mountOnH - top)
       const max = Math.min(config.size.max, states.mountOnH - top)
@@ -266,7 +260,7 @@ export default function useScrollbar(
       const safeHeight = Math.min(Math.max(height, config.size.min), max)
       states.size.y.height = safeHeight
     })
-    watchEffectGathered(() => {
+    watchEffect(() => {
       const left = states.offset.x.left || 0
       const base = Math.min(config.size.base, states.mountOnW - left)
       const max = Math.min(config.size.max, states.mountOnW - left)
@@ -296,11 +290,11 @@ export default function useScrollbar(
 
     /* 滚动条轨道高度 */
 
-    watchEffectGathered(() => {
+    watchEffect(() => {
       states.size.y.path = viewportH.value - states.size.y.height - SCROLLBAR_GAP * 2
       // console.log("[debug] scrollbar y path", viewportH.value, states.size.y.height);
     })
-    watchEffectGathered(() => {
+    watchEffect(() => {
       states.size.x.path = viewportW.value - states.size.x.width - SCROLLBAR_GAP * 2
       // console.log("[debug] scrollbar x path", viewportW.value, states.size.x.width);
     })
@@ -314,18 +308,18 @@ export default function useScrollbar(
 
     /* 计算滚动条距边缘的距离 */
 
-    watchEffectGathered(() => {
+    watchEffect(() => {
       const top = states.size.y.path * scrollbarToEdgeRatio.value.y
       const safeTop = Math.min(states.size.y.path, Math.max(top, 0))
       states.position.y.top = safeTop
     })
-    watchEffectGathered(() => {
+    watchEffect(() => {
       const left = states.size.x.path * scrollbarToEdgeRatio.value.x
       const safeLeft = Math.min(states.size.x.path, Math.max(left, 0))
       states.position.x.left = safeLeft
     })
 
-    watchEffectGathered(() => {
+    watchEffect(() => {
       mount(opts.mount)
       visibleOnHover(opts.mount)
     })
@@ -357,52 +351,52 @@ export default function useScrollbar(
 
     /* 将部分值代理为状态 */
 
-    watchEffectGathered(() => {
+    watchEffect(() => {
       if (states.mountOnW !== mountOnW.value) {
         states.mountOnW = mountOnW.value
       }
     })
-    watchEffectGathered(() => {
+    watchEffect(() => {
       if (states.mountOnH !== mountOnH.value) {
         states.mountOnH = mountOnH.value
       }
     })
-    watchEffectGathered(() => {
+    watchEffect(() => {
       if (states.viewportH !== viewportH.value) {
         states.viewportH = viewportH.value
       }
     })
-    watchEffectGathered(() => {
+    watchEffect(() => {
       if (states.viewportW !== viewportW.value) {
         states.viewportW = viewportW.value
       }
     })
-    watchEffectGathered(() => {
+    watchEffect(() => {
       if (states.contentH !== contentH.value) {
         states.contentH = contentH.value
       }
     })
-    watchEffectGathered(() => {
+    watchEffect(() => {
       if (states.contentW !== contentW.value) {
         states.contentW = contentW.value
       }
     })
-    watchEffectGathered(() => {
+    watchEffect(() => {
       if (states.scrollTop !== scrollTop.value) {
         states.scrollTop = scrollTop.value
       }
     })
-    watchEffectGathered(() => {
+    watchEffect(() => {
       if (states.scrollLeft !== scrollLeft.value) {
         states.scrollLeft = scrollLeft.value
       }
     })
-    watchEffectGathered(() => {
+    watchEffect(() => {
       if (states.isScrolling.x !== Boolean(scrollXTick.value)) {
         states.isScrolling.x = Boolean(scrollXTick.value)
       }
     })
-    watchEffectGathered(() => {
+    watchEffect(() => {
       if (states.isScrolling.y !== Boolean(scrollYTick.value)) {
         states.isScrolling.y = Boolean(scrollYTick.value)
       }
