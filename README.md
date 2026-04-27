@@ -15,7 +15,7 @@
 
 # use-scrollbar
 
-`Use-Scrollbar` enables a component relies on a native scrollbar to replace its native scrollbar with a virtual scrollbar instead, NOT virtual scroll.
+`Use-Scrollbar` replaces a component's native scrollbar with a fully customizable one — ideal for styling third-party widgets like tables. Not to be confused with virtual scrolling; this is purely a scrollbar overlay.
 
 </div>
 
