@@ -87,17 +87,17 @@
 **示例：**
 
 ```typescript
-import { ref, watch } from 'vue-demi'
-import { useEventListener, unrefElement } from '@vueuse/core'
-import { tryOnScopeDispose } from '@vueuse/shared'
-import { useElementHover, useElementSize, useScroll } from '@/hooks'
-import { createComponent } from './scrollbars'
-import { notEmpty, safeRatio, safePrecicion, SCROLLBAR_GAP, findScrollElement } from './utils'
-import getOpts from './states'
-
-import type { Ref, CSSProperties } from 'vue-demi'
-import type { MaybeComputedElementRef, MaybeRef, MaybeElement } from '@vueuse/core'
+import type { MaybeComputedElementRef, MaybeElement, MaybeRef } from '@vueuse/core'
+import type { CSSProperties, Ref } from 'vue-demi'
 import type { States } from './states'
+import { unrefElement, useEventListener } from '@vueuse/core'
+import { tryOnScopeDispose } from '@vueuse/shared'
+import { ref, watch } from 'vue-demi'
+import { useElementHover, useElementSize, useScroll } from '@/hooks'
+
+import { createComponent } from './scrollbars'
+import getOpts from './states'
+import { findScrollElement, notEmpty, safePrecicion, safeRatio, SCROLLBAR_GAP } from './utils'
 ```
 
 **路径别名：**
@@ -112,9 +112,12 @@ import type { States } from './states'
 
 - 防御式提前返回（Guard Clauses）处理 `window` 或元素不存在的情况：
   ```typescript
-  if (!window) return
+  if (!window)
+    return
   const _element = toValue(element)
-  if (!_element) return
+  if (!_element)
+    return
+  const $elm = _element instanceof Document ? window.document.body : _element
   ```
 - 可恢复的内部错误使用 `try/catch` + `console.error`：
   - `useScrollbar` 自动初始化失败时捕获异常（`src/hooks/useScrollbar/index.ts:528-539`）

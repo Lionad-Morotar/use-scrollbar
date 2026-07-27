@@ -55,7 +55,7 @@ src/
 - 当前无测试套件。建议按以下模式组织：
 
 ```typescript
-import { describe, it, expect, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { ref } from 'vue'
 import { useScroll } from '@/hooks'
 
