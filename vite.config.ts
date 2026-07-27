@@ -45,5 +45,5 @@ export default defineConfig(({ mode }) => {
 
   console.log('[info] mode', mode)
 
-  return config;
+  return config
 })

@@ -2,10 +2,11 @@
   <div class="play-container">
     <h1># use-scrollbar</h1>
     <p align="center">
-      <img width="555" alt="use-scrollbar" src="../../docs/assets/logo.png">
+      <img width="555" alt="use-scrollbar" src="../../docs/assets/logo.png" />
     </p>
     <p class="intro">
-      `Use-Scrollbar` enables a component relies on a native scrollbar to replace its native scrollbar with a virtual scrollbar instead, NOT virtual scroll.
+      `Use-Scrollbar` enables a component relies on a native scrollbar to replace its native
+      scrollbar with a virtual scrollbar instead, NOT virtual scroll.
     </p>
     <h2>## examples</h2>
     <ol>
@@ -27,12 +28,12 @@
 <script setup lang="ts"></script>
 
 <style scoped>
-.intro {
-  max-width: clamp(60em, 62vw);
-}
-.play-container {
-  display: flex;
-  flex-direction: column;
-  padding: 5em;
-}
+  .intro {
+    max-width: clamp(60em, 62vw);
+  }
+  .play-container {
+    display: flex;
+    flex-direction: column;
+    padding: 5em;
+  }
 </style>

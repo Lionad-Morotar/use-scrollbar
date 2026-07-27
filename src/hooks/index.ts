@@ -12,8 +12,22 @@ export * from './useNativeScrollbar'
 
 const useScrollbars = useScrollbar
 
-export { useElementSize, useElementHover, useScroll, useScrollbar, useScrollbars, useNativeScrollbar }
+export {
+  useElementSize,
+  useElementHover,
+  useScroll,
+  useScrollbar,
+  useScrollbars,
+  useNativeScrollbar,
+}
 
-const index = { useElementSize, useElementHover, useScroll, useScrollbar, useScrollbars, useNativeScrollbar }
+const index = {
+  useElementSize,
+  useElementHover,
+  useScroll,
+  useScrollbar,
+  useScrollbars,
+  useNativeScrollbar,
+}
 
 export default index

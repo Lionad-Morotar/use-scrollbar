@@ -30,71 +30,73 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, reactive, onMounted } from "vue";
-import dayjs from 'dayjs';
-import GanttElastic from "./gantt-elastic/index.vue";
-import { isEmptyOrFallback } from "./gantt-elastic/utils";
+  import { ref, reactive, onMounted } from 'vue'
+  import dayjs from 'dayjs'
+  import GanttElastic from './gantt-elastic/index.vue'
+  import { isEmptyOrFallback } from './gantt-elastic/utils'
 
-const playRef = ref();
+  const playRef = ref()
 
-const options = {
-  taskList: {
-    columns: [
-      {
-        id: 1,
-        label: "任务标题",
-        value: "title",
-        width: 350,
-        expander: true,
-      },
-      {
-        id: 2,
-        label: "任务分类",
-        value: "group",
-        width: 80,
-      },
-      {
-        id: 3,
-        label: "编号",
-        value: "code",
-        width: 80,
-      },
-    ],
-  },
-}
-
-const states = reactive({
-  isLoading: false,
-  tasks: [] as any[],
-})
-
-const refresh = async () => {
-  function time(s: string | null, offset: number = 0) {
-    const raw = dayjs(isEmptyOrFallback(s) ? new Date() : s);
-    const res = raw.add(offset, "ms").valueOf();
-    return res;
+  const options = {
+    taskList: {
+      columns: [
+        {
+          id: 1,
+          label: '任务标题',
+          value: 'title',
+          width: 350,
+          expander: true,
+        },
+        {
+          id: 2,
+          label: '任务分类',
+          value: 'group',
+          width: 80,
+        },
+        {
+          id: 3,
+          label: '编号',
+          value: 'code',
+          width: 80,
+        },
+      ],
+    },
   }
-  states.isLoading = true
-  states.tasks = []
-  setTimeout(() => {
-    const itemCount = 300
-    states.tasks = Array(itemCount).fill(0).map((x, idx) => {
-      return {
-        id: idx,
-        title: '任务名称' + idx,
-        label: '任务名称' + idx,
-        group: 'Group' + idx,
-        code: '8d910dl3bd821d',
-        start: time(null, ~~(Math.random() * -50) * 3600 * 24 * 1000),
-        end: time(null, ~~(Math.random() * 10) * 3600 * 24 * 1000),
-        type: "task",
-        collapsed: true,
-        progress: 100,
-      }
-    })
-    states.isLoading = false
-  }, 300)
-}
 
-onMounted(refresh)
+  const states = reactive({
+    isLoading: false,
+    tasks: [] as any[],
+  })
+
+  const refresh = async () => {
+    function time(s: string | null, offset: number = 0) {
+      const raw = dayjs(isEmptyOrFallback(s) ? new Date() : s)
+      const res = raw.add(offset, 'ms').valueOf()
+      return res
+    }
+    states.isLoading = true
+    states.tasks = []
+    setTimeout(() => {
+      const itemCount = 300
+      states.tasks = Array(itemCount)
+        .fill(0)
+        .map((x, idx) => {
+          return {
+            id: idx,
+            title: '任务名称' + idx,
+            label: '任务名称' + idx,
+            group: 'Group' + idx,
+            code: '8d910dl3bd821d',
+            start: time(null, ~~(Math.random() * -50) * 3600 * 24 * 1000),
+            end: time(null, ~~(Math.random() * 10) * 3600 * 24 * 1000),
+            type: 'task',
+            collapsed: true,
+            progress: 100,
+          }
+        })
+      states.isLoading = false
+    }, 300)
+  }
+
+  onMounted(refresh)
 </script>

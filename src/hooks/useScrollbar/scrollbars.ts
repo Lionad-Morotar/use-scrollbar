@@ -1,10 +1,10 @@
-import { Transition, h, withCtx, withDirectives, createVNode, vShow, createApp } from "vue-demi";
+import { Transition, h, withCtx, withDirectives, createVNode, vShow, createApp } from 'vue-demi'
 
-import type { ScrollbarStates } from "./index";
+import type { ScrollbarStates } from './index'
 
 export function createComponent(states: ScrollbarStates) {
   const component = {
-    name: "CScrollbars",
+    name: 'CScrollbars',
     setup() {
       return () => {
         return h('div', { class: `c-scrollbar-container is-${states.theme}` }, [
@@ -69,13 +69,13 @@ export function createComponent(states: ScrollbarStates) {
             ],
           ),
         ])
-      };
+      }
     },
-  };
+  }
 
-  const instance = createApp(component);
+  const instance = createApp(component)
 
-  const vm = instance.mount(document.createElement("div"));
+  const vm = instance.mount(document.createElement('div'))
 
   function destroy() {
     removeDOMChild()
@@ -90,7 +90,7 @@ export function createComponent(states: ScrollbarStates) {
     destroy,
     vm,
     get $el(): HTMLElement {
-      return vm.$el;
+      return vm.$el
     },
-  };
+  }
 }

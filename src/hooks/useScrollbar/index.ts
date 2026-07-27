@@ -2,21 +2,21 @@ import { ref, unref, watchEffect, computed, watch, reactive, onUnmounted } from 
 import { useEventListener, unrefElement } from '@vueuse/core'
 import { tryOnScopeDispose } from '@vueuse/shared'
 import { useElementHover, useElementSize, useScroll } from '@/hooks'
-import { createComponent } from "./scrollbars";
+import { createComponent } from './scrollbars'
 import { notEmpty, safeRatio, safePrecicion, SCROLLBAR_GAP, findScrollElement } from './utils'
 import getOpts from './states'
 
-import type { Ref, CSSProperties } from "vue-demi";
+import type { Ref, CSSProperties } from 'vue-demi'
 import type { MaybeComputedElementRef, MaybeRef, MaybeElement } from '@vueuse/core'
 import type { States } from './states'
 
-import "./index.less";
+import './index.less'
 
-export * from './type';
+export * from './type'
 
-type MaybeElem = MaybeRef<MaybeElement>;
+type MaybeElem = MaybeRef<MaybeElement>
 type MaybeElemOrNumber = MaybeRef<MaybeElement>
-type Direction = "x" | "y";
+type Direction = 'x' | 'y'
 
 /**
  * 一个滚动系统通常包含以下部分：
@@ -68,7 +68,6 @@ export default function useScrollbar(
     instance.value?.destroy?.()
   }
   tryOnScopeDispose(destroy)
-
 
   // 监听元素的 hover 事件以改变滚动条的显示隐藏状态
   function visibleOnHover($hoverOn: MaybeComputedElementRef) {
@@ -208,7 +207,7 @@ export default function useScrollbar(
       })
       watchEffect(() => {
         states.scrollTo = (x: number, y: number) => {
-          (opts.wrapper as MaybeElem[]).map(($elm) =>
+          ;(opts.wrapper as MaybeElem[]).map(($elm) =>
             (unref($elm) as HTMLElement)?.scrollTo?.(x, y),
           )
         }
@@ -324,30 +323,24 @@ export default function useScrollbar(
       visibleOnHover(opts.mount)
     })
 
-    const scrollXTick = ref(0);
-    const scrollYTick = ref(0);
-    watch(
-      scrollLeft,
-      () => {
-        if (scrollXTick.value) {
-          clearTimeout(scrollXTick.value);
-        }
-        scrollXTick.value = setTimeout(() => {
-          scrollXTick.value = 0;
-        }, 17 * 6) as unknown as number;
+    const scrollXTick = ref(0)
+    const scrollYTick = ref(0)
+    watch(scrollLeft, () => {
+      if (scrollXTick.value) {
+        clearTimeout(scrollXTick.value)
       }
-    );
-    watch(
-      scrollTop,
-      () => {
-        if (scrollYTick.value) {
-          clearTimeout(scrollYTick.value);
-        }
-        scrollYTick.value = setTimeout(() => {
-          scrollYTick.value = 0;
-        }, 17 * 3) as unknown as number;
+      scrollXTick.value = setTimeout(() => {
+        scrollXTick.value = 0
+      }, 17 * 6) as unknown as number
+    })
+    watch(scrollTop, () => {
+      if (scrollYTick.value) {
+        clearTimeout(scrollYTick.value)
       }
-    );
+      scrollYTick.value = setTimeout(() => {
+        scrollYTick.value = 0
+      }, 17 * 3) as unknown as number
+    })
 
     /* 将部分值代理为状态 */
 
@@ -556,4 +549,4 @@ export default function useScrollbar(
   return states
 }
 
-export type ScrollbarStates = ReturnType<typeof useScrollbar>;
+export type ScrollbarStates = ReturnType<typeof useScrollbar>

@@ -1,13 +1,13 @@
-import { ref, watch, computed } from "vue-demi";
-import { useResizeObserver } from "@vueuse/core";
-import { unrefElement } from "@vueuse/core";
+import { ref, watch, computed } from 'vue-demi'
+import { useResizeObserver } from '@vueuse/core'
+import { unrefElement } from '@vueuse/core'
 
-import type { MaybeComputedElementRef } from "@vueuse/core";
-import type { UseResizeObserverOptions } from "@vueuse/core";
+import type { MaybeComputedElementRef } from '@vueuse/core'
+import type { UseResizeObserverOptions } from '@vueuse/core'
 
 export interface ElementSize {
-  width: number;
-  height: number;
+  width: number
+  height: number
 }
 
 /**
@@ -77,4 +77,4 @@ export default function useElementSize(
   }
 }
 
-export type UseElementSizeReturn = ReturnType<typeof useElementSize>;
+export type UseElementSizeReturn = ReturnType<typeof useElementSize>

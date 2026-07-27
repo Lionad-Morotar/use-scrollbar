@@ -14,14 +14,14 @@
       stripe
       :enable="states.isVirtualScrollbar"
       :loading="states.isLoading"
-      :tree-config="{transform: true}"
-      :column-config="{resizable: true }"
-      :row-config="{isHover: true}"
-      :checkbox-config="{labelField: 'id', highlight: true}"
+      :tree-config="{ transform: true }"
+      :column-config="{ resizable: true }"
+      :row-config="{ isHover: true }"
+      :checkbox-config="{ labelField: 'id', highlight: true }"
       :data="states.tableData"
       :scroll-x="{ enabled: states.isVirtualScroll, oSize: 0 }"
       :scroll-y="{ enabled: states.isVirtualScroll, oSize: 0 }"
-      >
+    >
       <vxe-column type="seq" :width="180" fixed="left" tree-node></vxe-column>
       <vxe-column type="checkbox" title="ID" :width="140"></vxe-column>
       <vxe-column field="name" title="Name" :width="140"></vxe-column>
@@ -104,100 +104,102 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, reactive, watch, onMounted } from "vue";
-import { ElButton, ElIcon } from "element-plus"
-import { Upload } from "@element-plus/icons-vue"
-import { useElementHover } from "@/hooks";
-import VxeTableVirtualScrollbar from "./vxe-table/index.vue";
-import NativeBird from "nativebird";
+  import { ref, reactive, watch, onMounted } from 'vue'
+  import { ElButton, ElIcon } from 'element-plus'
+  import { Upload } from '@element-plus/icons-vue'
+  import { useElementHover } from '@/hooks'
+  import VxeTableVirtualScrollbar from './vxe-table/index.vue'
+  import NativeBird from 'nativebird'
 
-const playRef = ref();
-const isHover = useElementHover(playRef);
+  const playRef = ref()
+  const isHover = useElementHover(playRef)
 
-const vxeTableRef = ref();
-const states = reactive({
-  isVirtualScroll: true,
-  isVirtualScrollbar: true,
-  isLoading: false,
-  tableData: [] as any[],
-  sexList: [
-    {
-      label: '女',
-      value: '0'
-    },
-    {
-      label: '男',
-      value: '1'
-    }
-  ]
-})
-
-const formatterSex = ({ cellValue }: any) => {
-  const item = states.sexList.find(item => item.value === cellValue)
-  return item ? item.label : ''
-}
-
-let count = 0
-let parentId = 0
-const listCount = 500
-const getTableData = () => {
-  const res = Array(listCount).fill(0).map((x) => {
-    const res = {
-      id: count++,
-      parentId: null as number | null,
-      name: 'Test-' + (count + 1),
-      role: 'Develop',
-      address: Array(10).fill('long address long long long address').join(', '),
-      // @ts-ignore
-      ...(Array.from({ length: 19 }).reduce((acc: any, _, idx) => {
-        acc[`sex${idx + 1}`] = Math.random() < 0.5 ? '1' : '0'
-        acc[`age${idx + 1}`] = Math.random() < 0.5 ? '1' : '0'
-        return acc
-      }, {} as Record<string, string>))
-    }
-    if (Math.random() < 0.5) {
-      parentId = count
-    }
-    if (Math.random() < 0.5) {
-      res.parentId = parentId
-    }
-    return res
+  const vxeTableRef = ref()
+  const states = reactive({
+    isVirtualScroll: true,
+    isVirtualScrollbar: true,
+    isLoading: false,
+    tableData: [] as any[],
+    sexList: [
+      {
+        label: '女',
+        value: '0',
+      },
+      {
+        label: '男',
+        value: '1',
+      },
+    ],
   })
-  return res
-}
 
-const refresh = async () => {
-  states.isLoading = true
-  states.tableData = []
-  setTimeout(async () => {
-    states.tableData = getTableData()
-    states.isLoading = false
-  }, 300)
-}
-
-const addMore = async () => {
-  states.isLoading = true
-  setTimeout(() => {
-    states.tableData = states.tableData.concat(getTableData())
-    states.isLoading = false
-  }, 300)
-}
-
-onMounted(refresh)
-watch(() => states.isVirtualScroll, refresh)
-watch(() => states.isVirtualScrollbar, refresh)
-
-const measure = (async () => {
-  if (!vxeTableRef.value) {
-    throw new Error('[ERR] no vxeTableRef')
+  const formatterSex = ({ cellValue }: any) => {
+    const item = states.sexList.find((item) => item.value === cellValue)
+    return item ? item.label : ''
   }
-  const startTime = performance.now()
 
-  await NativeBird.mapSeries(Array.from({ length: 20 }), async (_, idx) => {
-    await vxeTableRef.value.scrollTo(0, idx * 30)
-  })
+  let count = 0
+  let parentId = 0
+  const listCount = 500
+  const getTableData = () => {
+    const res = Array(listCount)
+      .fill(0)
+      .map((x) => {
+        const res = {
+          id: count++,
+          parentId: null as number | null,
+          name: 'Test-' + (count + 1),
+          role: 'Develop',
+          address: Array(10).fill('long address long long long address').join(', '),
+          // @ts-ignore
+          ...Array.from({ length: 19 }).reduce((acc: any, _, idx) => {
+            acc[`sex${idx + 1}`] = Math.random() < 0.5 ? '1' : '0'
+            acc[`age${idx + 1}`] = Math.random() < 0.5 ? '1' : '0'
+            return acc
+          }, {} as Record<string, string>),
+        }
+        if (Math.random() < 0.5) {
+          parentId = count
+        }
+        if (Math.random() < 0.5) {
+          res.parentId = parentId
+        }
+        return res
+      })
+    return res
+  }
 
-  const endTime = performance.now()
-  console.log('[info] total time', endTime - startTime)
-})
+  const refresh = async () => {
+    states.isLoading = true
+    states.tableData = []
+    setTimeout(async () => {
+      states.tableData = getTableData()
+      states.isLoading = false
+    }, 300)
+  }
+
+  const addMore = async () => {
+    states.isLoading = true
+    setTimeout(() => {
+      states.tableData = states.tableData.concat(getTableData())
+      states.isLoading = false
+    }, 300)
+  }
+
+  onMounted(refresh)
+  watch(() => states.isVirtualScroll, refresh)
+  watch(() => states.isVirtualScrollbar, refresh)
+
+  const measure = async () => {
+    if (!vxeTableRef.value) {
+      throw new Error('[ERR] no vxeTableRef')
+    }
+    const startTime = performance.now()
+
+    await NativeBird.mapSeries(Array.from({ length: 20 }), async (_, idx) => {
+      await vxeTableRef.value.scrollTo(0, idx * 30)
+    })
+
+    const endTime = performance.now()
+    console.log('[info] total time', endTime - startTime)
+  }
 </script>

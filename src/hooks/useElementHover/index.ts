@@ -1,7 +1,7 @@
-import { ref, watch } from "vue-demi";
+import { ref, watch } from 'vue-demi'
 import { useEventListener, unrefElement } from '@vueuse/core'
 
-import type { Ref } from "vue-demi";
+import type { Ref } from 'vue-demi'
 import type { MaybeComputedElementRef } from '@vueuse/core'
 import type { Fn } from '@vueuse/shared'
 

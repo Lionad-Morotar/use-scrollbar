@@ -1,6 +1,3 @@
-<template>
-  WIP
-</template>
+<template> WIP </template>
 
-<script>
-</script>
+<script></script>

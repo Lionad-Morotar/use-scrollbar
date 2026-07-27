@@ -21,10 +21,10 @@
 
 ## 🎇 Brief
 
-Assuming a 400px height div, you can easily get a div with beautiful virtual scrollbars by simply wrap the div with [ElementPlus Scrollbar](https://element-plus.gitee.io/zh-CN/component/scrollbar.html) scrollbars. But  none of the popular scrollbar components provide an interface for handling complex elements, that is to say, you cant wrap an complex component with [ElementPlus Scrollbar](https://element-plus.gitee.io/zh-CN/component/scrollbar.html) to have its internal native scrollbar replaced with beautiful virtual scrollbars. So you need `use-scrollbar`.
+Assuming a 400px height div, you can easily get a div with beautiful virtual scrollbars by simply wrap the div with [ElementPlus Scrollbar](https://element-plus.gitee.io/zh-CN/component/scrollbar.html) scrollbars. But none of the popular scrollbar components provide an interface for handling complex elements, that is to say, you cant wrap an complex component with [ElementPlus Scrollbar](https://element-plus.gitee.io/zh-CN/component/scrollbar.html) to have its internal native scrollbar replaced with beautiful virtual scrollbars. So you need `use-scrollbar`.
 
-* [vxe-table example](./play/src/vxe-table.vue)
-* [antd-vue-table example](./play/src/ant-vue-table.vue)
+- [vxe-table example](./play/src/vxe-table.vue)
+- [antd-vue-table example](./play/src/ant-vue-table.vue)
 
 ## ⚒️ Feature
 
@@ -63,14 +63,14 @@ Simple example
 import { onMounted, ref } from 'vue'
 import { useScrollbar } from 'use-scrollbars'
 
-const componentOrElementRef = ref(null);
+const componentOrElementRef = ref(null)
 const barStates = useScrollbar(componentOrElementRef, {
   // override default options
-});
+})
 
 // dont forget to import style.css
 // in your main.ts (or entry.ts anyway)
-import "use-scrollbars/dist/style.css"
+import 'use-scrollbars/dist/style.css'
 ```
 
 Another example
@@ -79,12 +79,12 @@ Another example
 import { watchEffect, onMounted, ref } from 'vue'
 import { useScrollbar } from 'use-scrollbars'
 
-const componentOrElementRef = ref(null);
+const componentOrElementRef = ref(null)
 const barStates = useScrollbar(componentOrElementRef, {
   // override default options
-});
+})
 
-const componentStates = ref('your-states');
+const componentStates = ref('your-states')
 watchEffect(() => {
   if (componentStates.xxx === 'your-states') {
     barStates.theme = 'steam'
@@ -157,9 +157,9 @@ console.log(barStates.isScrolling.x)
 如果不是通过显式初始化（即 `useScrollbar(elem)`）的方式自动初始化滚动条，那么需要使用 init 方法手动初始化。init 方法提供了对控制滚动区（甚至多个滚动区）所需要的更细致的参数。
 
 ```typescript
-const $parent = cmptRef.value.$el.parentElement;
-const $wrapper = $parent.querySelector(".content-wrapper");
-const $content = $parent.querySelector(".content");
+const $parent = cmptRef.value.$el.parentElement
+const $wrapper = $parent.querySelector('.content-wrapper')
+const $content = $parent.querySelector('.content')
 
 // 详细 API 见类型文档
 barStates.init({
@@ -185,12 +185,12 @@ barStates.init({
 </p>
 
 ```typescript
-const cmptOrElemRef = ref(null);
+const cmptOrElemRef = ref(null)
 
 barStates.setOffset({
   y: {
     top: cmptOrElemRef,
-  }
+  },
 })
 ```
 

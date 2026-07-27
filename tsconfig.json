@@ -23,18 +23,11 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "skipLibCheck": true,
-    "types": [
-      "node"
-    ],
+    "types": ["node"],
     "paths": {
-      "@/*": [
-        "./src/*"
-      ]
+      "@/*": ["./src/*"]
     }
   },
-  "includes": [
-    "env.d.ts",
-    "node_modules/element-plus/global.d.ts"
-  ],
+  "includes": ["env.d.ts", "node_modules/element-plus/global.d.ts"],
   "exclude": ["node_modules", "dist", "docs", "example", "test"]
 }

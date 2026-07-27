@@ -89,71 +89,71 @@
 </template>
 
 <script setup lang="ts">
-import { OverlayScrollbarsComponent, useOverlayScrollbars } from 'overlayscrollbars-vue';
-import type { OverlayScrollbarsComponentRef } from 'overlayscrollbars-vue';
-import { onMounted, ref } from 'vue';
-import { useEventObserver } from './useEventObserver';
+  import { OverlayScrollbarsComponent, useOverlayScrollbars } from 'overlayscrollbars-vue'
+  import type { OverlayScrollbarsComponentRef } from 'overlayscrollbars-vue'
+  import { onMounted, ref } from 'vue'
+  import { useEventObserver } from './useEventObserver'
 
-const contentHidden = ref(false);
-const elementHidden = ref(false);
-const overlayScrollbarsApplied = ref(true);
-const bodyOverlayScrollbarsApplied = ref<boolean | null>(null);
-const osRef = ref<OverlayScrollbarsComponentRef | null>(null);
-const [activeEvents, activateEvent] = useEventObserver();
-const [initBodyOverlayScrollbars, getBodyOverlayScrollbarsInstance] = useOverlayScrollbars({
-  defer: true,
-  events: {
-    initialized: () => {
-      bodyOverlayScrollbarsApplied.value = true;
-    },
-    destroyed: () => {
-      bodyOverlayScrollbarsApplied.value = false;
-    },
-  },
-  options: {
-    scrollbars: {
-      theme: 'os-theme-light',
-    },
-  },
-});
-
-const scrollContent = () => {
-  const osInstance = osRef?.value?.osInstance();
-
-  if (!osInstance) {
-    return;
-  }
-
-  const { overflowAmount } = osInstance.state();
-  const { scrollOffsetElement } = osInstance.elements();
-  const { scrollLeft, scrollTop } = scrollOffsetElement;
-
-  scrollOffsetElement.scrollTo({
-    behavior: 'smooth',
-    left: Math.round((overflowAmount.x - scrollLeft) / overflowAmount.x) * overflowAmount.x,
-    top: Math.round((overflowAmount.y - scrollTop) / overflowAmount.y) * overflowAmount.y,
-  });
-};
-const toggleContent = () => (contentHidden.value = !contentHidden.value);
-const toggleElement = () => (elementHidden.value = !elementHidden.value);
-const toggleBodyOverlayScrollbars = () => {
-  const bodyOsInstance = getBodyOverlayScrollbarsInstance();
-
-  if (bodyOsInstance && !bodyOsInstance.state().destroyed) {
-    bodyOsInstance.destroy();
-  } else {
-    initBodyOverlayScrollbars({
-      target: document.body,
-      cancel: {
-        body: false,
+  const contentHidden = ref(false)
+  const elementHidden = ref(false)
+  const overlayScrollbarsApplied = ref(true)
+  const bodyOverlayScrollbarsApplied = ref<boolean | null>(null)
+  const osRef = ref<OverlayScrollbarsComponentRef | null>(null)
+  const [activeEvents, activateEvent] = useEventObserver()
+  const [initBodyOverlayScrollbars, getBodyOverlayScrollbarsInstance] = useOverlayScrollbars({
+    defer: true,
+    events: {
+      initialized: () => {
+        bodyOverlayScrollbarsApplied.value = true
       },
-    });
-  }
-};
+      destroyed: () => {
+        bodyOverlayScrollbarsApplied.value = false
+      },
+    },
+    options: {
+      scrollbars: {
+        theme: 'os-theme-light',
+      },
+    },
+  })
 
-onMounted(() => initBodyOverlayScrollbars(document.body));
+  const scrollContent = () => {
+    const osInstance = osRef?.value?.osInstance()
+
+    if (!osInstance) {
+      return
+    }
+
+    const { overflowAmount } = osInstance.state()
+    const { scrollOffsetElement } = osInstance.elements()
+    const { scrollLeft, scrollTop } = scrollOffsetElement
+
+    scrollOffsetElement.scrollTo({
+      behavior: 'smooth',
+      left: Math.round((overflowAmount.x - scrollLeft) / overflowAmount.x) * overflowAmount.x,
+      top: Math.round((overflowAmount.y - scrollTop) / overflowAmount.y) * overflowAmount.y,
+    })
+  }
+  const toggleContent = () => (contentHidden.value = !contentHidden.value)
+  const toggleElement = () => (elementHidden.value = !elementHidden.value)
+  const toggleBodyOverlayScrollbars = () => {
+    const bodyOsInstance = getBodyOverlayScrollbarsInstance()
+
+    if (bodyOsInstance && !bodyOsInstance.state().destroyed) {
+      bodyOsInstance.destroy()
+    } else {
+      initBodyOverlayScrollbars({
+        target: document.body,
+        cancel: {
+          body: false,
+        },
+      })
+    }
+  }
+
+  onMounted(() => initBodyOverlayScrollbars(document.body))
 </script>
 
 <style lang="less">
-@import "./main.css";
+  @import './main.css';
 </style>
