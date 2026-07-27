@@ -60,24 +60,24 @@ and PRs are welcome
 Simple example
 
 ```typescript
-import { onMounted, ref } from 'vue'
 import { useScrollbar } from 'use-scrollbars'
+import { onMounted, ref } from 'vue'
+
+// dont forget to import style.css
+// in your main.ts (or entry.ts anyway)
+import 'use-scrollbars/dist/style.css'
 
 const componentOrElementRef = ref(null)
 const barStates = useScrollbar(componentOrElementRef, {
   // override default options
 })
-
-// dont forget to import style.css
-// in your main.ts (or entry.ts anyway)
-import 'use-scrollbars/dist/style.css'
 ```
 
 Another example
 
 ```typescript
-import { watchEffect, onMounted, ref } from 'vue'
 import { useScrollbar } from 'use-scrollbars'
+import { onMounted, ref, watchEffect } from 'vue'
 
 const componentOrElementRef = ref(null)
 const barStates = useScrollbar(componentOrElementRef, {
@@ -88,7 +88,8 @@ const componentStates = ref('your-states')
 watchEffect(() => {
   if (componentStates.xxx === 'your-states') {
     barStates.theme = 'steam'
-  } else {
+  }
+  else {
     barStates.destroy()
   }
 })
@@ -128,11 +129,11 @@ barStates.offset.x.bottom = 5 // px
 
 #### 1.3. barStates.scrollTop
 
-如果传入多个 wrapper，那么 scrollTop 属性等同于这几个 wrapper 对应 DOM 元素的最大的哪个 scrollTop 属性。如果需要滚动 wrapper 中的内容，可以给 scrollTop 设置值，也可以使用 [barStates.scrollTo](#barStates-scrollTo) 方法。
+如果传入多个 wrapper，那么 scrollTop 属性等同于这几个 wrapper 对应 DOM 元素的最大的哪个 scrollTop 属性。如果需要滚动 wrapper 中的内容，可以给 scrollTop 设置值，也可以使用 barStates.scrollTo 方法。
 
 #### 1.4. barStates.scrollLeft
 
-类似 [barStates.scrollTop](#barStates-scrollTop)。
+类似 [barStates.scrollTop](#13-barstatesscrolltop)。
 
 #### 1.5. barStates.isDragging
 

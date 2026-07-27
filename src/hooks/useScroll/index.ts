@@ -1,7 +1,8 @@
-import { computed, ref } from 'vue-demi'
+import type { MaybeRefOrGetter } from 'vue'
 import { useEventListener } from '@vueuse/core'
-import type { MaybeRefOrGetter } from '@vueuse/shared'
-import { tryOnMounted, noop, toValue, useDebounceFn, useThrottleFn } from '@vueuse/shared'
+import { noop, tryOnMounted, useDebounceFn, useThrottleFn } from '@vueuse/shared'
+// toValue / MaybeRefOrGetter 自 Vue 3.3 起由核心提供，@vueuse/shared v13+ 移除了重复导出
+import { computed, ref, toValue } from 'vue'
 
 const defaultWindow = typeof window === 'undefined' ? undefined : window
 
@@ -110,11 +111,16 @@ export default function useScroll(
   })
 
   function scrollTo(_x: number | undefined, _y: number | undefined) {
-    if (!window) return
+    if (!window)
+      return
 
     const _element = toValue(element)
-    if (!_element) return
-    ;(_element instanceof Document ? window.document.body : _element)?.scrollTo({
+    if (!_element)
+      return
+
+    // 显式拆出目标元素：防御分号被自动修复工具吞掉后，`}(...)` 会与上方语句粘连
+    const $elm = _element instanceof Document ? window.document.body : _element
+    $elm?.scrollTo({
       top: toValue(_y) ?? y.value,
       left: toValue(_x) ?? x.value,
       behavior: toValue(behavior),
@@ -125,7 +131,8 @@ export default function useScroll(
 
   const onScrollEnd = (e: Event) => {
     // dedupe if support native scrollend event
-    if (!isScrolling.value) return
+    if (!isScrolling.value)
+      return
 
     isScrolling.value = false
     onStop(e)
@@ -135,7 +142,8 @@ export default function useScroll(
   const setArrivedState = (
     target: HTMLElement | SVGElement | Window | Document | null | undefined,
   ) => {
-    if (!window) return
+    if (!window)
+      return
 
     const el = (
       (target as Window).document
@@ -150,13 +158,15 @@ export default function useScroll(
     let scrollTop = el.scrollTop
 
     // patch for mobile compatible
-    if (target === window.document && !scrollTop) scrollTop = window.document.body.scrollTop
+    if (target === window.document && !scrollTop)
+      scrollTop = window.document.body.scrollTop
 
     internalY.value = scrollTop
   }
 
   const onScrollHandler = (e: Event) => {
-    if (!window) return
+    if (!window)
+      return
 
     const eventTarget = ((e.target as Document).documentElement ?? e.target) as HTMLElement
 
@@ -176,7 +186,8 @@ export default function useScroll(
 
   tryOnMounted(() => {
     const _element = toValue(element)
-    if (!_element) return
+    if (!_element)
+      return
 
     setArrivedState(_element)
   })
@@ -190,7 +201,8 @@ export default function useScroll(
     measure() {
       const _element = toValue(element)
 
-      if (window && _element) setArrivedState(_element)
+      if (window && _element)
+        setArrivedState(_element)
     },
   }
 }

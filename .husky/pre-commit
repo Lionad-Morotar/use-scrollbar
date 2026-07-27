@@ -1,7 +1,7 @@
-#!/usr/bin/env sh
-. "$(dirname -- "$0")/_/husky.sh"
-. "$(dirname "$0")/common.sh"
-
 [ -n "$CI" ] && exit 0
+
+# common.sh 修复 Windows winpty 下的 tty 输入问题；
+# husky 9 的 hook 是纯 shell 脚本，不再 source _/husky.sh（该文件在 v9 已移除）
+. "$(dirname "$0")/common.sh"
 
 npx lint-staged

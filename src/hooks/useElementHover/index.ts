@@ -1,9 +1,9 @@
-import { ref, watch } from 'vue-demi'
-import { useEventListener, unrefElement } from '@vueuse/core'
-
-import type { Ref } from 'vue-demi'
 import type { MaybeComputedElementRef } from '@vueuse/core'
 import type { Fn } from '@vueuse/shared'
+
+import type { Ref } from 'vue'
+import { unrefElement, useEventListener } from '@vueuse/core'
+import { ref, watch } from 'vue'
 
 export default function useElementHover(
   target: MaybeComputedElementRef,
@@ -18,7 +18,7 @@ export default function useElementHover(
   watch(
     targetRef,
     (value) => {
-      cleanup.value.map((stop) => stop())
+      cleanup.value.map(stop => stop())
       if (value) {
         cleanup.value = [
           useEventListener(

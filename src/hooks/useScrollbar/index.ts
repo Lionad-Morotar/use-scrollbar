@@ -1,14 +1,15 @@
-import { ref, unref, watchEffect, computed, watch, reactive, onUnmounted } from 'vue-demi'
-import { useEventListener, unrefElement } from '@vueuse/core'
-import { tryOnScopeDispose } from '@vueuse/shared'
-import { useElementHover, useElementSize, useScroll } from '@/hooks'
-import { createComponent } from './scrollbars'
-import { notEmpty, safeRatio, safePrecicion, SCROLLBAR_GAP, findScrollElement } from './utils'
-import getOpts from './states'
-
-import type { Ref, CSSProperties } from 'vue-demi'
-import type { MaybeComputedElementRef, MaybeRef, MaybeElement } from '@vueuse/core'
+import type { MaybeComputedElementRef, MaybeElement } from '@vueuse/core'
+// MaybeRef 自 Vue 3.3 起由核心导出，@vueuse/core v13+ 移除了重复导出
+import type { CSSProperties, MaybeRef, Ref } from 'vue'
 import type { States } from './states'
+import { unrefElement, useEventListener } from '@vueuse/core'
+import { tryOnScopeDispose } from '@vueuse/shared'
+import { computed, onUnmounted, reactive, ref, unref, watch, watchEffect } from 'vue'
+import { useElementHover, useElementSize, useScroll } from '@/hooks'
+
+import { createComponent } from './scrollbars'
+import getOpts from './states'
+import { findScrollElement, notEmpty, safePrecicion, safeRatio, SCROLLBAR_GAP } from './utils'
 
 import './index.less'
 
@@ -108,23 +109,29 @@ export default function useScrollbar(
     ]
     // TODO number
     const $elms = args.filter(notEmpty)
-    $elms.map(($elm) => {
+    $elms.forEach(($elm) => {
       const { width, height } = useElementSize($elm, undefined, { box: 'border-box' })
       watchEffect(() => {
-        if (opts?.x?.left === $elm) states.offset.x.left = safePrecicion(width.value + gap)
-        if (opts?.x?.bottom === $elm) states.offset.x.bottom = safePrecicion(height.value + gap)
-        if (opts?.y?.right === $elm) states.offset.y.right = safePrecicion(width.value + gap)
-        if (opts?.y?.top === $elm) states.offset.y.top = safePrecicion(height.value + gap)
+        if (opts?.x?.left === $elm)
+          states.offset.x.left = safePrecicion(width.value + gap)
+        if (opts?.x?.bottom === $elm)
+          states.offset.x.bottom = safePrecicion(height.value + gap)
+        if (opts?.y?.right === $elm)
+          states.offset.y.right = safePrecicion(width.value + gap)
+        if (opts?.y?.top === $elm)
+          states.offset.y.top = safePrecicion(height.value + gap)
       })
     })
   }
 
   /**
    * 滚动条计算初始化
-   * @param opts.mount 滚动条 DOM 挂载的容器
-   * @param opts.wrapper 滚动容器，用于计算内容区的 scrollTop 等属性，默认为 opts.content 的父容器
-   * @param opts.content 滚动子项的非定高父容器
-   * @param opts.viewport
+   *
+   * opts 字段：
+   * - mount：滚动条 DOM 挂载的容器
+   * - wrapper：滚动容器，用于计算内容区的 scrollTop 等属性，默认为 opts.content 的父容器
+   * - content：滚动子项的非定高父容器
+   * - viewport：视口元素
    */
   function init(opts: {
     mount: MaybeElem
@@ -138,14 +145,15 @@ export default function useScrollbar(
     opts.mount = opts.mount!
     opts.content = Array.isArray(opts.content) ? opts.content : [opts.content]
     opts.content = opts.content.filter(notEmpty) as MaybeElem[]
-    opts.wrapper = opts.wrapper || opts.content.map((x) => unrefElement(x)!.parentElement)
+    // 显式标注参数类型：TS 5.9 对 opts.content 连续赋值 + as 断言后的 CFA 收窄会丢失元素类型
+    opts.wrapper = opts.wrapper || opts.content.map((x: MaybeElem) => unrefElement(x)!.parentElement)
     opts.wrapper = Array.isArray(opts.wrapper) ? opts.wrapper : [opts.wrapper]
     opts.wrapper = opts.wrapper.filter(notEmpty) as MaybeElem[]
     opts.viewport = Array.isArray(opts.viewport)
       ? opts.viewport
       : opts.viewport
-      ? [opts.viewport]
-      : opts.wrapper
+        ? [opts.viewport]
+        : opts.wrapper
     opts.viewport = opts.viewport.filter(notEmpty) as MaybeElem[]
     // console.log('[debug] init opts', opts)
 
@@ -207,7 +215,7 @@ export default function useScrollbar(
       })
       watchEffect(() => {
         states.scrollTo = (x: number, y: number) => {
-          ;(opts.wrapper as MaybeElem[]).map(($elm) =>
+          ;(opts.wrapper as MaybeElem[]).map($elm =>
             (unref($elm) as HTMLElement)?.scrollTo?.(x, y),
           )
         }
@@ -251,7 +259,8 @@ export default function useScrollbar(
         const offset = (1 - overflow / viewportH.value) * unset
         height += offset
         // console.log('[debug]', states.mountOnH, top, base, max, unset, height, overflow, offset)
-      } else {
+      }
+      else {
         const overflowSQRT = Math.min(Math.sqrt(overflow), viewportH.value) * 10
         const ratio = 1 - overflowSQRT / viewportH.value
         height *= safeRatio(ratio)
@@ -278,7 +287,8 @@ export default function useScrollbar(
         const unset = max - base
         const offset = (1 - overflow / viewportW.value) * unset
         width += offset
-      } else {
+      }
+      else {
         const overflowSQRT = Math.min(Math.sqrt(overflow), viewportW.value) * 10
         const ratio = 1 - overflowSQRT / viewportW.value
         width *= safeRatio(ratio)
@@ -400,20 +410,22 @@ export default function useScrollbar(
 
   watchEffect(() => {
     const style: CSSProperties = {}
-    style.top = safePrecicion(states.offset.y.top) + 'px'
-    style.right = safePrecicion(states.offset.y.right) + 'px'
-    style.height = safePrecicion(states.size.y.height) + 'px'
-    style.transform = `translateY(${safePrecicion(states.position.y.top) + 'px'})`
-    if (states.isDragging.x) style[`--prefer-opacity`] = '0.25'
+    style.top = `${safePrecicion(states.offset.y.top)}px`
+    style.right = `${safePrecicion(states.offset.y.right)}px`
+    style.height = `${safePrecicion(states.size.y.height)}px`
+    style.transform = `translateY(${`${safePrecicion(states.position.y.top)}px`})`
+    if (states.isDragging.x)
+      style[`--prefer-opacity`] = '0.25'
     states.styles.y = style
   })
   watchEffect(() => {
     const style: CSSProperties = {}
-    style.left = safePrecicion(states.offset.x.left) + 'px'
-    style.bottom = safePrecicion(states.offset.x.bottom) + 'px'
-    style.width = safePrecicion(states.size.x.width) + 'px'
-    style.transform = `translateX(${safePrecicion(states.position.x.left) + 'px'})`
-    if (states.isDragging.y) style[`--prefer-opacity`] = '0.25'
+    style.left = `${safePrecicion(states.offset.x.left)}px`
+    style.bottom = `${safePrecicion(states.offset.x.bottom)}px`
+    style.width = `${safePrecicion(states.size.x.width)}px`
+    style.transform = `translateX(${`${safePrecicion(states.position.x.left)}px`})`
+    if (states.isDragging.y)
+      style[`--prefer-opacity`] = '0.25'
     states.styles.x = style
   })
 
@@ -463,6 +475,7 @@ export default function useScrollbar(
 
     selectEventRaw.value = document.onselectstart
     document.onselectstart = () => {
+      // eslint-disable-next-line no-console -- 拖拽期的信息追踪，故意保留（库本体仅此处输出）
       console.log('[info] temporarily disable select when dragging scrollbars')
       return false
     }
@@ -534,7 +547,8 @@ export default function useScrollbar(
               wrapper: [$wrapper!],
               content: $content,
             })
-          } catch (err) {
+          }
+          catch (err) {
             console.error('[ERR] error in init virtual scrollbar', x, err)
           }
         }

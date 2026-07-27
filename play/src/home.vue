@@ -1,8 +1,10 @@
+<script setup lang="ts"></script>
+
 <template>
   <div class="play-container">
     <h1># use-scrollbar</h1>
     <p align="center">
-      <img width="555" alt="use-scrollbar" src="../../docs/assets/logo.png" />
+      <img width="555" alt="use-scrollbar" src="../../docs/assets/logo.png">
     </p>
     <p class="intro">
       `Use-Scrollbar` enables a component relies on a native scrollbar to replace its native
@@ -24,8 +26,6 @@
     </ol>
   </div>
 </template>
-
-<script setup lang="ts"></script>
 
 <style scoped>
   .intro {

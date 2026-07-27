@@ -3,7 +3,7 @@ name: CI
 on:
   push:
     branches:
-      - 'release'
+      - release
 
 jobs:
   check:
@@ -11,23 +11,32 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
-        with:
-          ref: dev
+      # 检出触发分支（release）本身；旧版硬编码 ref: dev 会导致发布构建
+      # 实际验证的是 dev 代码，与 release 分支内容不一致
+      - uses: actions/checkout@v4
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: 7
+        # 版本来自 package.json 的 packageManager 字段，避免双源漂移
+        uses: pnpm/action-setup@v4
 
       - name: Setup node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: 16
-          cache: 'pnpm'
+          node-version: 24
+          cache: pnpm
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+
+      # 四道门禁按成本升序排列：类型检查最快失败，构建最慢
+      - name: Type check
+        run: pnpm check:types
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Test
+        run: pnpm test
 
       - name: Build Module
         run: pnpm build

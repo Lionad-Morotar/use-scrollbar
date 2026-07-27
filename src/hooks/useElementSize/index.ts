@@ -1,9 +1,7 @@
-import { ref, watch, computed } from 'vue-demi'
-import { useResizeObserver } from '@vueuse/core'
-import { unrefElement } from '@vueuse/core'
+import type { MaybeComputedElementRef, UseResizeObserverOptions } from '@vueuse/core'
+import { unrefElement, useResizeObserver } from '@vueuse/core'
 
-import type { MaybeComputedElementRef } from '@vueuse/core'
-import type { UseResizeObserverOptions } from '@vueuse/core'
+import { computed, ref, watch } from 'vue'
 
 export interface ElementSize {
   width: number
@@ -18,7 +16,7 @@ export interface ElementSize {
  *
  * @doc https://vueuse.org/useElementSize
  * @param target
- * @param callback
+ * @param initialSize
  * @param options
  */
 export default function useElementSize(
@@ -34,26 +32,28 @@ export default function useElementSize(
   useResizeObserver(
     target,
     ([entry]) => {
-      const boxSize =
-        box === 'border-box'
+      const boxSize
+        = box === 'border-box'
           ? entry.borderBoxSize
           : box === 'content-box'
-          ? entry.contentBoxSize
-          : entry.devicePixelContentBoxSize
+            ? entry.contentBoxSize
+            : entry.devicePixelContentBoxSize
 
       if (isSVG.value) {
         const $elem = unrefElement(target)
         if ($elem) {
           // TODO use getBoundingRect
           const styles = window.getComputedStyle($elem)
-          width.value = parseFloat(styles.getPropertyValue('width'))
-          height.value = parseFloat(styles.getPropertyValue('height'))
+          width.value = Number.parseFloat(styles.getPropertyValue('width'))
+          height.value = Number.parseFloat(styles.getPropertyValue('height'))
         }
-      } else {
+      }
+      else {
         if (boxSize) {
           width.value = boxSize.reduce((acc, { inlineSize }) => acc + inlineSize, 0)
           height.value = boxSize.reduce((acc, { blockSize }) => acc + blockSize, 0)
-        } else {
+        }
+        else {
           // fallback
           width.value = entry.contentRect.width
           height.value = entry.contentRect.height

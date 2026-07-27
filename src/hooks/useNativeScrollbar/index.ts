@@ -16,7 +16,7 @@ export default function useNativeScrollbar() {
       const $outer = document.createElement('div')
       $outer.style.visibility = 'hidden'
       $outer.style.height = '100px'
-      // @ts-ignore
+      // @ts-expect-error msOverflowStyle 是 IE 专有的遗留样式属性，无标准类型声明
       $outer.style.msOverflowStyle = 'scrollbar'
       document.body.appendChild($outer)
 
@@ -32,8 +32,9 @@ export default function useNativeScrollbar() {
       $outer?.parentNode?.removeChild?.($outer)
 
       states.thick = heightNoScroll - heightWithScroll
-    } catch (err) {
-      console.log('[ERR] err on useScrollbarHeight', err)
+    }
+    catch (err) {
+      console.error('[ERR] err on useScrollbarHeight', err)
     }
   }
 

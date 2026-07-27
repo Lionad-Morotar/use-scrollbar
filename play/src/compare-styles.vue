@@ -1,16 +1,79 @@
+<script lang="ts" setup>
+import type { Theme } from '@/hooks'
+import { useOverlayScrollbars } from 'overlayscrollbars-vue'
+import { computed, onMounted, reactive, ref, watchEffect } from 'vue'
+
+import { useScrollbar } from '@/hooks'
+
+const querys = new URLSearchParams(window.location.search)
+const states = reactive({
+  type: (querys.get('type') || 'normal') as Theme,
+})
+const kls = computed(() => ({
+  [`is-${states.type}`]: true,
+}))
+
+const elemRef = ref<HTMLElement>()
+const barStates = useScrollbar(elemRef)
+
+watchEffect(() => {
+  barStates.theme = states.type
+})
+
+watchEffect(() => {
+  const offset = {
+    x: {
+      left: 8 + 2,
+      bottom: 8 + 2.5,
+    },
+    y: {
+      top: 8 + 2,
+      right: 8 + 2.5,
+    },
+  }
+  if (states.type === 'css-tricks') {
+    offset.x.left = 0
+    offset.x.bottom = 0
+    offset.y.top = 0
+    offset.y.right = 0
+  }
+  if (states.type === 'steam') {
+    offset.y.right = 8 + 2
+  }
+  barStates.offset = offset
+})
+
+console.log('[debug] barStates', barStates)
+
+const overlayScrollbarDivRef = ref(null)
+const reactiveParams = reactive({ options: {}, events: {}, defer: false })
+const [initialize] = useOverlayScrollbars(reactiveParams)
+
+onMounted(() => {
+  console.log('overlayScrollbarDivRef.value')
+  initialize({ target: overlayScrollbarDivRef.value! })
+})
+</script>
+
 <template>
-  <div class="play-container" ref="playRef">
+  <div class="play-container">
     <div class="header">
       <h4>## Principle（Simply Usage）</h4>
-      <el-radio-group class="type-radio-group" v-model="states.type">
-        <el-radio label="normal">Normal</el-radio>
-        <el-radio label="steam">Steam</el-radio>
-        <el-radio label="css-tricks">CSS Tricks</el-radio>
+      <el-radio-group v-model="states.type" class="type-radio-group">
+        <el-radio label="normal">
+          Normal
+        </el-radio>
+        <el-radio label="steam">
+          Steam
+        </el-radio>
+        <el-radio label="css-tricks">
+          CSS Tricks
+        </el-radio>
       </el-radio-group>
     </div>
     <div class="compare-container">
       <h4>use-scrollbars</h4>
-      <div class="complex-component-example cutom-scrollbar" :class="kls" ref="elemRef">
+      <div ref="elemRef" class="complex-component-example cutom-scrollbar" :class="kls">
         <div class="content-wrapper">
           <pre class="content">
 // use-scrollbar
@@ -155,7 +218,7 @@ function world() {
       <!-- OverlayScrollbars -->
       <h4>overlay-scrollbars-vue</h4>
       <div class="complex-component-example" :class="kls">
-        <div class="content-wrapper" ref="overlayScrollbarDivRef">
+        <div ref="overlayScrollbarDivRef" class="content-wrapper">
           <pre class="content">
 // OverlayScrollbars
 function hello() {
@@ -226,63 +289,6 @@ function world() {
     </div>
   </div>
 </template>
-
-<script lang="ts" setup>
-  import { ref, computed, reactive, watchEffect, onMounted } from 'vue'
-  import { useOverlayScrollbars } from 'overlayscrollbars-vue'
-  import { useScrollbar } from '@/hooks'
-
-  import type { Theme } from '@/hooks'
-
-  const querys = new URLSearchParams(window.location.search)
-  const states = reactive({
-    type: (querys.get('type') || 'normal') as Theme,
-  })
-  const kls = computed(() => ({
-    [`is-${states.type}`]: true,
-  }))
-
-  const elemRef = ref<HTMLElement>()
-  const barStates = useScrollbar(elemRef)
-
-  watchEffect(() => {
-    barStates.theme = states.type
-  })
-
-  watchEffect(() => {
-    const offset = {
-      x: {
-        left: 8 + 2,
-        bottom: 8 + 2.5,
-      },
-      y: {
-        top: 8 + 2,
-        right: 8 + 2.5,
-      },
-    }
-    if (states.type === 'css-tricks') {
-      offset.x.left = 0
-      offset.x.bottom = 0
-      offset.y.top = 0
-      offset.y.right = 0
-    }
-    if (states.type === 'steam') {
-      offset.y.right = 8 + 2
-    }
-    barStates.offset = offset
-  })
-
-  console.log('[debug] barStates', barStates)
-
-  const overlayScrollbarDivRef = ref(null)
-  const reactiveParams = reactive({ options: {}, events: {}, defer: false })
-  const [initialize, instance] = useOverlayScrollbars(reactiveParams)
-
-  onMounted(() => {
-    console.log('overlayScrollbarDivRef.value')
-    initialize({ target: overlayScrollbarDivRef.value! })
-  })
-</script>
 
 <style scoped>
   .type-radio-group {

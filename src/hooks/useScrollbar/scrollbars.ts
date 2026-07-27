@@ -1,6 +1,6 @@
-import { Transition, h, withCtx, withDirectives, createVNode, vShow, createApp } from 'vue-demi'
-
 import type { ScrollbarStates } from './index'
+
+import { createApp, createVNode, h, Transition, vShow, withCtx, withDirectives } from 'vue'
 
 export function createComponent(states: ScrollbarStates) {
   const component = {
