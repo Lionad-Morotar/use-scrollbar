@@ -1,0 +1,36 @@
+{
+  "name": "use-scrollbar-playground",
+  "type": "module",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Playground demos for @lionad/use-scrollbar",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "check:types": "vue-tsc --noEmit"
+  },
+  "dependencies": {
+    "@lionad/use-scrollbar": "workspace:*"
+  },
+  "devDependencies": {
+    "@element-plus/icons-vue": "^2.3.2",
+    "@types/node": "^24.13.3",
+    "@vitejs/plugin-basic-ssl": "^2.3.0",
+    "@vitejs/plugin-vue": "^6.0.8",
+    "@vueuse/core": "^14.3.0",
+    "ant-design-vue": "^4.2.6",
+    "dayjs": "^1.11.21",
+    "element-plus": "^2.14.3",
+    "less": "^4.8.0",
+    "mitt": "^3.0.1",
+    "overlayscrollbars": "^2.16.0",
+    "overlayscrollbars-vue": "^0.5.10",
+    "resize-observer-polyfill": "^1.5.1",
+    "typescript": "~5.9.3",
+    "vite": "^8.1.5",
+    "vue": "^3.5.40",
+    "vue-tsc": "^3.3.8",
+    "vxe-table": "4.5.13",
+    "xe-utils": "^3.5.14"
+  }
+}

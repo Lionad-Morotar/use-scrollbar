@@ -17,11 +17,11 @@ export default antfu({
     '.planning/**',
     // gantt-elastic 是 vendored 的 Vue2 时代遗留 demo（含 JS mixin），
     // 对其全量 lint+fix 只会产生与库本体无关的大面积 diff
-    'play/src/gantt-elastic/**',
+    'playground/src/gantt-elastic/**',
   ],
 }, {
   // playground 是演示应用，console 输出属于正当交互反馈，不适用库源码的 no-console 约束
-  files: ['play/**'],
+  files: ['playground/**'],
   rules: {
     'no-console': 'off',
   },

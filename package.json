@@ -14,7 +14,8 @@
     "pnpm": ">=10"
   },
   "scripts": {
-    "dev": "vite ./play",
+    "dev": "pnpm dev:playground",
+    "dev:playground": "pnpm --filter use-scrollbar-playground dev",
     "serve": "pnpm dev",
     "build": "pnpm -r --if-present build",
     "check:types": "pnpm -r --if-present check:types",
@@ -27,29 +28,12 @@
     "@antfu/eslint-config": "^9.2.0",
     "@commitlint/cli": "^21.2.1",
     "@commitlint/config-conventional": "^21.2.0",
-    "@element-plus/icons-vue": "^2.3.2",
-    "@types/node": "^24.13.3",
-    "@vitejs/plugin-basic-ssl": "^2.3.0",
-    "@vitejs/plugin-vue": "^6.0.8",
-    "@vueuse/core": "^14.3.0",
-    "ant-design-vue": "^4.2.6",
-    "dayjs": "^1.11.21",
-    "element-plus": "^2.14.3",
     "eslint": "^10.8.0",
     "husky": "^9.1.7",
-    "less": "^4.8.0",
     "lint-staged": "^17.2.0",
-    "mitt": "^3.0.1",
-    "overlayscrollbars": "^2.16.0",
-    "overlayscrollbars-vue": "^0.5.10",
     "postcss": "^8.5.23",
     "postcss-preset-env": "^11.3.2",
-    "resize-observer-polyfill": "^1.5.1",
-    "typescript": "~5.9.3",
-    "vite": "^8.1.5",
-    "vue": "^3.5.40",
-    "vxe-table": "4.5.13",
-    "xe-utils": "^3.5.14"
+    "typescript": "~5.9.3"
   },
   "lint-staged": {
     "*.{js,cjs,mjs,ts,tsx,vue,json,md,yml,yaml}": [

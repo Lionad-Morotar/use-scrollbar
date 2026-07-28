@@ -1,0 +1,30 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "jsx": "preserve",
+    "lib": ["ESNext", "DOM", "DOM.Iterable"],
+    "useDefineForClassFields": true,
+    "baseUrl": ".",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "paths": {
+      "@/hooks": ["../packages/vue/src/hooks/index.ts"]
+    },
+    "resolveJsonModule": true,
+    "types": ["node", "vite/client"],
+    "allowJs": true,
+    "strict": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "isolatedModules": true,
+    "skipLibCheck": true
+  },
+  "include": [
+    "main.ts",
+    "vite.config.ts",
+    "src/**/*.ts",
+    "src/**/*.vue",
+    "src/**/*.js"
+  ],
+  "exclude": ["node_modules", "dist"]
+}
