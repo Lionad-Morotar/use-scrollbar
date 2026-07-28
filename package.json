@@ -1,37 +1,14 @@
 {
-  "name": "use-scrollbars",
+  "name": "use-scrollbar-monorepo",
   "type": "module",
-  "version": "0.4.11",
-  "private": false,
+  "version": "0.0.0",
+  "private": true,
   "packageManager": "pnpm@10.15.0",
-  "description": "Cover components' native scrollbars with fully customizable virtual scrollbars, built for Vue 3",
+  "description": "Monorepo for @lionad/use-scrollbar and its Nuxt module",
   "author": "Lionad",
   "license": "MIT",
   "homepage": "https://github.com/Lionad-Morotar/use-scrollbar",
   "repository": "https://github.com/Lionad-Morotar/use-scrollbar",
-  "keywords": [
-    "scrollbar",
-    "virtual",
-    "scroll",
-    "vue3",
-    "vue",
-    "hook",
-    "directive"
-  ],
-  "exports": {
-    ".": {
-      "types": "./dist/types/index.d.ts",
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.cjs"
-    },
-    "./*": "./*"
-  },
-  "main": "./dist/index.cjs",
-  "module": "./dist/index.mjs",
-  "types": "./dist/types/index.d.ts",
-  "files": [
-    "dist"
-  ],
   "engines": {
     "node": "^20.19.0 || >=22.12.0",
     "pnpm": ">=10"
@@ -39,23 +16,12 @@
   "scripts": {
     "dev": "vite ./play",
     "serve": "pnpm dev",
-    "clean": "rm -rf dist",
-    "build": "pnpm clean && vite build",
-    "build:watch": "pnpm clean && vite build --watch",
-    "check:types": "vue-tsc --noEmit",
+    "build": "pnpm -r --if-present build",
+    "check:types": "pnpm -r --if-present check:types",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "test": "vitest run",
-    "test:watch": "vitest",
-    "prepare": "husky",
-    "auto:publish": "git checkout dev && git branch -D release && git checkout -b release && git merge dev && npm version patch && pnpm build && pnpm publish && git push --set-upstream origin release && git checkout dev && git merge release && git push origin dev"
-  },
-  "peerDependencies": {
-    "vue": "^3.5.0"
-  },
-  "dependencies": {
-    "@vueuse/core": "^14.3.0",
-    "@vueuse/shared": "^14.3.0"
+    "test": "pnpm -r --if-present test",
+    "prepare": "husky"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^9.2.0",
@@ -65,12 +31,11 @@
     "@types/node": "^24.13.3",
     "@vitejs/plugin-basic-ssl": "^2.3.0",
     "@vitejs/plugin-vue": "^6.0.8",
-    "@vue/test-utils": "^2.4.11",
+    "@vueuse/core": "^14.3.0",
     "ant-design-vue": "^4.2.6",
     "dayjs": "^1.11.21",
     "element-plus": "^2.14.3",
     "eslint": "^10.8.0",
-    "happy-dom": "^20.11.1",
     "husky": "^9.1.7",
     "less": "^4.8.0",
     "lint-staged": "^17.2.0",
@@ -81,11 +46,8 @@
     "postcss-preset-env": "^11.3.2",
     "resize-observer-polyfill": "^1.5.1",
     "typescript": "~5.9.3",
-    "unplugin-dts": "^1.0.3",
     "vite": "^8.1.5",
-    "vitest": "^4.1.10",
     "vue": "^3.5.40",
-    "vue-tsc": "^3.3.8",
     "vxe-table": "4.5.13",
     "xe-utils": "^3.5.14"
   },
@@ -93,8 +55,5 @@
     "*.{js,cjs,mjs,ts,tsx,vue,json,md,yml,yaml}": [
       "eslint --fix"
     ]
-  },
-  "publishConfig": {
-    "registry": "https://registry.npmjs.org"
   }
 }

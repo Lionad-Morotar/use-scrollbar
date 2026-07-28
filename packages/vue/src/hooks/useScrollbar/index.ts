@@ -20,6 +20,28 @@ type MaybeElemOrNumber = MaybeRef<MaybeElement>
 type Direction = 'x' | 'y'
 
 /**
+ * init() 的入参形态。
+ * 声明在模块作用域而非 useScrollbar 函数体内：init 随返回值暴露给调用方，
+ * 函数体内的 interface 会让默认导出函数的返回类型引用私有名（TS4060），
+ * unplugin-dts 因此放弃生成 useScrollbar/index.d.ts
+ */
+interface InitOpts {
+  mount: MaybeElem
+  content: MaybeElem | MaybeElem[] | null
+  wrapper?: MaybeElem | MaybeElem[]
+  viewport?: MaybeElem | MaybeElem[]
+  // TODO contents?: MaybeElem | MaybeElem[] | null
+}
+
+/** init() 完成 guards 归一化后的形态（content/wrapper/viewport 均为非空数组） */
+interface NormalizedInitOpts {
+  mount: MaybeElem
+  content: MaybeElem[]
+  wrapper: MaybeElem[]
+  viewport: MaybeElem[]
+}
+
+/**
  * 一个滚动系统通常包含以下部分：
  * 1. 容器，用于包含大量子项，并通过 overflow 在界面上控制滚动显示
  * 2. 子项，通常子项的元素尺寸是确定的或至少是可估算的
@@ -167,14 +189,6 @@ export default function useScrollbar(
    * - content：滚动子项的非定高父容器
    * - viewport：视口元素
    */
-  interface InitOpts {
-    mount: MaybeElem
-    content: MaybeElem | MaybeElem[] | null
-    wrapper?: MaybeElem | MaybeElem[]
-    viewport?: MaybeElem | MaybeElem[]
-    // TODO contents?: MaybeElem | MaybeElem[] | null
-  }
-
   function init(opts: InitOpts) {
     /* Guards */
 
@@ -206,13 +220,6 @@ export default function useScrollbar(
    * 使重复 init 与 destroy 可以把整批 watcher 一次性回收。
    * 入参为 init() 完成 guards 归一化后的形态（content/wrapper/viewport 均为非空数组）
    */
-  interface NormalizedInitOpts {
-    mount: MaybeElem
-    content: MaybeElem[]
-    wrapper: MaybeElem[]
-    viewport: MaybeElem[]
-  }
-
   function setup(opts: NormalizedInitOpts) {
     const { width: mountOnW, height: mountOnH } = useElementSize(opts.mount, undefined, {
       box: 'content-box',

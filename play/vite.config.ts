@@ -14,7 +14,7 @@ export default defineConfig(({ mode }) => {
       alias: [
         {
           find: /^@\/hooks$/,
-          replacement: path.join(import.meta.dirname, '../src/hooks/index.ts'),
+          replacement: path.join(import.meta.dirname, '../packages/vue/src/hooks/index.ts'),
         },
       ],
     },

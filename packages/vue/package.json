@@ -1,0 +1,69 @@
+{
+  "name": "@lionad/use-scrollbar",
+  "type": "module",
+  "version": "0.4.11",
+  "private": false,
+  "description": "Cover components' native scrollbars with fully customizable virtual scrollbars, built for Vue 3",
+  "author": "Lionad",
+  "license": "MIT",
+  "homepage": "https://github.com/Lionad-Morotar/use-scrollbar",
+  "repository": "https://github.com/Lionad-Morotar/use-scrollbar",
+  "keywords": [
+    "scrollbar",
+    "virtual",
+    "scroll",
+    "vue3",
+    "vue",
+    "hook",
+    "directive"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs"
+    },
+    "./*": "./*"
+  },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/types/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": "^20.19.0 || >=22.12.0",
+    "pnpm": ">=10"
+  },
+  "scripts": {
+    "clean": "rm -rf dist",
+    "build": "pnpm clean && vite build",
+    "build:watch": "pnpm clean && vite build --watch",
+    "check:types": "vue-tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "auto:publish": "git checkout dev && git branch -D release && git checkout -b release && git merge dev && npm version patch && pnpm build && pnpm publish && git push --set-upstream origin release && git checkout dev && git merge release && git push origin dev"
+  },
+  "peerDependencies": {
+    "vue": "^3.5.0"
+  },
+  "dependencies": {
+    "@vueuse/core": "^14.3.0",
+    "@vueuse/shared": "^14.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.13.3",
+    "@vue/test-utils": "^2.4.11",
+    "happy-dom": "^20.11.1",
+    "less": "^4.8.0",
+    "typescript": "~5.9.3",
+    "unplugin-dts": "^1.0.3",
+    "vite": "^8.1.5",
+    "vitest": "^4.1.10",
+    "vue": "^3.5.40",
+    "vue-tsc": "^3.3.8"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org"
+  }
+}

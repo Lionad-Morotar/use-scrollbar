@@ -7,13 +7,6 @@ settings:
 importers:
 
   .:
-    dependencies:
-      '@vueuse/core':
-        specifier: ^14.3.0
-        version: 14.3.0(vue@3.5.40(typescript@5.9.3))
-      '@vueuse/shared':
-        specifier: ^14.3.0
-        version: 14.3.0(vue@3.5.40(typescript@5.9.3))
     devDependencies:
       '@antfu/eslint-config':
         specifier: ^9.2.0
@@ -36,9 +29,9 @@ importers:
       '@vitejs/plugin-vue':
         specifier: ^6.0.8
         version: 6.0.8(vite@8.1.5(@types/node@24.13.3)(jiti@2.6.1)(less@4.8.0)(yaml@2.9.0))(vue@3.5.40(typescript@5.9.3))
-      '@vue/test-utils':
-        specifier: ^2.4.11
-        version: 2.4.11(@vue/compiler-dom@3.5.40)(@vue/server-renderer@3.5.40)(vue@3.5.40(typescript@5.9.3))
+      '@vueuse/core':
+        specifier: ^14.3.0
+        version: 14.3.0(vue@3.5.40(typescript@5.9.3))
       ant-design-vue:
         specifier: ^4.2.6
         version: 4.2.6(vue@3.5.40(typescript@5.9.3))
@@ -51,9 +44,6 @@ importers:
       eslint:
         specifier: ^10.8.0
         version: 10.8.0(jiti@2.6.1)
-      happy-dom:
-        specifier: ^20.11.1
-        version: 20.11.1
       husky:
         specifier: ^9.1.7
         version: 9.1.7
@@ -84,6 +74,43 @@ importers:
       typescript:
         specifier: ~5.9.3
         version: 5.9.3
+      vite:
+        specifier: ^8.1.5
+        version: 8.1.5(@types/node@24.13.3)(jiti@2.6.1)(less@4.8.0)(yaml@2.9.0)
+      vue:
+        specifier: ^3.5.40
+        version: 3.5.40(typescript@5.9.3)
+      vxe-table:
+        specifier: 4.5.13
+        version: 4.5.13(vue@3.5.40(typescript@5.9.3))(xe-utils@3.9.1)
+      xe-utils:
+        specifier: ^3.5.14
+        version: 3.9.1
+
+  packages/vue:
+    dependencies:
+      '@vueuse/core':
+        specifier: ^14.3.0
+        version: 14.3.0(vue@3.5.40(typescript@5.9.3))
+      '@vueuse/shared':
+        specifier: ^14.3.0
+        version: 14.3.0(vue@3.5.40(typescript@5.9.3))
+    devDependencies:
+      '@types/node':
+        specifier: ^24.13.3
+        version: 24.13.3
+      '@vue/test-utils':
+        specifier: ^2.4.11
+        version: 2.4.11(@vue/compiler-dom@3.5.40)(@vue/server-renderer@3.5.40)(vue@3.5.40(typescript@5.9.3))
+      happy-dom:
+        specifier: ^20.11.1
+        version: 20.11.1
+      less:
+        specifier: ^4.8.0
+        version: 4.8.0
+      typescript:
+        specifier: ~5.9.3
+        version: 5.9.3
       unplugin-dts:
         specifier: ^1.0.3
         version: 1.0.3(@vue/language-core@3.3.8)(rolldown@1.1.5)(typescript@5.9.3)(vite@8.1.5(@types/node@24.13.3)(jiti@2.6.1)(less@4.8.0)(yaml@2.9.0))
@@ -99,12 +126,6 @@ importers:
       vue-tsc:
         specifier: ^3.3.8
         version: 3.3.8(typescript@5.9.3)
-      vxe-table:
-        specifier: 4.5.13
-        version: 4.5.13(vue@3.5.40(typescript@5.9.3))(xe-utils@3.9.1)
-      xe-utils:
-        specifier: ^3.5.14
-        version: 3.9.1
 
 packages:
 
