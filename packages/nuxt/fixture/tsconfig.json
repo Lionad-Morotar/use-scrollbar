@@ -1,0 +1,5 @@
+{
+  // 类型由 `nuxi prepare ./fixture` 生成（.nuxt/tsconfig.json 已覆盖
+  // 本目录源码、nuxt.config.ts 全局函数与 #imports 映射），勿手改 extends
+  "extends": "./.nuxt/tsconfig.json"
+}
