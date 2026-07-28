@@ -12,8 +12,10 @@ import logoUrl from '../../docs/assets/logo.png'
 
 type ThemeKey = 'normal' | 'steam' | 'css-tricks'
 
-// hero 活预览当前主题，驱动 useScrollbar 的 theme 响应式
-const liveTheme = ref<ThemeKey>('normal')
+// hero 活预览当前主题，驱动 useScrollbar 的 theme 响应式；
+// 默认 steam：其 thumb 为 opacity:1 实色，配深底镜像首屏即肉眼可见，
+// 比 normal 的半透灰条更能直接证明「滚动条确实被本库渲染」
+const liveTheme = ref<ThemeKey>('steam')
 const liveRef = ref<HTMLElement>()
 const bar = useScrollbar(liveRef)
 watchEffect(() => {
