@@ -136,7 +136,7 @@ function goExamples() {
           <!-- 隐藏原生条，由 useScrollbar 覆盖渲染；
                自动探测（findScrollElement）只在子元素中找滚动容器，故 ref 挂外层包装而非滚动元素自身 -->
           <div ref="liveRef" class="live-viewport">
-            <div class="live-scroll">
+            <div class="live-scroll" :class="`lv-${liveTheme}`">
               <pre class="live-code">// use-scrollbar
 function paint(container) {
   const bar = useScrollbar(container)
@@ -576,6 +576,28 @@ function done() {
   .live-scroll::-webkit-scrollbar {
     width: 0;
     height: 0;
+  }
+  /* 主题镜像底色：steam / css-tricks 需要深底才能让 opacity:1 的 thumb 显形 */
+  .live-scroll.lv-steam {
+    background: linear-gradient(135deg, #1c1f22, #2c313c);
+  }
+  .live-scroll.lv-css-tricks {
+    background: linear-gradient(13deg, #262626, #545454);
+  }
+  .live-scroll.lv-steam .live-code,
+  .live-scroll.lv-css-tricks .live-code {
+    color: #d4d4d4;
+  }
+  /* normal 默认灰 thumb 在浅底上几乎不可见；
+     提满不透明 + hover 注入品牌 pink——演示「皮肤可完全定制」 */
+  .live-viewport :deep(.is-normal .c-scrollbar) {
+    opacity: 0.82;
+    background-color: #b0b0b8;
+  }
+  .live-viewport :deep(.is-normal .c-scrollbar:hover),
+  .live-viewport :deep(.is-normal .c-scrollbar.is-dragging) {
+    opacity: 1;
+    background-color: var(--accent);
   }
   .live-code {
     margin: 0;
