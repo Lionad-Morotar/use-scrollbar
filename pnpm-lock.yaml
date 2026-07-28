@@ -39,18 +39,12 @@ importers:
       '@vue/test-utils':
         specifier: ^2.4.11
         version: 2.4.11(@vue/compiler-dom@3.5.40)(@vue/server-renderer@3.5.40)(vue@3.5.40(typescript@5.9.3))
-      '@vxe-ui/core':
-        specifier: ^4.4.18
-        version: 4.4.18(vue@3.5.40(typescript@5.9.3))
       ant-design-vue:
         specifier: ^4.2.6
         version: 4.2.6(vue@3.5.40(typescript@5.9.3))
       dayjs:
         specifier: ^1.11.21
         version: 1.11.21
-      dom-zindex:
-        specifier: ^1.0.7
-        version: 1.0.7
       element-plus:
         specifier: ^2.14.3
         version: 2.14.3(vue@3.5.40(typescript@5.9.3))
@@ -106,11 +100,11 @@ importers:
         specifier: ^3.3.8
         version: 3.3.8(typescript@5.9.3)
       vxe-table:
-        specifier: ^4.20.8
-        version: 4.20.8
+        specifier: 4.5.13
+        version: 4.5.13(vue@3.5.40(typescript@5.9.3))(xe-utils@3.9.1)
       xe-utils:
-        specifier: ^4.0.11
-        version: 4.0.11
+        specifier: ^3.5.14
+        version: 3.9.1
 
 packages:
 
@@ -1178,11 +1172,6 @@ packages:
     resolution: {integrity: sha512-bZpge9eSXwa4ToSiqJ7j6KRwhAsneMFoSz3LMWKQDkqimm3D/tbFlrklrs/IOqC8tEcYmXQZJ6N0UrjhBirVCg==}
     peerDependencies:
       vue: ^3.5.0
-
-  '@vxe-ui/core@4.4.18':
-    resolution: {integrity: sha512-1w9eSWxUe5gIgkZB9QTTWiAcYd9fnnhWeyZNILIp7SwYA8s8962S6bNi2xYv4FFj5ipXrZjfIXdOUJzb3d3aYw==}
-    peerDependencies:
-      vue: ^3.2.0
 
   abbrev@2.0.0:
     resolution: {integrity: sha512-6/mh1E2u2YgEsCHdY0Yx5oW+61gZU+1vXaoiHHrpKeuRNNgFvS+/jrwHiQhB5apAf5oB7UB7E19ol2R2LKH8hQ==}
@@ -3076,8 +3065,11 @@ packages:
       typescript:
         optional: true
 
-  vxe-table@4.20.8:
-    resolution: {integrity: sha512-r/8yfjB0+TZU4Qh3F2XditOyjUihY7H5LK3uv0T0JGLN62sjmwJHOUxvmRGjon5DVwaKdFHr41IUa6sVf2wiYg==}
+  vxe-table@4.5.13:
+    resolution: {integrity: sha512-CKsyUhDYIcO4TSXoO0I2YVkKEWjQLUq24PN6MhmFmvyFRdfj80cgLZ4iEjihLieW4aRqPcLHqkw83hCAyzvO8w==}
+    peerDependencies:
+      vue: ^3.2.28
+      xe-utils: ^3.5.0
 
   warning@4.0.3:
     resolution: {integrity: sha512-rpJyN222KWIvHJ/F53XSZv0Zl/accqHR8et1kpaMTD/fLCRxtV8iX8czMzY7sVZupTI3zcUTg8eycS2kNF9l6w==}
@@ -3130,8 +3122,8 @@ packages:
       utf-8-validate:
         optional: true
 
-  xe-utils@4.0.11:
-    resolution: {integrity: sha512-r3v1o10AnHXKRZ5ikuAOQ+Mxw/hy1XWjFr2/Q9L+LEZYq/PRxmiZ6/J53DEH53XqklEXddsmx1vYjOaOACq8IQ==}
+  xe-utils@3.9.1:
+    resolution: {integrity: sha512-Ujk5UmoH6Iaqhgz3oGwfCXVcMdUJKlXnfvLABdnMyseMG0eHsX2mcCvLd/8sGlIXtfwsprI9bW7vgcVognLmqQ==}
 
   xml-name-validator@5.0.0:
     resolution: {integrity: sha512-EvGK8EJ3DhaHfbRlETOWAS5pO9MZITeauHKJyb8wyajUfQUenkIg2MvLDTZ4T/TgIcm3HU0TFBgWWboAZ30UHg==}
@@ -4303,12 +4295,6 @@ snapshots:
   '@vueuse/shared@14.3.0(vue@3.5.40(typescript@5.9.3))':
     dependencies:
       vue: 3.5.40(typescript@5.9.3)
-
-  '@vxe-ui/core@4.4.18(vue@3.5.40(typescript@5.9.3))':
-    dependencies:
-      dom-zindex: 1.0.7
-      vue: 3.5.40(typescript@5.9.3)
-      xe-utils: 4.0.11
 
   abbrev@2.0.0: {}
 
@@ -6375,7 +6361,11 @@ snapshots:
     optionalDependencies:
       typescript: 5.9.3
 
-  vxe-table@4.20.8: {}
+  vxe-table@4.5.13(vue@3.5.40(typescript@5.9.3))(xe-utils@3.9.1):
+    dependencies:
+      dom-zindex: 1.0.7
+      vue: 3.5.40(typescript@5.9.3)
+      xe-utils: 3.9.1
 
   warning@4.0.3:
     dependencies:
@@ -6418,7 +6408,7 @@ snapshots:
 
   ws@8.21.1: {}
 
-  xe-utils@4.0.11: {}
+  xe-utils@3.9.1: {}
 
   xml-name-validator@5.0.0: {}
 

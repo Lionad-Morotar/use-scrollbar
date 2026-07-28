@@ -66,10 +66,8 @@
     "@vitejs/plugin-basic-ssl": "^2.3.0",
     "@vitejs/plugin-vue": "^6.0.8",
     "@vue/test-utils": "^2.4.11",
-    "@vxe-ui/core": "^4.4.18",
     "ant-design-vue": "^4.2.6",
     "dayjs": "^1.11.21",
-    "dom-zindex": "^1.0.7",
     "element-plus": "^2.14.3",
     "eslint": "^10.8.0",
     "happy-dom": "^20.11.1",
@@ -88,8 +86,8 @@
     "vitest": "^4.1.10",
     "vue": "^3.5.40",
     "vue-tsc": "^3.3.8",
-    "vxe-table": "^4.20.8",
-    "xe-utils": "^4.0.11"
+    "vxe-table": "4.5.13",
+    "xe-utils": "^3.5.14"
   },
   "lint-staged": {
     "*.{js,cjs,mjs,ts,tsx,vue,json,md,yml,yaml}": [

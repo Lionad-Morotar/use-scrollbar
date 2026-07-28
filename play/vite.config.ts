@@ -23,12 +23,11 @@ export default defineConfig(({ mode }) => {
       port: 7232,
       host: true,
     },
-    // pnpm 10 严格布局下 vxe-table 的传递依赖（@vxe-ui/core、dom-zindex）仅在
-    // esbuild 预打包阶段（从项目根 resolve）可达；若 exclude 则原始 JS 的
-    // import-analysis 从 .pnpm 内视角解析会失败。vue-demi 已移除，旧版 exclude
-    // 防双 vue 实例的动机不复存在，故不再排除。
+    // vxe-table 4.5 自声明依赖，排除预打包保持源码直引（4.20 时代因传递依赖
+    // 声明缺失被迫 include 并显式补声明，回退后该动机不复存在）
     optimizeDeps: {
-      include: ['vue', '@vue/shared', 'xe-utils', 'element-plus', 'vxe-table'],
+      include: ['vue', '@vue/shared', 'xe-utils', 'element-plus'],
+      exclude: ['vxe-table'],
     },
   }
 })

@@ -98,13 +98,6 @@
 - 脆弱原因：假设了固定表头高度与任意额外宽度；设计变更时即会失效。
 - 安全修改：测量实际表头高度，或从 token/ref 中读取。
 
-**vxe-table 4.20 缺失运行时依赖声明：**
-
-- vxe-table@4.20.8 的 `package.json` 既不声明 `dependencies` 也不声明 `peerDependencies`，却在运行时 import `@vxe-ui/core` 与 `dom-zindex`。在 pnpm 7 的扁平布局下这些传递依赖隐式可达；pnpm 10 严格布局 + Vite 8 预打包下则需消费方显式声明，否则浏览器 import-analysis 报 `Failed to resolve import`。
-- 文件：playground 的 `package.json`（已显式声明 `@vxe-ui/core`、`dom-zindex`）；`play/vite.config.ts`（将 `vxe-table` 列入 `optimizeDeps.include`，使预打包阶段从项目根 resolve 全部传递依赖）
-- 影响：任何升级 vxe-table 或更换 pnpm 主版本的消费方都可能踩到同一缺陷。
-- 修复方向：这是 vxe-table 自身的打包缺陷，应由上游补全其 `package.json` 的 dependencies；消费方短期只能显式声明。
-
 ## 扩展限制
 
 **每个滚动条实例一个 Vue 应用：**
@@ -170,6 +163,10 @@
 - **样式 effect 每帧全量重建 CSSProperties**：静态字段与位移分层，transform 改 `translateY(var(--thumb-y))` 消费 CSS 变量，states.styles 对象引用稳定；同引用对象下字段移除须空串赋值（Vue patchStyle 删除路径对同引用失效）。
 - **`useNativeScrollbar` 探针测量未缓存**：模块级缓存（null 哨兵，0 为有效值），SSR 无 document 时不测量不缓存。
 - **thumb 的 `will-change: auto` 无效**：改 isScrolling/isDragging 期间动态内联 `will-change: transform`，静止空串移除。
+
+## 已于 2026-07-28 演示页修复中退役的隐患
+
+- **vxe-table 4.20 的集成不兼容**：其 `package.json` 不声明 dependencies 却运行时 import `@vxe-ui/core`/`dom-zindex`（pnpm 10 严格布局下消费方须显式声明并将 `vxe-table` 列入 `optimizeDeps.include`）；4.20 新增 `.vxe-table--scroll-*-handle` 自绘滚动条元素，play 隐藏原生条的 `::-webkit-scrollbar` 规则对其失效致双滚动条共存；固定列整表复制 ×3 叠加只增不减的虚拟滚动渲染窗口（`endIndex = Math.max(...)`）使滚动长任务达 0.3-5s。经钉死回退 vxe-table@4.5.13 并恢复 `optimizeDeps.exclude` 退役。
 
 ## 已于 2026-07-28 工具链现代化中退役的隐患
 
