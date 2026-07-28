@@ -30,13 +30,6 @@
 
 ## 安全考量
 
-**SSR 环境下访问全局 DOM 不安全：**
-
-- `createComponent` 在 `scrollbars.ts` 中调用 `document.createElement('div')`；`onMouseDown` 访问 `window.getSelection()` 与 `document.onselectstart`。
-- 文件：`src/hooks/useScrollbar/scrollbars.ts`，`src/hooks/useScrollbar/index.ts`
-- 当前缓解：`useNativeScrollbar.calcThick` 已加 `typeof document` 守卫（不测量不缓存）；其余访问点无守卫，本库假设运行环境为浏览器。
-- 建议：将 DOM 访问置于 `typeof document !== 'undefined'` 守卫之后，或至少注明这些 hook 仅客户端可用。对于 Nuxt/Vite SSR 用户这是硬性阻塞。
-
 **全局修改 `document.onselectstart`：**
 
 - 拖拽期间库会覆盖 `document.onselectstart`，并在清理时恢复之前的原始值。这绕过了现代事件监听器规范。
@@ -135,11 +128,6 @@
 
 ## 缺失的关键功能
 
-**没有 SSR 守卫：**
-
-- 问题：服务端渲染时会因无条件访问 DOM 全局对象而崩溃。
-- 阻塞：无法在 Nuxt 或任何 SSR 环境中使用。
-
 **Headless 组件与指令尚未完成：**
 
 - `src/headless/use-scrollbar.vue` 只有 `<template> WIP </template>`，README 中也将指令与 headless 组件标为 WIP。
@@ -179,5 +167,9 @@
 - **release CI 检出错误分支**：移除硬编码 `ref: dev`，检出触发分支本身。
 - **Husky v8 废弃的 husky install**：迁 Husky 9，hook 改纯 shell 格式，prepare 改 `husky`。
 - **Vue2 兼容声明不真实**：移除 vue-demi，peer 收紧 `vue: ^3.5.0`，声明现已与实际能力一致。
+
+## 已于 2026-07-28 monorepo 改造中退役的隐患
+
+- **SSR 环境下访问全局 DOM 不安全**（安全考量）与**没有 SSR 守卫**（缺失的关键功能）：`init`/`mount`/`onMouseDown`/`clean` 四个入口补齐 `typeof document`/`typeof window` 守卫，SSR 下静默跳过而非抛错；node 环境契约测试 `packages/vue/test/ssr.test.ts`（6 例）锁定不回退。
 
 _隐患审计：2026-07-28（工具链现代化后刷新；同日经性能专项探索 + 外部正交审查复核，修正"sqrt 曲线每帧重算"的错误描述；同日性能优化落地 4 切片，7 条隐患退役、3 条更新现状，见性能退役清单）_

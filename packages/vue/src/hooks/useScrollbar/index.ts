@@ -192,6 +192,12 @@ export default function useScrollbar(
   function init(opts: InitOpts) {
     /* Guards */
 
+    // SSR 环境（Nuxt 服务端渲染 setup 阶段）无 document：
+    // init 的一切工作都围绕真实 DOM 展开，直接静默跳过而非抛出，
+    // 让 composable 在同构代码里可以无条件调用，水合后由客户端再次 init
+    if (typeof document === 'undefined')
+      return
+
     opts.mount = opts.mount!
     opts.content = Array.isArray(opts.content) ? opts.content : [opts.content]
     opts.content = opts.content.filter(notEmpty) as MaybeElem[]
@@ -570,6 +576,10 @@ export default function useScrollbar(
     states.isDragging.x = states.isDragging.y = false
   }
   const onMouseDown = (e: MouseEvent) => {
+    // SSR 环境无 window/document：拖拽本质是客户端交互，守卫只为同构代码的容错
+    if (typeof window === 'undefined')
+      return
+
     // console.log("[debug] onMouseDown", e);
     clean()
     e.stopPropagation()
@@ -607,7 +617,9 @@ export default function useScrollbar(
     }
 
     // 从未 mousedown 时 selectEventRaw 为 undefined，恢复时回落 null（EventHandler 初态）
-    document.onselectstart = selectEventRaw.value ?? null
+    // SSR 的 unmount 路径没有 document，跳过恢复
+    if (typeof document !== 'undefined')
+      document.onselectstart = selectEventRaw.value ?? null
 
     while (clean.todos.length) {
       const cleanJob = clean.todos.pop()
@@ -636,6 +648,11 @@ export default function useScrollbar(
   // 不去重会让每次重挂载都累积一个 Vue 应用与 DOM 容器
   // TODO remove event
   function mount($elem: MaybeElem) {
+    // SSR 环境无 document，createComponent 的 createElement 会抛 ReferenceError；
+    // 服务端跳过挂载，水合后由客户端路径重建实例
+    if (typeof document === 'undefined')
+      return
+
     instance.value?.destroy?.()
     instance.value = null
     instance.value = createComponent(states)
