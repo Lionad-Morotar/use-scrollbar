@@ -1,3 +1,4 @@
+import type { NuxtModule } from '@nuxt/schema'
 import { addImports, defineNuxtModule } from '@nuxt/kit'
 
 export interface UseScrollbarModuleOptions {
@@ -12,8 +13,11 @@ export interface UseScrollbarModuleOptions {
  * 只注册 auto-imports 与样式注入，不注册任何插件：
  * 核心包的 composable 在 SSR 下是无害的（DOM 访问已守卫、静默跳过），
  * 不需要 client-only 插件把运行时与 SSR 隔离；水合后 init/mount 才触碰真实 DOM
+ *
+ * 显式标注 NuxtModule：rollup-plugin-dts 无法从 .pnpm 虚拟 store 路径
+ * 可移植地命名 defineNuxtModule 的推断返回类型（TS2742），须以 import 锚定
  */
-export default defineNuxtModule<UseScrollbarModuleOptions>({
+const useScrollbarModule: NuxtModule<UseScrollbarModuleOptions> = defineNuxtModule<UseScrollbarModuleOptions>({
   meta: {
     name: '@lionad/nuxt-use-scrollbar',
     configKey: 'useScrollbar',
@@ -36,3 +40,5 @@ export default defineNuxtModule<UseScrollbarModuleOptions>({
     addImports(composables.map(name => ({ name, from: '@lionad/use-scrollbar' })))
   },
 })
+
+export default useScrollbarModule

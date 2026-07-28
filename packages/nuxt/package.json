@@ -47,6 +47,7 @@
   "devDependencies": {
     "@lionad/use-scrollbar": "workspace:*",
     "@nuxt/module-builder": "^1.0.3",
+    "@nuxt/schema": "^4.5.1",
     "@types/node": "^24.13.3",
     "nuxt": "^4.5.1",
     "typescript": "~5.9.3",

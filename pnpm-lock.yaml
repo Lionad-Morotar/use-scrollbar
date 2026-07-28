@@ -51,6 +51,9 @@ importers:
       '@nuxt/module-builder':
         specifier: ^1.0.3
         version: 1.0.3(@nuxt/cli@3.37.0(@nuxt/schema@4.5.1)(magicast@0.5.3))(@volar/typescript@2.4.28)(@vue/compiler-core@3.5.40)(@vue/language-core@3.3.8)(esbuild@0.28.1)(rolldown@1.2.0)(rollup@4.62.3)(typescript@5.9.3)(vite@8.1.5(@types/node@24.13.3)(esbuild@0.28.1)(jiti@2.7.0)(less@4.8.0)(terser@5.49.0)(yaml@2.9.0))(vue-tsc@3.3.8(typescript@5.9.3))(vue@3.5.40(typescript@5.9.3))
+      '@nuxt/schema':
+        specifier: ^4.5.1
+        version: 4.5.1
       '@types/node':
         specifier: ^24.13.3
         version: 24.13.3
