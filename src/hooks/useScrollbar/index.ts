@@ -1,11 +1,11 @@
 import type { MaybeComputedElementRef, MaybeElement } from '@vueuse/core'
 // MaybeRef 自 Vue 3.3 起由核心导出，@vueuse/core v13+ 移除了重复导出
-import type { CSSProperties, MaybeRef, Ref } from 'vue'
+import type { CSSProperties, EffectScope, MaybeRef, Ref } from 'vue'
 import type { States } from './states'
 import { unrefElement, useEventListener } from '@vueuse/core'
 import { tryOnScopeDispose } from '@vueuse/shared'
-import { computed, onUnmounted, reactive, ref, unref, watch, watchEffect } from 'vue'
-import { useElementHover, useElementSize, useScroll } from '@/hooks'
+import { computed, effectScope, onUnmounted, reactive, ref, unref, watch, watchEffect } from 'vue'
+import { useElementSize, useScroll } from '@/hooks'
 
 import { createComponent } from './scrollbars'
 import getOpts from './states'
@@ -65,18 +65,49 @@ export default function useScrollbar(
 
   // console.log('states', states)
 
+  // hover 监听器的清理句柄：init 在事件回调（如 onMounted）里执行时
+  // 没有 active effect scope，watcher 的自动清理不会注册，必须由本闭包手动持有并回收
+  let stopHover: (() => void) | null = null
+
+  // 每次 init 的响应式副作用（~20+ watcher）收进独立 scope：
+  // 重复 init 时整体回收上一批，否则 watcher 会随 init 次数线性泄漏
+  let initScope: EffectScope | null = null
+
   function destroy() {
+    stopHover?.()
+    stopHover = null
+    initScope?.stop()
+    initScope = null
     instance.value?.destroy?.()
+    instance.value = null
   }
   tryOnScopeDispose(destroy)
 
-  // 监听元素的 hover 事件以改变滚动条的显示隐藏状态
+  // 监听元素的 hover 事件以改变滚动条的显示隐藏状态。
+  // 返回清理函数；重复注册前应先调用上一次返回的清理函数，否则监听器会累加
   function visibleOnHover($hoverOn: MaybeComputedElementRef) {
-    useElementHover(
-      $hoverOn,
-      () => (inTrigger.value.y = inTrigger.value.x = true),
-      () => (inTrigger.value.y = inTrigger.value.x = false),
+    const enter = () => (inTrigger.value.y = inTrigger.value.x = true)
+    const leave = () => (inTrigger.value.y = inTrigger.value.x = false)
+    let bound: HTMLElement | null = null
+    const unbind = () => {
+      bound?.removeEventListener('mouseenter', enter)
+      bound?.removeEventListener('mouseleave', leave)
+      bound = null
+    }
+    const stopWatch = watch(
+      () => unrefElement($hoverOn),
+      ($el) => {
+        unbind()
+        bound = ($el as HTMLElement | null) ?? null
+        bound?.addEventListener('mouseenter', enter)
+        bound?.addEventListener('mouseleave', leave)
+      },
+      { immediate: true, flush: 'post' },
     )
+    return () => {
+      stopWatch()
+      unbind()
+    }
   }
 
   // 使用元素 x 的宽度作为滚动条的 offset.left 或 offset.right，
@@ -133,13 +164,15 @@ export default function useScrollbar(
    * - content：滚动子项的非定高父容器
    * - viewport：视口元素
    */
-  function init(opts: {
+  interface InitOpts {
     mount: MaybeElem
     content: MaybeElem | MaybeElem[] | null
     wrapper?: MaybeElem | MaybeElem[]
     viewport?: MaybeElem | MaybeElem[]
     // TODO contents?: MaybeElem | MaybeElem[] | null
-  }) {
+  }
+
+  function init(opts: InitOpts) {
     /* Guards */
 
     opts.mount = opts.mount!
@@ -157,6 +190,27 @@ export default function useScrollbar(
     opts.viewport = opts.viewport.filter(notEmpty) as MaybeElem[]
     // console.log('[debug] init opts', opts)
 
+    // 先回收上一次 init 的 hover 监听器与全部响应式副作用，再在独立 scope 内重建
+    stopHover?.()
+    stopHover = null
+    initScope?.stop()
+    initScope = effectScope()
+    initScope.run(() => setup(opts as NormalizedInitOpts))
+  }
+
+  /**
+   * 在独立 effect scope 内建立一次 init 的全部响应式副作用，
+   * 使重复 init 与 destroy 可以把整批 watcher 一次性回收。
+   * 入参为 init() 完成 guards 归一化后的形态（content/wrapper/viewport 均为非空数组）
+   */
+  interface NormalizedInitOpts {
+    mount: MaybeElem
+    content: MaybeElem[]
+    wrapper: MaybeElem[]
+    viewport: MaybeElem[]
+  }
+
+  function setup(opts: NormalizedInitOpts) {
     const { width: mountOnW, height: mountOnH } = useElementSize(opts.mount, undefined, {
       box: 'content-box',
     })
@@ -328,10 +382,19 @@ export default function useScrollbar(
       states.position.x.left = safeLeft
     })
 
-    watchEffect(() => {
-      mount(opts.mount)
-      visibleOnHover(opts.mount)
-    })
+    // 显式依赖 mount 元素：元素就绪/更换时重挂载；避免旧实现的隐式依赖
+    // （instance 自写、states 样式写入）触发无约束重跑导致实例爆炸
+    watch(
+      () => unrefElement(opts.mount as MaybeElem),
+      ($mount) => {
+        if (!$mount)
+          return
+        mount($mount)
+        stopHover?.()
+        stopHover = visibleOnHover($mount)
+      },
+      { immediate: true, flush: 'post' },
+    )
 
     const scrollXTick = ref(0)
     const scrollYTick = ref(0)
@@ -520,9 +583,13 @@ export default function useScrollbar(
     onMouseDown.bind(e)(e)
   }
 
-  // 将滚动条挂载在某个 DOM 节点
+  // 将滚动条挂载在某个 DOM 节点。
+  // 挂载前先销毁旧实例：createApp 的副作用不在任何 watcher 的清理范围内，
+  // 不去重会让每次重挂载都累积一个 Vue 应用与 DOM 容器
   // TODO remove event
   function mount($elem: MaybeElem) {
+    instance.value?.destroy?.()
+    instance.value = null
     instance.value = createComponent(states)
     const $el = unrefElement($elem as HTMLElement)
     $el && $el.appendChild(instance.value.$el)
@@ -541,7 +608,8 @@ export default function useScrollbar(
           try {
             const $wrapper = findScrollElement($elm) as HTMLElement
             const $content = Array.from($wrapper.children) as HTMLElement[]
-            visibleOnHover($elm)
+            // hover 注册由 init() 内的 mount watch 统一负责（stopHover 链管理）；
+            // 此处再注册会与其重复，且返回值无人持有，initOn 切换时残留监听器
             init({
               mount: $elm,
               wrapper: [$wrapper!],
