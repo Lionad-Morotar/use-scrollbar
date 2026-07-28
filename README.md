@@ -4,7 +4,7 @@
 
 <p align="center">
   <!-- npm version -->
-  <a href="https://github.com/Lionad-Morotar/use-scrollbar"><img src="https://img.shields.io/npm/v/use-scrollbars.svg" alt="npm package"></a>
+  <a href="https://github.com/Lionad-Morotar/use-scrollbar"><img src="https://img.shields.io/npm/v/@lionad/use-scrollbar.svg" alt="npm package"></a>
   <!-- ci status -->
   <a href="https://github.com/Lionad-Morotar/use-scrollbar/actions/workflows/ci-on-release.yml"><img src="https://github.com/Lionad-Morotar/use-scrollbar/actions/workflows/ci-on-release.yml/badge.svg?branch=release" alt="build status"></a>
   <!-- license -->
@@ -23,8 +23,12 @@
 
 Assuming a 400px height div, you can easily get a div with beautiful virtual scrollbars by simply wrap the div with [ElementPlus Scrollbar](https://element-plus.gitee.io/zh-CN/component/scrollbar.html) scrollbars. But none of the popular scrollbar components provide an interface for handling complex elements, that is to say, you cant wrap an complex component with [ElementPlus Scrollbar](https://element-plus.gitee.io/zh-CN/component/scrollbar.html) to have its internal native scrollbar replaced with beautiful virtual scrollbars. So you need `use-scrollbar`.
 
-- [vxe-table example](./play/src/vxe-table.vue)
-- [antd-vue-table example](./play/src/ant-vue-table.vue)
+- [vxe-table example](./playground/src/vxe-table.vue)
+- [antd-vue-table example](./playground/src/ant-vue-table.vue)
+- [AG Grid example](./playground/src/ag-grid.vue)
+- [Tabulator example](./playground/src/tabulator.vue)
+- [CodeMirror 6 example](./playground/src/codemirror.vue)
+- [Element Plus Table example](./playground/src/el-table.vue)
 
 ## ⚒️ Feature
 
@@ -60,12 +64,12 @@ and PRs are welcome
 Simple example
 
 ```typescript
-import { useScrollbar } from 'use-scrollbars'
+import { useScrollbar } from '@lionad/use-scrollbar'
 import { onMounted, ref } from 'vue'
 
 // dont forget to import style.css
 // in your main.ts (or entry.ts anyway)
-import 'use-scrollbars/dist/style.css'
+import '@lionad/use-scrollbar/dist/style.css'
 
 const componentOrElementRef = ref(null)
 const barStates = useScrollbar(componentOrElementRef, {
@@ -76,7 +80,7 @@ const barStates = useScrollbar(componentOrElementRef, {
 Another example
 
 ```typescript
-import { useScrollbar } from 'use-scrollbars'
+import { useScrollbar } from '@lionad/use-scrollbar'
 import { onMounted, ref, watchEffect } from 'vue'
 
 const componentOrElementRef = ref(null)
@@ -100,8 +104,33 @@ More example on `pnpm dev`
 ## 📦 Install
 
 ```bash
-pnpm install use-scrollbars
+pnpm add @lionad/use-scrollbar
 ```
+
+### Nuxt
+
+Nuxt 项目可以改用配套模块 `@lionad/nuxt-use-scrollbar`，自动完成 composables 的 auto-import 与样式注入（SSR 安全，无需额外配置）：
+
+```bash
+pnpm add @lionad/use-scrollbar @lionad/nuxt-use-scrollbar
+```
+
+```typescript
+// nuxt.config.ts
+export default defineNuxtConfig({
+  modules: ['@lionad/nuxt-use-scrollbar'],
+  // 需要完全自管样式时可关闭注入
+  // useScrollbar: { injectStyles: false },
+})
+```
+
+## 🗂️ Monorepo
+
+| 包 | 说明 |
+| --- | --- |
+| [`packages/vue`](./packages/vue) | 核心包 `@lionad/use-scrollbar` |
+| [`packages/nuxt`](./packages/nuxt) | Nuxt 模块 `@lionad/nuxt-use-scrollbar` |
+| [`playground`](./playground) | 演示场（`pnpm dev` 启动） |
 
 ## 🗂️ Document
 
