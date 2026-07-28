@@ -51,7 +51,7 @@ export default defineComponent({
 });
 </script>
 
-<scope lang="less">
+<style lang="less">
 .gantt-elastic__calendar-row {
   display: flex;
 
@@ -73,4 +73,4 @@ export default defineComponent({
     font-weight: bold;
   }
 }
-</scope>
+</style>
