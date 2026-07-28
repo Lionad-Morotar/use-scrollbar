@@ -1,24 +1,89 @@
 import type { EffectScope } from 'vue'
 import { flushPromises, mount } from '@vue/test-utils'
-import { describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { defineComponent, getCurrentScope, onMounted, ref } from 'vue'
 import { useScrollbar } from '../src/hooks'
+
+// 尺寸源头控制：happy-dom 元素尺寸恒 0，且其 ResizeObserver 是空实现（observe 不做事），
+// 而 useScrollbar 的 contentH/viewportH 派生自 useElementSize（vueuse 经 RO 回调驱动），
+// 测试手写 states 会被同步 effect 拉回——必须 stub 一个真的会回调的 RO，
+// 按被观察元素的 data-testid 从 sizeMock 取尺寸
+const sizeMock: Record<string, { width: number, height: number }> = {
+  mount: { width: 0, height: 0 },
+  wrapper: { width: 0, height: 0 },
+  content: { width: 0, height: 0 },
+  default: { width: 0, height: 0 },
+}
+
+const roRegistry: Array<{ el: Element, cb: ResizeObserverCallback, ro: ResizeObserver }> = []
+
+function makeSizeEntry(el: Element): ResizeObserverEntry {
+  const testid = (el as HTMLElement).dataset?.testid
+  const size = sizeMock[testid && testid in sizeMock ? testid : 'default']
+  return {
+    target: el,
+    borderBoxSize: [{ inlineSize: size.width, blockSize: size.height }],
+    contentBoxSize: [{ inlineSize: size.width, blockSize: size.height }],
+    contentRect: { width: size.width, height: size.height },
+  } as unknown as ResizeObserverEntry
+}
+
+class MockResizeObserver implements ResizeObserver {
+  constructor(private cb: ResizeObserverCallback) {}
+  observe(el: Element) {
+    roRegistry.push({ el, cb: this.cb, ro: this })
+    this.cb([makeSizeEntry(el)], this)
+  }
+
+  unobserve(el: Element) {
+    const i = roRegistry.findIndex(r => r.el === el && r.ro === this)
+    if (i >= 0)
+      roRegistry.splice(i, 1)
+  }
+
+  disconnect() {
+    for (let i = roRegistry.length - 1; i >= 0; i--) {
+      if (roRegistry[i].ro === this)
+        roRegistry.splice(i, 1)
+    }
+  }
+}
+
+vi.stubGlobal('ResizeObserver', MockResizeObserver)
+
+// 尺寸 mock 变更后手动向所有被观察元素派发新一轮尺寸（真实 RO 由浏览器自动触发）
+function notifyResize() {
+  for (const { el, cb, ro } of [...roRegistry]) {
+    cb([makeSizeEntry(el)], ro)
+  }
+}
 
 // 集成测试：走真实 init() 路径（自动挂载），验证滚动条 DOM 的生成、销毁与泄漏防护。
 // 尺寸/拖拽等精细行为的覆盖留给后续专项测试。
 
 describe('useScrollbar', () => {
+  afterEach(() => {
+    // 尺寸 mock 与 RO 注册表是模块级共享状态，用例间必须复位，
+    // 否则非零尺寸与残留观察项会泄漏到下个用例
+    for (const key of Object.keys(sizeMock)) {
+      sizeMock[key].width = 0
+      sizeMock[key].height = 0
+    }
+    roRegistry.length = 0
+  })
+
   // 构造一个挂载真实容器并调用 init 的宿主组件，返回宿主句柄
   function mountHost(initTimes = 1) {
     let bar: ReturnType<typeof useScrollbar> | undefined
     let mountEl: HTMLElement | undefined
+    let wrapperEl: HTMLElement | undefined
     let scope: EffectScope | undefined
 
     const Host = defineComponent({
       template: `
-        <div ref="mountRef" class="mount">
-          <div ref="wrapperRef">
-            <div ref="contentRef">content</div>
+        <div ref="mountRef" class="mount" data-testid="mount">
+          <div ref="wrapperRef" data-testid="wrapper">
+            <div ref="contentRef" data-testid="content">content</div>
           </div>
         </div>
       `,
@@ -30,10 +95,12 @@ describe('useScrollbar', () => {
         bar = useScrollbar()
         onMounted(() => {
           mountEl = mountRef.value!
+          wrapperEl = wrapperRef.value!
           for (let i = 0; i < initTimes; i++) {
             bar!.init({
               mount: mountRef.value!,
               wrapper: [wrapperRef.value!],
+              viewport: [wrapperRef.value!],
               content: [contentRef.value!],
             })
           }
@@ -47,6 +114,7 @@ describe('useScrollbar', () => {
       wrapper,
       get bar() { return bar! },
       get mountEl() { return mountEl! },
+      get wrapperEl() { return wrapperEl! },
       get scope() { return scope! },
       count: () => mountEl!.querySelectorAll('.c-scrollbar-container').length,
     }
@@ -118,6 +186,92 @@ describe('useScrollbar', () => {
     host.mountEl.dispatchEvent(new MouseEvent('mouseenter'))
     await flushPromises()
     expect(host.bar.visible.x).toBe(false)
+
+    host.wrapper.unmount()
+  })
+
+  it('拖拽滚动映射按帧合并：同帧多次 mousemove 只产生一次 scrollTo 且取最后位移', async () => {
+    const host = mountHost()
+    await flushPromises()
+
+    // 通过尺寸 mock 构造可拖拽的映射条件：content 1000 / viewport 200
+    // （states 派生自 useElementSize，手写会被同步 effect 拉回，只能控制源头）
+    sizeMock.content.height = 1000
+    sizeMock.wrapper.height = 200
+    notifyResize()
+    await flushPromises()
+
+    expect(host.bar.contentH).toBe(1000)
+    expect(host.bar.viewportH).toBe(200)
+    const path = host.bar.size.y.path
+    expect(path).toBeGreaterThan(0)
+
+    const scrollToSpy = vi.fn()
+    host.wrapperEl.scrollTo = scrollToSpy
+
+    host.bar.onDragY(new MouseEvent('mousedown', { clientY: 100, bubbles: true }))
+    // 同帧连续三次位移：50 / 60 / 70
+    document.dispatchEvent(new MouseEvent('mousemove', { clientY: 150 }))
+    document.dispatchEvent(new MouseEvent('mousemove', { clientY: 160 }))
+    document.dispatchEvent(new MouseEvent('mousemove', { clientY: 170 }))
+
+    // rAF 未执行前不应产生 scrollTo（旧实现为每次 mousemove 各调一次）
+    expect(scrollToSpy).toHaveBeenCalledTimes(0)
+
+    // happy-dom 的 rAF 以 setTimeout 模拟，等过一个帧周期
+    await new Promise(r => setTimeout(r, 50))
+    expect(scrollToSpy).toHaveBeenCalledTimes(1)
+    // 取最后一次位移 offset=70，thumb 从 top 0 出发被钳制在轨道内：
+    // targetScroll = (contentH - viewportH) * min(path, 70) / path
+    const expected = 800 * (Math.min(path, 70) / path)
+    expect(scrollToSpy).toHaveBeenCalledWith(0, expected)
+
+    document.dispatchEvent(new MouseEvent('mouseup'))
+    host.wrapper.unmount()
+  })
+
+  it('轨道不可定位（path<=0）时拖拽不产生 scrollTo', async () => {
+    // happy-dom 尺寸为 0，path 经公式算得负值：映射比例会除零（经钳制得 1）
+    // 把内容直接拉到底，必须短路
+    const host = mountHost()
+    await flushPromises()
+
+    expect(host.bar.size.y.path).toBeLessThanOrEqual(0)
+
+    const scrollToSpy = vi.fn()
+    host.wrapperEl.scrollTo = scrollToSpy
+
+    host.bar.onDragY(new MouseEvent('mousedown', { clientY: 100, bubbles: true }))
+    document.dispatchEvent(new MouseEvent('mousemove', { clientY: 170 }))
+    await new Promise(r => setTimeout(r, 50))
+
+    expect(scrollToSpy).toHaveBeenCalledTimes(0)
+
+    document.dispatchEvent(new MouseEvent('mouseup'))
+    host.wrapper.unmount()
+  })
+
+  it('松手早于帧回调时丢弃挂起的拖拽帧：mouseup 后不再补滚', async () => {
+    // mousemove 调度 rAF 后、帧回调执行前就 mouseup：clean 必须取消挂起的帧，
+    // 否则内容会在松手后再跳一帧
+    const host = mountHost()
+    await flushPromises()
+
+    sizeMock.content.height = 1000
+    sizeMock.wrapper.height = 200
+    notifyResize()
+    await flushPromises()
+
+    const scrollToSpy = vi.fn()
+    host.wrapperEl.scrollTo = scrollToSpy
+
+    host.bar.onDragY(new MouseEvent('mousedown', { clientY: 100, bubbles: true }))
+    document.dispatchEvent(new MouseEvent('mousemove', { clientY: 170 }))
+    // 帧回调（happy-dom 以 setTimeout 模拟 rAF）尚未执行即松手
+    document.dispatchEvent(new MouseEvent('mouseup'))
+
+    await new Promise(r => setTimeout(r, 50))
+    expect(scrollToSpy).toHaveBeenCalledTimes(0)
 
     host.wrapper.unmount()
   })

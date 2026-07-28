@@ -74,6 +74,9 @@ export default function useScrollbar(
   let initScope: EffectScope | null = null
 
   function destroy() {
+    // 拖拽可能正在进行：先复位拖拽副作用（挂起的 rAF、document 监听器、onselectstart），
+    // 否则卸载路径无人触发 mouseup，这些资源会残留至页面结束
+    clean()
     stopHover?.()
     stopHover = null
     initScope?.stop()
@@ -502,24 +505,45 @@ export default function useScrollbar(
   const mouseOffsetXCurrent = ref(0)
   const selectEventRaw = ref()
 
+  // 拖拽位移的 rAF 合并句柄：mousemove 频率可达帧率数倍以上，
+  // 每次直驱 scrollTo 会与由此触发的 scroll 事件在同一帧重复驱动效应链
+  let dragRafId = 0
+
   const onMouseMove = (e: MouseEvent) => {
     // console.log("[debug] onMouseMove", e);
     e.preventDefault()
 
+    mouseOffsetYCurrent.value = e.clientY
+    mouseOffsetXCurrent.value = e.clientX
+    if (dragRafId)
+      return
+    dragRafId = requestAnimationFrame(() => {
+      dragRafId = 0
+      applyDrag()
+    })
+  }
+
+  // 把最近一帧内的拖拽位移映射为滚动位置；path 为 0 时轨道不可定位，
+  // 强行按比例换算（除零经钳制得 1）会把内容直接拉到底，直接跳过
+  function applyDrag() {
     if (direction.value === 'y') {
-      mouseOffsetYCurrent.value = e.clientY
+      const path = states.size.y.path
+      if (path <= 0)
+        return
       const offset = mouseOffsetYCurrent.value - mouseOffsetYStart.value
-      const top = Math.min(states.size.y.path, Math.max(lastPosition.value.top + offset, 0))
-      const ratio = safeRatio(top / states.size.y.path)
+      const top = Math.min(path, Math.max(lastPosition.value.top + offset, 0))
+      const ratio = safeRatio(top / path)
       const targetScroll = (states.contentH - states.viewportH) * ratio
       states.scrollTo(states.scrollLeft, targetScroll)
     }
     if (direction.value === 'x') {
+      const path = states.size.x.path
+      if (path <= 0)
+        return
       // console.log("[debug] on drag x", states.viewportW, states.size.x.width);
-      mouseOffsetXCurrent.value = e.clientX
       const offset = mouseOffsetXCurrent.value - mouseOffsetXStart.value
-      const left = Math.min(states.size.x.path, Math.max(lastPosition.value.left + offset, 0))
-      const ratio = safeRatio(left / states.size.x.path)
+      const left = Math.min(path, Math.max(lastPosition.value.left + offset, 0))
+      const ratio = safeRatio(left / path)
       // console.log("ratio", ratio, states.contentW, states.viewportW);
       const targetScroll = (states.contentW - states.viewportW) * ratio
       states.scrollTo(targetScroll, states.scrollTop)
@@ -559,7 +583,15 @@ export default function useScrollbar(
     mouseOffsetXStart.value = 0
     mouseOffsetXCurrent.value = 0
 
-    document.onselectstart = selectEventRaw.value
+    // 拖拽已结束（mouseup/mouseleave）时丢弃挂起的帧调度：
+    // 否则 mouseup 后还会补一帧 scrollTo，内容在松手后再跳一次
+    if (dragRafId) {
+      cancelAnimationFrame(dragRafId)
+      dragRafId = 0
+    }
+
+    // 从未 mousedown 时 selectEventRaw 为 undefined，恢复时回落 null（EventHandler 初态）
+    document.onselectstart = selectEventRaw.value ?? null
 
     while (clean.todos.length) {
       const cleanJob = clean.todos.pop()
