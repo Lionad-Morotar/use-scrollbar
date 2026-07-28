@@ -4,7 +4,7 @@ import type { CSSProperties, EffectScope, MaybeRef, Ref } from 'vue'
 import type { States } from './states'
 import { unrefElement, useEventListener } from '@vueuse/core'
 import { tryOnScopeDispose } from '@vueuse/shared'
-import { computed, effectScope, onUnmounted, reactive, ref, unref, watch, watchEffect } from 'vue'
+import { computed, effectScope, onScopeDispose, onUnmounted, reactive, ref, unref, watch, watchEffect } from 'vue'
 import { useElementSize, useScroll } from '@/hooks'
 
 import { createComponent } from './scrollbars'
@@ -270,13 +270,13 @@ export default function useScrollbar(
       watchEffect(() => {
         scrollLeft.value = Math.max(...lefts.map(unref))
       })
-      watchEffect(() => {
-        states.scrollTo = (x: number, y: number) => {
-          ;(opts.wrapper as MaybeElem[]).map($elm =>
-            (unref($elm) as HTMLElement)?.scrollTo?.(x, y),
-          )
-        }
-      })
+      // scrollTo 只需赋值一次：闭包在每次调用时实时 unref 元素，
+      // 包 watchEffect 只会多一个无收益 watcher
+      states.scrollTo = (x: number, y: number) => {
+        ;(opts.wrapper as MaybeElem[]).map($elm =>
+          (unref($elm) as HTMLElement)?.scrollTo?.(x, y),
+        )
+      }
     }
 
     /* 计算滚动条的显隐状态 */
@@ -399,75 +399,65 @@ export default function useScrollbar(
       { immediate: true, flush: 'post' },
     )
 
-    const scrollXTick = ref(0)
-    const scrollYTick = ref(0)
+    const scrollingX = ref(false)
+    const scrollingY = ref(false)
+    // timer 句柄放闭包变量而非 ref：旧实现把 timeout id 存 ref（scrollXTick），
+    // 滚动期每次 setTimeout 返回新 id 都会触发依赖它的代理 effect 空跑
+    let scrollXTimer = 0
+    let scrollYTimer = 0
     watch(scrollLeft, () => {
-      if (scrollXTick.value) {
-        clearTimeout(scrollXTick.value)
-      }
-      scrollXTick.value = setTimeout(() => {
-        scrollXTick.value = 0
+      scrollingX.value = true
+      clearTimeout(scrollXTimer)
+      scrollXTimer = setTimeout(() => {
+        scrollingX.value = false
       }, 17 * 6) as unknown as number
     })
     watch(scrollTop, () => {
-      if (scrollYTick.value) {
-        clearTimeout(scrollYTick.value)
-      }
-      scrollYTick.value = setTimeout(() => {
-        scrollYTick.value = 0
+      scrollingY.value = true
+      clearTimeout(scrollYTimer)
+      scrollYTimer = setTimeout(() => {
+        scrollingY.value = false
       }, 17 * 3) as unknown as number
+    })
+    onScopeDispose(() => {
+      clearTimeout(scrollXTimer)
+      clearTimeout(scrollYTimer)
     })
 
     /* 将部分值代理为状态 */
 
+    // 单 effect 全字段比较写入：比较是廉价操作，合并把 watcher 数量从 10 降到 1，
+    // 且滚动期重跑次数随之减半（旧实现 scrollLeft 与 tick id 各触发一个 effect）
     watchEffect(() => {
       if (states.mountOnW !== mountOnW.value) {
         states.mountOnW = mountOnW.value
       }
-    })
-    watchEffect(() => {
       if (states.mountOnH !== mountOnH.value) {
         states.mountOnH = mountOnH.value
       }
-    })
-    watchEffect(() => {
       if (states.viewportH !== viewportH.value) {
         states.viewportH = viewportH.value
       }
-    })
-    watchEffect(() => {
       if (states.viewportW !== viewportW.value) {
         states.viewportW = viewportW.value
       }
-    })
-    watchEffect(() => {
       if (states.contentH !== contentH.value) {
         states.contentH = contentH.value
       }
-    })
-    watchEffect(() => {
       if (states.contentW !== contentW.value) {
         states.contentW = contentW.value
       }
-    })
-    watchEffect(() => {
       if (states.scrollTop !== scrollTop.value) {
         states.scrollTop = scrollTop.value
       }
-    })
-    watchEffect(() => {
       if (states.scrollLeft !== scrollLeft.value) {
         states.scrollLeft = scrollLeft.value
       }
-    })
-    watchEffect(() => {
-      if (states.isScrolling.x !== Boolean(scrollXTick.value)) {
-        states.isScrolling.x = Boolean(scrollXTick.value)
+      if (states.isScrolling.x !== scrollingX.value) {
+        states.isScrolling.x = scrollingX.value
       }
-    })
-    watchEffect(() => {
-      if (states.isScrolling.y !== Boolean(scrollYTick.value)) {
-        states.isScrolling.y = Boolean(scrollYTick.value)
+      if (states.isScrolling.y !== scrollingY.value) {
+        states.isScrolling.y = scrollingY.value
       }
     })
   }

@@ -275,4 +275,36 @@ describe('useScrollbar', () => {
 
     host.wrapper.unmount()
   })
+
+  it('isScrolling 分方向翻转并按各自的 idle 时序恢复', async () => {
+    // 行为锁定：play demo 以 is-scrolling-x / is-scrolling-y 独立类名消费分方向语义，
+    // 响应式图瘦身不得改变该对外行为（y idle=51ms，x idle=102ms）
+    const host = mountHost()
+    await flushPromises()
+
+    expect(host.bar.isScrolling.x).toBe(false)
+    expect(host.bar.isScrolling.y).toBe(false)
+
+    host.wrapperEl.scrollTop = 120
+    host.wrapperEl.dispatchEvent(new Event('scroll'))
+    await flushPromises()
+    expect(host.bar.isScrolling.y).toBe(true)
+    expect(host.bar.isScrolling.x).toBe(false)
+
+    await new Promise(r => setTimeout(r, 70))
+    await flushPromises()
+    expect(host.bar.isScrolling.y).toBe(false)
+
+    host.wrapperEl.scrollLeft = 60
+    host.wrapperEl.dispatchEvent(new Event('scroll'))
+    await flushPromises()
+    expect(host.bar.isScrolling.x).toBe(true)
+    expect(host.bar.isScrolling.y).toBe(false)
+
+    await new Promise(r => setTimeout(r, 120))
+    await flushPromises()
+    expect(host.bar.isScrolling.x).toBe(false)
+
+    host.wrapper.unmount()
+  })
 })
