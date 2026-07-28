@@ -45,7 +45,7 @@ function getTableData() {
         role: 'Develop',
         address: Array(10).fill('long address long long long address').join(', '),
         // @ts-expect-error 动态生成 sex/age 列，展开的键不在行类型声明中
-        ...Array.from({ length: 19 }).reduce((acc: any, _, idx) => {
+        ...Array.from({ length: 6 }).reduce((acc: any, _, idx) => {
           acc[`sex${idx + 1}`] = Math.random() < 0.5 ? '1' : '0'
           acc[`age${idx + 1}`] = Math.random() < 0.5 ? '1' : '0'
           return acc
@@ -150,75 +150,7 @@ async function measure() {
       <vxe-column field="sex5" title="Sex" :formatter="formatterSex" :width="140" />
       <vxe-column field="age6" title="Age" :width="120" />
       <vxe-column field="sex6" title="Sex" :formatter="formatterSex" :width="140" />
-      <vxe-column field="age7" title="Age" :width="120" />
-      <vxe-column field="sex7" title="Sex" :formatter="formatterSex" :width="140" />
-      <vxe-column field="age8" title="Age" :width="120" />
-      <vxe-column field="sex8" title="Sex" :formatter="formatterSex" :width="140" />
-      <vxe-column field="age9" title="Age" :width="120" />
-      <vxe-column field="sex9" title="Sex" :formatter="formatterSex" :width="140" />
-      <vxe-column field="age10" title="Age" :width="120" />
-      <vxe-column field="sex10" title="Sex" :formatter="formatterSex" :width="140" />
-      <vxe-column field="age11" title="Age" :width="120" />
-      <vxe-column field="sex11" title="Sex" :formatter="formatterSex" :width="140" />
-      <vxe-column field="age12" title="Age" :width="120" />
-      <vxe-column field="sex12" title="Sex" :formatter="formatterSex" :width="140" />
-      <vxe-column field="age13" title="Age" :width="120" />
-      <vxe-column field="sex13" title="Sex" :formatter="formatterSex" :width="140" />
-      <vxe-column field="age14" title="Age" :width="120" />
-      <vxe-column field="sex14" title="Sex" :formatter="formatterSex" :width="140" />
-      <vxe-column field="age15" title="Age" :width="120" />
-      <vxe-column field="sex15" title="Sex" :formatter="formatterSex" :width="140" />
-      <vxe-column field="age16" title="Age" :width="120" />
-      <vxe-column field="sex16" title="Sex" :formatter="formatterSex" :width="140" />
-      <vxe-column field="age17" title="Age" :width="120" />
-      <vxe-column field="sex17" title="Sex" :formatter="formatterSex" :width="140" />
-      <vxe-column field="age18" title="Age" :width="120" />
-      <vxe-column field="sex18" title="Sex" :formatter="formatterSex" :width="140" />
-      <vxe-column field="age19" title="Age" :width="120" />
-      <vxe-column field="sex19" title="Sex" :formatter="formatterSex" :width="140" />
-      <vxe-column field="age20" title="Age" :width="120" />
-      <vxe-column field="sex20" title="Sex" :formatter="formatterSex" :width="140" />
-      <vxe-column width="500" fixed="right">
-        <ElButton size="small" text>
-          Upload<ElIcon class="el-icon--right">
-            <Upload />
-          </ElIcon>
-        </ElButton>
-        <ElButton size="small" text>
-          Upload<ElIcon class="el-icon--right">
-            <Upload />
-          </ElIcon>
-        </ElButton>
-        <ElButton size="small" text>
-          Upload<ElIcon class="el-icon--right">
-            <Upload />
-          </ElIcon>
-        </ElButton>
-        <ElButton size="small" text>
-          Upload<ElIcon class="el-icon--right">
-            <Upload />
-          </ElIcon>
-        </ElButton>
-        <ElButton size="small" text>
-          Upload<ElIcon class="el-icon--right">
-            <Upload />
-          </ElIcon>
-        </ElButton>
-        <ElButton size="small" text>
-          Upload<ElIcon class="el-icon--right">
-            <Upload />
-          </ElIcon>
-        </ElButton>
-        <ElButton size="small" text>
-          Upload<ElIcon class="el-icon--right">
-            <Upload />
-          </ElIcon>
-        </ElButton>
-        <ElButton size="small" text>
-          Upload<ElIcon class="el-icon--right">
-            <Upload />
-          </ElIcon>
-        </ElButton>
+      <vxe-column width="220">
         <ElButton size="small" text>
           Upload<ElIcon class="el-icon--right">
             <Upload />
