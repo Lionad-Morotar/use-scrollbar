@@ -307,4 +307,68 @@ describe('useScrollbar', () => {
 
     host.wrapper.unmount()
   })
+
+  it('滚动期样式对象引用稳定，位移经 CSS 变量原位更新', async () => {
+    // 渲染层优化：位移从 transform 字符串全量重建改为 CSS 变量字段原位写入，
+    // 滚动期 states.styles 对象引用必须保持稳定，避免每帧重建样式对象
+    const host = mountHost()
+    await flushPromises()
+
+    sizeMock.content.height = 1000
+    sizeMock.wrapper.height = 200
+    notifyResize()
+    await flushPromises()
+
+    const styleY = host.bar.styles.y as Record<string, string>
+    expect(styleY.transform).toBe('translateY(var(--thumb-y, 0px))')
+    const thumbYBefore = styleY['--thumb-y']
+
+    host.wrapperEl.scrollTop = 120
+    host.wrapperEl.dispatchEvent(new Event('scroll'))
+    await flushPromises()
+
+    expect(host.bar.styles.y).toBe(styleY)
+    expect(styleY['--thumb-y']).not.toBe(thumbYBefore)
+    expect(Number.parseFloat(styleY['--thumb-y'])).toBeCloseTo(host.bar.position.y.top, 5)
+
+    host.wrapper.unmount()
+  })
+
+  it('will-change 随滚动/拖拽激活并在静止后移除', async () => {
+    // will-change 常驻会强制提升合成层浪费内存，只在滚动或拖拽期间附加
+    const host = mountHost()
+    await flushPromises()
+
+    sizeMock.content.height = 1000
+    sizeMock.wrapper.height = 200
+    notifyResize()
+    await flushPromises()
+
+    const styleY = host.bar.styles.y as Record<string, string>
+    const styleX = host.bar.styles.x as Record<string, string>
+    expect(styleY.willChange ?? '').toBe('')
+
+    host.wrapperEl.scrollTop = 120
+    host.wrapperEl.dispatchEvent(new Event('scroll'))
+    await flushPromises()
+    expect(styleY.willChange).toBe('transform')
+
+    await new Promise(r => setTimeout(r, 70))
+    await flushPromises()
+    expect(styleY.willChange).toBe('')
+
+    host.bar.onDragY(new MouseEvent('mousedown', { clientY: 100, bubbles: true }))
+    await flushPromises()
+    expect(styleY.willChange).toBe('transform')
+    // 拖拽 y 时 x 滚动条降低不透明度（--prefer-opacity 交叉语义）
+    expect(styleX['--prefer-opacity']).toBe('0.25')
+
+    document.dispatchEvent(new MouseEvent('mouseup'))
+    await flushPromises()
+    expect(styleY.willChange).toBe('')
+    // 同引用样式对象下的字段移除须以空串写入，delete 会在 DOM 残留
+    expect(styleX['--prefer-opacity']).toBe('')
+
+    host.wrapper.unmount()
+  })
 })

@@ -464,25 +464,44 @@ export default function useScrollbar(
 
   /* 计算滚动条样式 */
 
+  // 样式按写入频率分层：静态字段（offset/size/拖拽态，低频）与位移字段
+  // （position，滚动期每帧）分属不同 effect。滚动期只原位写 --thumb-* 自定义属性，
+  // states.styles 对象引用保持稳定，避免每帧重建样式对象与全量字符串拼接；
+  // transform 经 var() 消费位移变量，浏览器侧只重算 transform 而非整组内联样式
   watchEffect(() => {
-    const style: CSSProperties = {}
+    const style = states.styles.y as CSSProperties
     style.top = `${safePrecicion(states.offset.y.top)}px`
     style.right = `${safePrecicion(states.offset.y.right)}px`
     style.height = `${safePrecicion(states.size.y.height)}px`
-    style.transform = `translateY(${`${safePrecicion(states.position.y.top)}px`})`
-    if (states.isDragging.x)
-      style[`--prefer-opacity`] = '0.25'
-    states.styles.y = style
+    style.transform = 'translateY(var(--thumb-y, 0px))'
+    // 用空串而非 delete 移除字段：states.styles 是稳定引用对象，Vue patchStyle
+    // 的删除路径依赖 prev/next 为不同对象，同引用下被 delete 的键会在 DOM 残留
+    style[`--prefer-opacity`] = states.isDragging.x ? '0.25' : ''
+
+    // will-change 常驻会强制提升合成层，只在滚动/拖拽期间附加
+    const willChange = states.isScrolling.y || states.isDragging.y ? 'transform' : ''
+    if (style.willChange !== willChange)
+      style.willChange = willChange
   })
   watchEffect(() => {
-    const style: CSSProperties = {}
+    const style = states.styles.x as CSSProperties
     style.left = `${safePrecicion(states.offset.x.left)}px`
     style.bottom = `${safePrecicion(states.offset.x.bottom)}px`
     style.width = `${safePrecicion(states.size.x.width)}px`
-    style.transform = `translateX(${`${safePrecicion(states.position.x.left)}px`})`
-    if (states.isDragging.y)
-      style[`--prefer-opacity`] = '0.25'
-    states.styles.x = style
+    style.transform = 'translateX(var(--thumb-x, 0px))'
+    // 用空串而非 delete 移除字段：states.styles 是稳定引用对象，Vue patchStyle
+    // 的删除路径依赖 prev/next 为不同对象，同引用下被 delete 的键会在 DOM 残留
+    style[`--prefer-opacity`] = states.isDragging.y ? '0.25' : ''
+
+    const willChange = states.isScrolling.x || states.isDragging.x ? 'transform' : ''
+    if (style.willChange !== willChange)
+      style.willChange = willChange
+  })
+  watchEffect(() => {
+    ;(states.styles.y as CSSProperties)[`--thumb-y`] = `${safePrecicion(states.position.y.top)}px`
+  })
+  watchEffect(() => {
+    ;(states.styles.x as CSSProperties)[`--thumb-x`] = `${safePrecicion(states.position.x.left)}px`
   })
 
   /* 滚动条拖动事件 */
