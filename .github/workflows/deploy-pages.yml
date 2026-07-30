@@ -1,0 +1,68 @@
+# GitHub Pages 部署（actions artifact 模式，无 gh-pages 分支）
+# 生效前提：仓库 Settings → Pages → Source = GitHub Actions
+name: deploy-pages
+
+on:
+  push:
+    branches: [dev]
+    # 影响站点产物的全部输入：playground 本体、被 workspace 直引的库源码、依赖锁与 workspace 声明
+    paths:
+      - playground/**
+      - packages/vue/**
+      - package.json
+      - pnpm-lock.yaml
+      - pnpm-workspace.yaml
+      - .github/workflows/deploy-pages.yml
+  workflow_dispatch:
+
+# 同一时刻只允许一个 Pages 部署，避免并发发布互相覆盖
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # 版本来自 package.json 的 packageManager 字段，避免双源漂移
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # playground 以 workspace:* 直引库包且其 exports 指向 dist,须先构建库包
+      # base 须为 /<repo>/ 子路径,构建期固化进 asset 路径;
+      # 用事件变量而非硬编码仓库名,fork/改名场景零改动
+      - name: Build library
+        run: pnpm --filter @lionad/use-scrollbar build
+
+      - name: Build playground site
+        run: pnpm --dir playground build:pages
+        env:
+          VITE_APP_BASE_URL: /${{ github.event.repository.name }}/
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: playground/dist
+
+  deploy:
+    needs: build
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
