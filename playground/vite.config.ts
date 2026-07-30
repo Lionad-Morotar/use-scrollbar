@@ -8,6 +8,8 @@ export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
 
   return {
+    // GitHub Pages 以 /<repo>/ 子路径托管,asset 路径构建期固化进产物,故从环境读入(本地开发缺省 '/')
+    base: env.VITE_APP_BASE_URL ?? '/',
     // Vite 8 移除了 server.https: boolean，自签证书改由插件提供（仅本地调试需要 HTTPS 时启用）
     plugins: [vue(), env.HTTPS ? basicSsl() : null].filter(Boolean),
     resolve: {
