@@ -590,17 +590,7 @@ function done() {
   .live-scroll.lv-css-tricks .live-code {
     color: #d4d4d4;
   }
-  /* normal 默认灰 thumb 在浅底上几乎不可见；
-     提满不透明 + hover 注入品牌 pink——演示「皮肤可完全定制」 */
-  .live-viewport :deep(.is-normal .c-scrollbar) {
-    opacity: 0.82;
-    background-color: #b0b0b8;
-  }
-  .live-viewport :deep(.is-normal .c-scrollbar:hover),
-  .live-viewport :deep(.is-normal .c-scrollbar.is-dragging) {
-    opacity: 1;
-    background-color: var(--accent);
-  }
+
   .live-code {
     margin: 0;
     padding: 18px 20px;
