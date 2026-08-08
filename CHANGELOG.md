@@ -6,6 +6,18 @@ monorepo 内各包独立版本，版本段以包名标注。
 
 ## [Unreleased]
 
+## [@lionad/use-scrollbar 0.5.0-alpha.1] - 2026-08-08
+
+### Fixed
+
+- 修复 mount 自身即滚动容器（如 `v-vscroll` 指令形态）时轨道/thumb 随滚动量飞出可视区、滚到底滚动条整体消失的问题：轨道坐标系现随 mount 自身滚动量原位反向平移；mount 为不滚动的外层壳形态时补偿恒为 0，既有接入行为不变
+
+## [@lionad/use-scrollbar-nuxt 0.2.0-alpha.1] - 2026-08-08
+
+### Fixed
+
+- 自动导入收敛为库独有 API（`useScrollbar` / `useScrollbars` / `useNativeScrollbar`）：不再注册与 `@vueuse/core` 同名的 `useScroll` / `useElementSize` / `useElementHover`，避免静默替换消费方的 vueuse 自动导入为库内部残缺实现（`useScroll` 无 `arrivedState`/`onScroll`，`useElementHover` 无 `delay` 选项）
+
 ## [@lionad/use-scrollbar 0.5.0-alpha.0] - 2026-08-08
 
 npm 首发（前身为未 scoped 的旧包 `use-scrollbars`，0.4.x 及更早历史对 npm 用户不可见，故收敛为本首发段）。
