@@ -17,7 +17,7 @@ onUnmounted(() => destroy())
 <template>
   <!-- fixture：SSR 验证页 -->
   <div data-testid="fixture-root">
-    <h1>@lionad/nuxt-use-scrollbar fixture</h1>
+    <h1>@lionad/use-scrollbar-nuxt fixture</h1>
     <div ref="elRef" class="scroll-host">
       <p v-for="i in 50" :key="i">
         row {{ i }}

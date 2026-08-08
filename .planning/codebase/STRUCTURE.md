@@ -21,7 +21,7 @@
 │   │   ├── tsconfig.json
 │   │   ├── vite.config.ts  # 库构建（Rolldown lib + unplugin-dts）
 │   │   └── vitest.config.ts
-│   └── nuxt/           # Nuxt 模块 @lionad/nuxt-use-scrollbar
+│   └── nuxt/           # Nuxt 模块 @lionad/use-scrollbar-nuxt
 │       ├── src/module.ts   # 模块定义（auto-imports + 样式注入）
 │       ├── fixture/        # 最小 Nuxt 应用（nuxi build + nitro prerender 验证）
 │       ├── package.json
@@ -72,7 +72,7 @@
 
 **`packages/nuxt/`：**
 
-- 用途：Nuxt 模块封装（`@lionad/nuxt-use-scrollbar`），@nuxt/module-builder 构建。
+- 用途：Nuxt 模块封装（`@lionad/use-scrollbar-nuxt`），@nuxt/module-builder 构建。
 - 包含：模块定义、最小 fixture 应用。
 - 关键文件：`src/module.ts`、`fixture/nuxt.config.ts`、`fixture/app.vue`
 

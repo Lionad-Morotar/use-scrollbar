@@ -52,7 +52,7 @@
 
 **发布自动化：**
 
-- `packages/vue/package.json` 中的脚本 `auto:publish` 自动完成分支创建、版本升级、构建、发布与推送（发布主体为核心包；`@lionad/nuxt-use-scrollbar` 首发手动）
+- `packages/vue/package.json` 中的脚本 `auto:publish` 自动完成分支创建、版本升级、构建、发布与推送（发布主体为核心包；`@lionad/use-scrollbar-nuxt` 首发手动）
 
 ## 环境配置
 

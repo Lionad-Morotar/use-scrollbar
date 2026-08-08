@@ -19,7 +19,7 @@ export interface UseScrollbarModuleOptions {
  */
 const useScrollbarModule: NuxtModule<UseScrollbarModuleOptions> = defineNuxtModule<UseScrollbarModuleOptions>({
   meta: {
-    name: '@lionad/nuxt-use-scrollbar',
+    name: '@lionad/use-scrollbar-nuxt',
     configKey: 'useScrollbar',
   },
   defaults: {

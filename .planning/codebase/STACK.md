@@ -2,7 +2,7 @@
 
 **分析日期：** 2026-07-28（monorepo 改造后刷新）
 
-仓库为 pnpm workspace monorepo：`packages/vue`（核心包 `@lionad/use-scrollbar`）、`packages/nuxt`（Nuxt 模块 `@lionad/nuxt-use-scrollbar`）、`playground`（演示场）。根包私有化，仅承载编排脚本与共享质量工具链（`pnpm -r --if-present` 调度各包 build / test / check:types）。
+仓库为 pnpm workspace monorepo：`packages/vue`（核心包 `@lionad/use-scrollbar`）、`packages/nuxt`（Nuxt 模块 `@lionad/use-scrollbar-nuxt`）、`playground`（演示场）。根包私有化，仅承载编排脚本与共享质量工具链（`pnpm -r --if-present` 调度各包 build / test / check:types）。
 
 ## 语言
 
@@ -123,6 +123,6 @@ vue-demi 已于本次现代化中移除：Vue2 支持早已脑死亡（peer 仅 
 **生产：**
 
 - 浏览器环境，使用 Vue 3.5+（SSR 场景经守卫静默降级，水合后生效）
-- 通过 npm 以 ES module（`dist/index.mjs`）、CommonJS（`dist/index.cjs`）与类型声明（`dist/types/`）形式分发，样式独立为 `dist/style.css`；Nuxt 场景可改用 `@lionad/nuxt-use-scrollbar` 模块（auto-imports + 样式注入）
+- 通过 npm 以 ES module（`dist/index.mjs`）、CommonJS（`dist/index.cjs`）与类型声明（`dist/types/`）形式分发，样式独立为 `dist/style.css`；Nuxt 场景可改用 `@lionad/use-scrollbar-nuxt` 模块（auto-imports + 样式注入）
 
 _栈分析：2026-07-28（monorepo 改造后刷新）_

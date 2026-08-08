@@ -1,5 +1,5 @@
 {
-  "name": "@lionad/nuxt-use-scrollbar",
+  "name": "@lionad/use-scrollbar-nuxt",
   "type": "module",
   "version": "0.1.0",
   "private": false,
