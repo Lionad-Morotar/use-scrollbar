@@ -36,10 +36,9 @@ export default defineNuxtConfig({
 以下 composables 自动可用，无需手动 import：
 
 - `useScrollbar`（等同于 `useScrollbars`）— 将已有滚动系统的原生滚动条替换为虚拟滚动条
-- `useScroll`
-- `useElementSize`
-- `useElementHover`
 - `useNativeScrollbar` — 获取原生滚动条信息（如宽度）
+
+模块只自动导入库独有 API。`useScroll`、`useElementSize`、`useElementHover` 等通用工具与 `@vueuse/core` 同名，为避免静默替换消费方的 vueuse 自动导入而不注册，需要时请从 `@vueuse/nuxt` 体系显式使用。
 
 ```vue
 <script setup lang="ts">
