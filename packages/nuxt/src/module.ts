@@ -29,12 +29,12 @@ const useScrollbarModule: NuxtModule<UseScrollbarModuleOptions> = defineNuxtModu
     if (options.injectStyles)
       nuxt.options.css.push('@lionad/use-scrollbar/dist/style.css')
 
+    // useScroll/useElementSize/useElementHover 是库内部实现细节且与 @vueuse/core
+    // 同名——注册会把消费方的 vueuse 自动导入静默替换为库版残缺实现（useScroll 无
+    // arrivedState/onScroll，useElementHover 无 delay 选项），只注册库独有 API
     const composables = [
       'useScrollbar',
       'useScrollbars',
-      'useScroll',
-      'useElementSize',
-      'useElementHover',
       'useNativeScrollbar',
     ]
     addImports(composables.map(name => ({ name, from: '@lionad/use-scrollbar' })))

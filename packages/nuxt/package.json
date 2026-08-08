@@ -1,7 +1,7 @@
 {
   "name": "@lionad/use-scrollbar-nuxt",
   "type": "module",
-  "version": "0.2.0-alpha.0",
+  "version": "0.2.0-alpha.1",
   "private": false,
   "description": "Nuxt module for @lionad/use-scrollbar: auto-imports composables and injects scrollbar styles",
   "author": "Lionad",
