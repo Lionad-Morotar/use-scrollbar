@@ -64,6 +64,7 @@
     "vue-tsc": "^3.3.8"
   },
   "publishConfig": {
+    "access": "public",
     "registry": "https://registry.npmjs.org"
   }
 }

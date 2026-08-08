@@ -18,10 +18,14 @@
     "dev:playground": "pnpm --filter use-scrollbar-playground dev",
     "serve": "pnpm dev",
     "build": "pnpm -r --if-present build",
+    "prebuild:packages": "pnpm test",
+    "build:packages": "pnpm --filter @lionad/use-scrollbar --filter @lionad/use-scrollbar-nuxt build",
     "check:types": "pnpm -r --if-present check:types",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "test": "pnpm -r --if-present test",
+    "prerelease": "pnpm run build:packages",
+    "release": "node scripts/release.mjs",
     "prepare": "husky"
   },
   "devDependencies": {
