@@ -294,6 +294,18 @@ export default function useScrollbar(
 
     /* 计算滚动条的显隐状态 */
 
+    // 轨道随滚补偿：overlay 挂进 mount 内部，track 以 absolute 相对 mount padding box
+    // 定位；mount 自身即滚动容器时该坐标系随内容上移，track/thumb 会被带进可视区外。
+    // 取 mount 自身的 scrollTop/scrollLeft 原位反向平移轨道坐标系——mount 可滚时
+    // 补偿量恰为其滚动量；mount 为不滚动的外层壳形态时恒为 0，既有行为不变
+    const { x: mountScrollX, y: mountScrollY } = useScroll(opts.mount as HTMLElement)
+    watchEffect(() => {
+      states.trackStyles['--vscroll-y'] = `${safePrecicion(mountScrollY.value)}px`
+    })
+    watchEffect(() => {
+      states.trackStyles['--vscroll-x'] = `${safePrecicion(mountScrollX.value)}px`
+    })
+
     watchEffect(() => {
       states.visible.x = states.isDragging.x || (!states.isHidden.x && inTrigger.value.x)
     })

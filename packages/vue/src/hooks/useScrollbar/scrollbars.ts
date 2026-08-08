@@ -12,6 +12,7 @@ export function createComponent(states: ScrollbarStates) {
             'div',
             {
               class: 'c-scrollbar-track is-y',
+              style: states.trackStyles,
             },
             [
               createVNode(
@@ -42,6 +43,7 @@ export function createComponent(states: ScrollbarStates) {
             'div',
             {
               class: 'c-scrollbar-track is-x',
+              style: states.trackStyles,
             },
             [
               createVNode(

@@ -64,6 +64,11 @@ function getOpts() {
       y: {},
       x: {},
     },
+    // 轨道样式：transform 静态引用 --vscroll-* 变量消费 mount 自身滚动量，
+    // 滚动期只原位写变量（与 thumb 的 --thumb-* 同法），对象引用保持稳定
+    trackStyles: {
+      transform: 'translate(var(--vscroll-x, 0px), var(--vscroll-y, 0px))',
+    } as Record<string, string>,
     /* 挂载滚动条的容器的尺寸 */
     mountOnW: 0,
     mountOnH: 0,

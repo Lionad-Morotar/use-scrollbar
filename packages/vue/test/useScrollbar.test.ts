@@ -371,4 +371,70 @@ describe('useScrollbar', () => {
 
     host.wrapper.unmount()
   })
+
+  it('轨道经 --vscroll-* 变量补偿 mount 自身滚动量，样式对象引用稳定', async () => {
+    // mount 自身即滚动容器时，absolute 定位的轨道处于滚动内容坐标系，
+    // 会随 scrollTop 上移滚出可视区（线上实测：滚到底轨道顶 = 容器顶 - scrollTop）。
+    // 修复以 mount 自身滚动量反向平移轨道坐标系；外层壳形态（mount≠wrapper）
+    // 的 mount 不可滚动，补偿量恒为 0，既有行为不变
+    const host = mountHost()
+    await flushPromises()
+
+    const trackStyles = host.bar.trackStyles
+    expect(trackStyles.transform).toBe('translate(var(--vscroll-x, 0px), var(--vscroll-y, 0px))')
+    // 壳形态：mount 不滚动，补偿变量保持 0
+    expect(trackStyles['--vscroll-y']).toBe('0px')
+    expect(trackStyles['--vscroll-x']).toBe('0px')
+
+    host.wrapperEl.scrollTop = 120
+    host.wrapperEl.dispatchEvent(new Event('scroll'))
+    await flushPromises()
+    // wrapper 滚动而 mount 不滚：补偿仍须为 0（取 mount 自身滚动量，不取 wrapper 的）
+    expect(trackStyles['--vscroll-y']).toBe('0px')
+    expect(host.bar.trackStyles).toBe(trackStyles)
+
+    host.wrapper.unmount()
+  })
+
+  it('mount 自身即滚动容器时 --vscroll-y 跟随其 scrollTop', async () => {
+    // v-vscroll 指令式接入的形态：init({ mount: el, wrapper: [el] }) 三者同元素，
+    // 轨道补偿量必须恰为容器自身 scrollTop，轨道才能钉在可视口
+    let bar: ReturnType<typeof useScrollbar> | undefined
+    let scrollEl: HTMLElement | undefined
+    const Host = defineComponent({
+      template: `
+        <div ref="scrollRef" data-testid="scroll">
+          <div ref="contentRef" data-testid="content">content</div>
+        </div>
+      `,
+      setup() {
+        const scrollRef = ref<HTMLElement>()
+        const contentRef = ref<HTMLElement>()
+        bar = useScrollbar()
+        onMounted(() => {
+          scrollEl = scrollRef.value!
+          bar!.init({
+            mount: scrollRef.value!,
+            wrapper: [scrollRef.value!],
+            content: [contentRef.value!],
+          })
+        })
+        return { scrollRef, contentRef }
+      },
+    })
+    const wrapper = mount(Host, { attachTo: document.body })
+    await flushPromises()
+
+    scrollEl!.scrollTop = 240
+    scrollEl!.dispatchEvent(new Event('scroll'))
+    await flushPromises()
+    expect(bar!.trackStyles['--vscroll-y']).toBe('240px')
+
+    scrollEl!.scrollTop = 0
+    scrollEl!.dispatchEvent(new Event('scroll'))
+    await flushPromises()
+    expect(bar!.trackStyles['--vscroll-y']).toBe('0px')
+
+    wrapper.unmount()
+  })
 })
