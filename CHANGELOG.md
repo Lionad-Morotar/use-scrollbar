@@ -1,0 +1,31 @@
+# Changelog
+
+本仓库所有显著变更记录于此文件。格式遵循 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)，版本号遵循 [Semantic Versioning](https://semver.org/lang/zh-CN/)。
+
+monorepo 内各包独立版本，版本段以包名标注。
+
+## [Unreleased]
+
+## [@lionad/use-scrollbar 0.5.0-alpha.0] - 2026-08-08
+
+npm 首发（前身为未 scoped 的旧包 `use-scrollbars`，0.4.x 及更早历史对 npm 用户不可见，故收敛为本首发段）。
+
+### Added
+
+- `useScrollbar` composable：用完全可定制的虚拟滚动条覆盖替换组件原生滚动条（纯滚动条 overlay，非虚拟滚动），专为 vxe-table、antd-vue-table 等复杂第三方组件的滚动条样式定制而生
+- 内置主题 normal、steam、css-tricks，支持运行时 `barStates.theme` 切换
+- 滚动条状态与行为 API：`init`（多滚动区手动初始化）、`scrollTo` / `scrollTop` / `scrollLeft`、`offset` 与 `setOffset`（按元素尺寸自动跟踪滚动条偏移）、`visibleOnHover`（悬停显隐）、`isDragging` / `isScrolling`（拖拽与滚动状态）、`destroy`
+- `useNativeScrollbar` composable：获取原生滚动条信息（如宽度）
+- 全量 TypeScript 类型声明
+- SSR 安全：DOM 访问已守卫，服务端渲染时静默跳过，水合后 init/mount 才触碰真实 DOM
+- 性能设计：拖拽位移按帧合并、滚动条样式按写入频率分层、滚动状态经 debounced 检测，滚动期不重建样式对象
+
+## [@lionad/use-scrollbar-nuxt 0.2.0-alpha.0] - 2026-08-08
+
+npm 首发。
+
+### Added
+
+- Nuxt 模块：注册即用，自动注入 `@lionad/use-scrollbar` 虚拟滚动条样式；`useScrollbar: { injectStyles: false }` 可关闭注入以完全自管样式
+- composables 自动导入：`useScrollbar` / `useScrollbars`、`useScroll`、`useElementSize`、`useElementHover`、`useNativeScrollbar`
+- SSR 安全：核心包 DOM 访问已守卫，无需 client-only 插件隔离

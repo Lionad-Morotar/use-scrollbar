@@ -1,7 +1,7 @@
 {
   "name": "@lionad/use-scrollbar",
   "type": "module",
-  "version": "0.4.11",
+  "version": "0.5.0-alpha.0",
   "private": false,
   "description": "Cover components' native scrollbars with fully customizable virtual scrollbars, built for Vue 3",
   "author": "Lionad",
