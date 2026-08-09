@@ -89,9 +89,39 @@ function verifyTarball(pkgDir, pkg) {
 
 const root = process.cwd()
 
+/**
+ * 已发布版本跳过（发布幂等）：单包变更时其余包版本未动，重跑必然 EPUBLISHCONFLICT；
+ * 中途失败重跑时已成功的包也应自动跳过——逐包 OTP 场景下少输一枚是一枚。
+ * 读查询显式锁官方源：本地 .npmrc 指向 npmmirror，镜像同步延迟只会造成假阴性
+ * （代价是重发冲突报错），不会造成错发。
+ */
+function isPublished(pkg) {
+  try {
+    const out = execFileSync('npm', ['view', `${pkg.name}@${pkg.version}`, 'version', `--registry=${REGISTRY}`], {
+      encoding: 'utf8',
+      stdio: ['pipe', 'pipe', 'pipe'],
+      shell: process.platform === 'win32',
+    })
+    return out.trim() === pkg.version
+  }
+  catch {
+    // 包或版本不存在（首发 / 新版本）时 npm view 以 E404 退出，走正常发布路径
+    return false
+  }
+}
+
+let publishedCount = 0
+let skippedCount = 0
+
 for (const dir of PACKAGES) {
   const pkgDir = join(root, dir)
   const pkg = JSON.parse(readFileSync(join(pkgDir, 'package.json'), 'utf8'))
+
+  if (isPublished(pkg)) {
+    console.log(`\n▸ ${pkg.name}@${pkg.version} — registry 已存在，跳过`)
+    skippedCount++
+    continue
+  }
 
   // dist-tag 自动推导: prerelease 段（1.0.0-alpha.0）→ --tag alpha，防止顶掉 latest。
   // 注意 npm 平台行为: 首发时 registry 强制 latest 指向首版本，该防护只对已有 latest 的包生效。
@@ -120,11 +150,12 @@ for (const dir of PACKAGES) {
       stdio: 'inherit',
       shell: process.platform === 'win32',
     })
+    publishedCount++
   }
   catch {
-    console.error(`\n✗ ${pkg.name} 发布失败，已中止。已发布的包不会回滚，修复后重跑即可。`)
+    console.error(`\n✗ ${pkg.name} 发布失败，已中止。已发布的包不会回滚，修复后重跑即可（已存在版本自动跳过）。`)
     process.exit(1)
   }
 }
 
-console.log(`\n✓ ${dryRun ? 'dry-run 通过' : '全部发布完成'}（${PACKAGES.length} 个包）`)
+console.log(`\n✓ ${dryRun ? 'dry-run 通过' : '全部发布完成'}（发布 ${publishedCount}，跳过 ${skippedCount}）`)
