@@ -6,6 +6,12 @@ monorepo 内各包独立版本，版本段以包名标注。
 
 ## [Unreleased]
 
+## [@lionad/use-scrollbar 0.5.0-alpha.2] - 2026-08-09
+
+### Fixed
+
+- 修复宿主无组件实例场景（如自定义指令 `mounted` 钩子内调用 `useScrollbar`）产生 `onUnmounted is called when there is no active component instance` Vue 警告的问题：拖拽清理注册收敛为 `tryOnUnmounted`，无实例时静默跳过——该场景本就由宿主卸载路径的 `destroy`（内含 `clean`）兜底
+
 ## [@lionad/use-scrollbar 0.5.0-alpha.1] - 2026-08-08
 
 ### Fixed
