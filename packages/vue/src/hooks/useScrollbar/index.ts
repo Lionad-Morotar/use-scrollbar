@@ -3,8 +3,8 @@ import type { MaybeComputedElementRef, MaybeElement } from '@vueuse/core'
 import type { CSSProperties, EffectScope, MaybeRef, Ref } from 'vue'
 import type { States } from './states'
 import { unrefElement, useEventListener } from '@vueuse/core'
-import { tryOnScopeDispose } from '@vueuse/shared'
-import { computed, effectScope, onScopeDispose, onUnmounted, reactive, ref, unref, watch, watchEffect } from 'vue'
+import { tryOnScopeDispose, tryOnUnmounted } from '@vueuse/shared'
+import { computed, effectScope, onScopeDispose, reactive, ref, unref, watch, watchEffect } from 'vue'
 import { useElementSize, useScroll } from '@/hooks'
 
 import { createComponent } from './scrollbars'
@@ -639,7 +639,9 @@ export default function useScrollbar(
     }
   }
   clean.todos = [] as (() => void)[]
-  onUnmounted(clean)
+  // 宿主无组件实例时(如自定义指令 mounted 钩子里调用)跳过注册:
+  // 该场景由宿主卸载路径的 destroy 兜底(destroy 内含 clean),裸 onUnmounted 只会产生 Vue 警告
+  tryOnUnmounted(clean)
 
   /**
    * 拖动滚动条时的事件处理，
