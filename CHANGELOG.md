@@ -6,6 +6,12 @@ monorepo 内各包独立版本，版本段以包名标注。
 
 ## [Unreleased]
 
+## [@lionad/use-scrollbar 0.5.0-alpha.3] - 2026-09-04
+
+### Changed
+
+- 滑块最小长度钳制 `config.size.min` 由 75 提升至 160：内容远超一屏时滑块按比例缩短，75 的下限会让滑块缩成一个点，拖拽命中区与视觉可辨识度都不够；x/y 共用同一钳制下限，容器小于 160 时仍由 `max` 侧钳制兜住不溢出轨道，JS 未就绪闪烁窗口的 CSS 兜底（30px）保持原值
+
 ## [@lionad/use-scrollbar 0.5.0-alpha.2] - 2026-08-09
 
 ### Fixed

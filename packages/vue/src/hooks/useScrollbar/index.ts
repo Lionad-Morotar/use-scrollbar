@@ -59,7 +59,10 @@ export default function useScrollbar(
   const config = {
     size: {
       base: 280,
-      min: 75,
+      // 滑块最小长度钳制:内容远超一屏时按比例缩到 75 会短成一个点,拖拽命中区
+      // 与视觉可辨识度都不够;160 是产品设计契约(滑块太短不成形)。x/y 共用
+      // 单一来源,窄容器横向条同步放大,超出轨道的部分由 max 侧钳制兜住
+      min: 160,
       max: 500,
     },
   }

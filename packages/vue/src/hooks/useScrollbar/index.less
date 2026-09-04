@@ -1,5 +1,7 @@
 @padding-border: 2px;
 @thick: 7px + @padding-border + @padding-border;
+// JS 计算链的 CSS 兜底下限,仅覆盖内联尺寸未就绪的闪烁窗口;
+// 必须恒 ≤ index.ts config.size.min,否则容器矮于 JS 下限时兜底会反顶内联尺寸溢出轨道
 @min-width: 30px;
 
 .c-scrollbar-container {
