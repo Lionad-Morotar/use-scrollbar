@@ -81,6 +81,8 @@ barStates.offset.x.left = 5 // px
 barStates.offset.x.bottom = 5 // px
 ```
 
+几何契约：thumb 的位置与长度由 offset 驱动的**内联样式**决定，而轨道（`.c-scrollbar-track`）的 CSS 是 `inset: 0; width: 100%; height: 100%` 过约束布局（LTR 下 `right`/`bottom` 被忽略，恒铺满容器）。想给滚动条贴边留白时直接改 `offset`；覆写轨道的 `right`/`bottom` 无效，覆写 thumb 内联样式需要 `!important`，两者都不推荐。
+
 #### barStates.scrollTop / barStates.scrollLeft
 
 如果传入多个 wrapper，那么 scrollTop 属性等同于这几个 wrapper 对应 DOM 元素的最大的哪个 scrollTop 属性。如果需要滚动 wrapper 中的内容，可以给 scrollTop 设置值，也可以使用 barStates.scrollTo 方法。scrollLeft 类似。

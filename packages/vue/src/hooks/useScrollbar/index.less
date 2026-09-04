@@ -11,6 +11,11 @@
 
   .c-scrollbar-track {
     display: block;
+    // inset:0 与 width/height:100% 同设属过约束:LTR 下 right/bottom 被忽略,
+    // 轨道恒铺满容器——这是有意的,轨道只是 thumb 的定位画布,thumb 的位置与
+    // 长度全部由内联样式(states.styles.* 经 offset 驱动)决定,且滚动补偿依赖
+    // 轨道锚定容器全尺寸;因此消费方覆写轨道的 right/bottom 无效,想移动 thumb
+    // 应改用 barStates.offset,覆写 thumb 内联样式则需 !important(不推荐)
     position: absolute;
     inset: 0;
     width: 100%;
