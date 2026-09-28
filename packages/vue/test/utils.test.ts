@@ -84,4 +84,13 @@ describe('findScrollElement', () => {
     root.appendChild(a)
     expect(findScrollElement(root)).toBeNull()
   })
+
+  it('自身可滚时优先返回自身（含纯横向）', () => {
+    const root = document.createElement('div')
+    Object.defineProperty(root, 'scrollHeight', { value: 100, configurable: true })
+    Object.defineProperty(root, 'clientHeight', { value: 100, configurable: true })
+    Object.defineProperty(root, 'scrollWidth', { value: 400, configurable: true })
+    Object.defineProperty(root, 'clientWidth', { value: 200, configurable: true })
+    expect(findScrollElement(root)).toBe(root)
+  })
 })

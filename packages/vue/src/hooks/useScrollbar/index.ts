@@ -258,18 +258,34 @@ export default function useScrollbar(
       })
     }
     if (opts.content.length) {
+      // RO 给 border-box；当 content 即滚动容器本身时还需 scrollWidth/Height
+      // （自动初始化走 content=[$wrapper]），否则多子节点 Math.max(RO) 会低估总高
       const ws = [] as Ref<number>[]
       const hs = [] as Ref<number>[]
+      const els = [] as MaybeElem[]
       opts.content.forEach(($elm: MaybeElem) => {
         const { width, height } = useElementSize($elm, undefined, { box: 'border-box' })
         ws.push(width)
         hs.push(height)
+        els.push($elm)
       })
       watchEffect(() => {
-        contentW.value = Math.max(...ws.map(unref))
+        contentW.value = Math.max(
+          ...els.map(($elm, i) => {
+            const el = unrefElement($elm as MaybeElem) as HTMLElement | null | undefined
+            const ro = unref(ws[i])
+            return el ? Math.max(ro, el.scrollWidth || 0) : ro
+          }),
+        )
       })
       watchEffect(() => {
-        contentH.value = Math.max(...hs.map(unref))
+        contentH.value = Math.max(
+          ...els.map(($elm, i) => {
+            const el = unrefElement($elm as MaybeElem) as HTMLElement | null | undefined
+            const ro = unref(hs[i])
+            return el ? Math.max(ro, el.scrollHeight || 0) : ro
+          }),
+        )
       })
     }
     if (opts.wrapper.length) {
@@ -322,17 +338,24 @@ export default function useScrollbar(
      * 1. 当内容不超过一屏时，不显示滚动条
      * 2. 当内容超出一屏，但超出量在一屏以内时，尺寸从 size.max 逼近 size.base
      * 3. 当内容超出更多，尺寸从 size.base 逼近 size.min
-     * @FIXME 当容器尺寸大于滚动条尺寸时
+     * thumb 长度与 path 必须同参照面：轨道行程 = viewport - GAP×2，
+     * min/max 按轨道裁剪，保证 path 恒 ≥ 0（旧实现用 mountOn 算长度、viewport 算 path，
+     * mount≠viewport 或小视口时 path 变负，拖拽与跟随全死）
      */
+    const MIN_PATH = 1
     watchEffect(() => {
       const top = states.offset.y.top || 0
-      const base = Math.min(config.size.base, states.mountOnH - top)
-      const max = Math.min(config.size.max, states.mountOnH - top)
-      let height = config.size.base
+      const track = Math.max(0, viewportH.value - SCROLLBAR_GAP * 2)
+      const maxByMount = Math.max(0, states.mountOnH - top - SCROLLBAR_GAP * 2)
+      const maxByTrack = Math.max(0, track - MIN_PATH)
+      const max = Math.min(config.size.max, maxByMount, maxByTrack)
+      const min = Math.min(config.size.min, max)
+      const base = Math.min(config.size.base, max)
+      let height = base
       const hiddenY = contentH.value <= viewportH.value
       states.isHidden.y = hiddenY
 
-      const isBaseNearMax = Math.abs(base - max) / max < 0.1
+      const isBaseNearMax = max > 0 && Math.abs(base - max) / max < 0.1
       if (isBaseNearMax) {
         height *= 0.7
       }
@@ -343,25 +366,28 @@ export default function useScrollbar(
         const unset = max - base
         const offset = (1 - overflow / viewportH.value) * unset
         height += offset
-        // console.log('[debug]', states.mountOnH, top, base, max, unset, height, overflow, offset)
       }
       else {
         const overflowSQRT = Math.min(Math.sqrt(overflow), viewportH.value) * 10
         const ratio = 1 - overflowSQRT / viewportH.value
         height *= safeRatio(ratio)
       }
-      const safeHeight = Math.min(Math.max(height, config.size.min), max)
+      const safeHeight = Math.min(Math.max(height, min), max)
       states.size.y.height = safeHeight
     })
     watchEffect(() => {
       const left = states.offset.x.left || 0
-      const base = Math.min(config.size.base, states.mountOnW - left)
-      const max = Math.min(config.size.max, states.mountOnW - left)
-      let width = config.size.base
+      const track = Math.max(0, viewportW.value - SCROLLBAR_GAP * 2)
+      const maxByMount = Math.max(0, states.mountOnW - left - SCROLLBAR_GAP * 2)
+      const maxByTrack = Math.max(0, track - MIN_PATH)
+      const max = Math.min(config.size.max, maxByMount, maxByTrack)
+      const min = Math.min(config.size.min, max)
+      const base = Math.min(config.size.base, max)
+      let width = base
       const hiddenX = contentW.value <= viewportW.value
       states.isHidden.x = hiddenX
 
-      const isBaseNearMax = Math.abs(base - max) / max < 0.1
+      const isBaseNearMax = max > 0 && Math.abs(base - max) / max < 0.1
       if (isBaseNearMax) {
         width *= 0.7
       }
@@ -378,19 +404,17 @@ export default function useScrollbar(
         const ratio = 1 - overflowSQRT / viewportW.value
         width *= safeRatio(ratio)
       }
-      const safeWidth = Math.min(Math.max(width, config.size.min), max)
+      const safeWidth = Math.min(Math.max(width, min), max)
       states.size.x.width = safeWidth
     })
 
     /* 滚动条轨道高度 */
 
     watchEffect(() => {
-      states.size.y.path = viewportH.value - states.size.y.height - SCROLLBAR_GAP * 2
-      // console.log("[debug] scrollbar y path", viewportH.value, states.size.y.height);
+      states.size.y.path = Math.max(0, viewportH.value - states.size.y.height - SCROLLBAR_GAP * 2)
     })
     watchEffect(() => {
-      states.size.x.path = viewportW.value - states.size.x.width - SCROLLBAR_GAP * 2
-      // console.log("[debug] scrollbar x path", viewportW.value, states.size.x.width);
+      states.size.x.path = Math.max(0, viewportW.value - states.size.x.width - SCROLLBAR_GAP * 2)
     })
 
     /* 滚动条距离顶部的比例 */
@@ -586,6 +610,9 @@ export default function useScrollbar(
       states.scrollTo(targetScroll, states.scrollTop)
     }
   }
+  // 仅在本库写入过 onselectstart 后才恢复；避免 destroy/首次 clean
+  // 把宿主页面的 handler 清成 null（selectEventRaw 初值 undefined）
+  const selectStartOwned = ref(false)
   const onMouseUp = () => {
     clean()
     states.isDragging.x = states.isDragging.y = false
@@ -596,17 +623,21 @@ export default function useScrollbar(
       return
 
     // console.log("[debug] onMouseDown", e);
+    // 先捕获宿主 handler，再 clean——clean 只在 owned 时恢复，顺序安全
+    if (!selectStartOwned.value)
+      selectEventRaw.value = document.onselectstart
+
     clean()
     e.stopPropagation()
     e.stopImmediatePropagation()
     window.getSelection()?.removeAllRanges()
 
-    selectEventRaw.value = document.onselectstart
     document.onselectstart = () => {
       // eslint-disable-next-line no-console -- 拖拽期的信息追踪，故意保留（库本体仅此处输出）
       console.log('[info] temporarily disable select when dragging scrollbars')
       return false
     }
+    selectStartOwned.value = true
 
     states.isDragging[direction.value] = true
     mouseOffsetYStart.value = e.clientY
@@ -631,10 +662,12 @@ export default function useScrollbar(
       dragRafId = 0
     }
 
-    // 从未 mousedown 时 selectEventRaw 为 undefined，恢复时回落 null（EventHandler 初态）
-    // SSR 的 unmount 路径没有 document，跳过恢复
-    if (typeof document !== 'undefined')
+    // 仅恢复本库写入过的 onselectstart；从未拖拽时 destroy→clean 不得抹宿主 handler
+    if (typeof document !== 'undefined' && selectStartOwned.value) {
       document.onselectstart = selectEventRaw.value ?? null
+      selectStartOwned.value = false
+      selectEventRaw.value = undefined
+    }
 
     while (clean.todos.length) {
       const cleanJob = clean.todos.pop()
@@ -688,14 +721,17 @@ export default function useScrollbar(
         const $elm = unrefElement(x as any) as HTMLElement
         if ($elm) {
           try {
-            const $wrapper = findScrollElement($elm) as HTMLElement
-            const $content = Array.from($wrapper.children) as HTMLElement[]
-            // hover 注册由 init() 内的 mount watch 统一负责（stopHover 链管理）；
-            // 此处再注册会与其重复，且返回值无人持有，initOn 切换时残留监听器
+            const $wrapper = findScrollElement($elm)
+            if (!$wrapper) {
+              console.error('[ERR] no scrollable element under', x)
+              return
+            }
+            // 自动路径：content 取滚动容器自身（用 scrollHeight 量总高），
+            // 不再把每个直接子节点当 content 喂给 Math.max——堆叠子项会被低估
             init({
               mount: $elm,
-              wrapper: [$wrapper!],
-              content: $content,
+              wrapper: [$wrapper as HTMLElement],
+              content: [$wrapper as HTMLElement],
             })
           }
           catch (err) {
