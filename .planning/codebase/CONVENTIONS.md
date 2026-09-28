@@ -7,17 +7,17 @@
 **文件：**
 
 - 可复用 Hook 使用小写驼峰（camelCase）的目录名，入口文件统一为 `index.ts`：
-  - `src/hooks/useScrollbar/index.ts`
+  - `packages/vue/src/hooks/useScrollbar/index.ts`
   - `src/hooks/useScroll/index.ts`
   - `src/hooks/useElementHover/index.ts`
 - Vue 单文件组件（SFC）使用大写驼峰（PascalCase）：
   - `src/headless/use-scrollbar.vue`
   - `play/src/vxe-table.vue`
 - 同一 Hook 的辅助模块按职责命名：
-  - `src/hooks/useScrollbar/states.ts`
-  - `src/hooks/useScrollbar/scrollbars.ts`
-  - `src/hooks/useScrollbar/utils.ts`
-  - `src/hooks/useScrollbar/type.ts`
+  - `packages/vue/src/hooks/useScrollbar/states.ts`
+  - `packages/vue/src/hooks/useScrollbar/scrollbars.ts`
+  - `packages/vue/src/hooks/useScrollbar/utils.ts`
+  - `packages/vue/src/hooks/useScrollbar/type.ts`
 
 **函数：**
 
@@ -45,12 +45,12 @@
   - `UseScrollReturn`（`src/hooks/useScroll/index.ts:199`）
   - `UseElementSizeReturn`（`src/hooks/useElementSize/index.ts:80`）
 - 组件内部状态类型使用 `States` / `ScrollbarStates`：
-  - `States`（`src/hooks/useScrollbar/states.ts:84`）
+  - `States`（`packages/vue/src/hooks/useScrollbar/states.ts:84`）
 
 **常量：**
 
 - 全大写 SNAKE_CASE 用于模块级常量：
-  - `SCROLLBAR_GAP`（`src/hooks/useScrollbar/utils.ts:11`）
+  - `SCROLLBAR_GAP`（`packages/vue/src/hooks/useScrollbar/utils.ts:11`）
 
 ## 代码风格
 
@@ -120,10 +120,10 @@ import { findScrollElement, notEmpty, safePrecicion, safeRatio, SCROLLBAR_GAP } 
   const $elm = _element instanceof Document ? window.document.body : _element
   ```
 - 可恢复的内部错误使用 `try/catch` + `console.error`：
-  - `useScrollbar` 自动初始化失败时捕获异常（`src/hooks/useScrollbar/index.ts:528-539`）
+  - `useScrollbar` 自动初始化失败时捕获异常（`packages/vue/src/hooks/useScrollbar/index.ts:528-539`）
   - `useNativeScrollbar` 测量原生滚动条宽度时捕获异常（`src/hooks/useNativeScrollbar/index.ts:35-37`）
 - 未初始化方法通过抛出错误提示开发者：
-  - `scrollTo` 默认实现 `throw new Error('uninitial')`（`src/hooks/useScrollbar/states.ts:79-81`）
+  - `scrollTo` 默认实现 `throw new Error('uninitial')`（`packages/vue/src/hooks/useScrollbar/states.ts:79-81`）
 
 **避免：**
 
@@ -137,8 +137,8 @@ import { findScrollElement, notEmpty, safePrecicion, safeRatio, SCROLLBAR_GAP } 
 
 - 调试日志保留在源码中，使用 `[debug]` / `[info]` / `[ERR]` 前缀：
   - `console.log('[info] mode', mode)`（`vite.config.ts:46`）
-  - `console.error('[ERR] error in init virtual scrollbar', x, err)`（`src/hooks/useScrollbar/index.ts:538`）
-- 业务交互日志：拖动滚动条时临时禁用文本选择会打印 `[info] temporarily disable select when dragging scrollbars`（`src/hooks/useScrollbar/index.ts:466`）
+  - `console.error('[ERR] error in init virtual scrollbar', x, err)`（`packages/vue/src/hooks/useScrollbar/index.ts:538`）
+- 业务交互日志：拖动滚动条时临时禁用文本选择会打印 `[info] temporarily disable select when dragging scrollbars`（`packages/vue/src/hooks/useScrollbar/index.ts:466`）
 
 ## 注释
 
@@ -146,15 +146,15 @@ import { findScrollElement, notEmpty, safePrecicion, safeRatio, SCROLLBAR_GAP } 
 
 - 用中文解释模块职责、算法规则、隐含假设和折衷，而不是复述代码动作。
 - 使用 `/* 区域标题 */` 分隔代码段落：
-  - `/* Guards */`、`/* 初始化数据 */`、`/* 计算滚动条的显隐状态 */`（`src/hooks/useScrollbar/index.ts`）
+  - `/* Guards */`、`/* 初始化数据 */`、`/* 计算滚动条的显隐状态 */`（`packages/vue/src/hooks/useScrollbar/index.ts`）
 - 对复杂算法补充规则说明：
-  - `useScrollbar` 滚动条尺寸计算规则（`src/hooks/useScrollbar/index.ts:226-233`）
+  - `useScrollbar` 滚动条尺寸计算规则（`packages/vue/src/hooks/useScrollbar/index.ts:226-233`）
 
 **TODO / FIXME：**
 
 - 允许在注释中保留 `TODO` / `FIXME` / `@FIXME` 作为未完成事项的显式标记：
-  - `// TODO DeepPartial<typeof defaultOpts>`（`src/hooks/useScrollbar/index.ts:33`）
-  - `@FIXME 当容器尺寸大于滚动条尺寸时`（`src/hooks/useScrollbar/index.ts:232`）
+  - `// TODO DeepPartial<typeof defaultOpts>`（`packages/vue/src/hooks/useScrollbar/index.ts:33`）
+  - `@FIXME 当容器尺寸大于滚动条尺寸时`（`packages/vue/src/hooks/useScrollbar/index.ts:232`）
 
 **JSDoc/TSDoc：**
 
@@ -166,7 +166,7 @@ import { findScrollElement, notEmpty, safePrecicion, safeRatio, SCROLLBAR_GAP } 
 
 **大小：**
 
-- 没有严格行数限制，但核心实现文件明显偏长：`src/hooks/useScrollbar/index.ts` 约 550 行，已超过一般 300 行拆分建议。
+- 没有严格行数限制，但核心实现文件明显偏长：`packages/vue/src/hooks/useScrollbar/index.ts` 约 550 行，已超过一般 300 行拆分建议。
 
 **参数：**
 
@@ -202,7 +202,7 @@ import { findScrollElement, notEmpty, safePrecicion, safeRatio, SCROLLBAR_GAP } 
 **无 SFC 组件：**
 
 - 滚动条 UI 通过渲染函数（render function）创建，不使用 `.vue` 文件：
-  - `src/hooks/useScrollbar/scrollbars.ts` 使用 `h`、`createVNode`、`createApp` 动态挂载组件
+  - `packages/vue/src/hooks/useScrollbar/scrollbars.ts` 使用 `h`、`createVNode`、`createApp` 动态挂载组件
 
 ---
 

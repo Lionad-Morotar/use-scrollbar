@@ -26,7 +26,7 @@
   /***************** thumbs */
 
   .c-scrollbar {
-    // hide scrollbar x when scrolling y
+    // 拖拽另一轴时本轴降为 0.25（对称；由 --prefer-opacity 注入，非 scrolling / 非完全隐藏）
     --prefer-opacity: 0.5;
 
     position: absolute;
@@ -121,7 +121,8 @@
     }
   }
   &.is-css-tricks .c-scrollbar {
-    display: block !important;
+    /* 勿用 display:!important — 会压过 vShow 的内联 display:none，显隐契约失效 */
+    display: block;
     border: none;
     border-radius: 16px;
     background: #434343;

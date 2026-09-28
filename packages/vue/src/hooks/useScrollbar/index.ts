@@ -16,7 +16,6 @@ import './index.less'
 export * from './type'
 
 type MaybeElem = MaybeRef<MaybeElement>
-type MaybeElemOrNumber = MaybeRef<MaybeElement>
 type Direction = 'x' | 'y'
 
 /**
@@ -102,8 +101,11 @@ export default function useScrollbar(
     // 拖拽可能正在进行：先复位拖拽副作用（挂起的 rAF、document 监听器、onselectstart），
     // 否则卸载路径无人触发 mouseup，这些资源会残留至页面结束
     clean()
+    states.isDragging.x = states.isDragging.y = false
     stopHover?.()
     stopHover = null
+    stopOffset?.()
+    stopOffset = null
     initScope?.stop()
     initScope = null
     instance.value?.destroy?.()
@@ -138,48 +140,44 @@ export default function useScrollbar(
     }
   }
 
-  // 使用元素 x 的宽度作为滚动条的 offset.left 或 offset.right，
-  // 使用元素 y 的高度作为滚动条的 offset.top 或 offset.bottom
-  // TODO padding of opts.mount
+  // 使用元素尺寸驱动 offset 的 4 个有效槽位（与 CSS 锚定一致：
+  // y 锚 top+right，x 锚 left+bottom）。其余槽位曾被类型接纳但无落点。
+  let stopOffset: (() => void) | null = null
   function setOffset(opts: {
     x?: {
-      left?: MaybeElemOrNumber
-      bottom?: MaybeElemOrNumber
-      top?: MaybeElemOrNumber
-      right?: MaybeElemOrNumber
+      left?: MaybeElem
+      bottom?: MaybeElem
     }
     y?: {
-      top?: MaybeElemOrNumber
-      right?: MaybeElemOrNumber
-      left?: MaybeElemOrNumber
-      bottom?: MaybeElemOrNumber
+      top?: MaybeElem
+      right?: MaybeElem
     }
   }) {
+    stopOffset?.()
+    stopOffset = null
     const gap = SCROLLBAR_GAP
-    const args = [
-      opts?.x?.left,
-      opts?.x?.right,
-      opts?.x?.top,
-      opts?.x?.bottom,
-      opts?.y?.left,
-      opts?.y?.right,
-      opts?.y?.top,
-      opts?.y?.bottom,
-    ]
-    // TODO number
-    const $elms = args.filter(notEmpty)
-    $elms.forEach(($elm) => {
-      const { width, height } = useElementSize($elm, undefined, { box: 'border-box' })
-      watchEffect(() => {
-        if (opts?.x?.left === $elm)
-          states.offset.x.left = safePrecicion(width.value + gap)
-        if (opts?.x?.bottom === $elm)
-          states.offset.x.bottom = safePrecicion(height.value + gap)
-        if (opts?.y?.right === $elm)
-          states.offset.y.right = safePrecicion(width.value + gap)
-        if (opts?.y?.top === $elm)
-          states.offset.y.top = safePrecicion(height.value + gap)
-      })
+    const scope = effectScope()
+    stopOffset = () => {
+      scope.stop()
+      stopOffset = null
+    }
+    scope.run(() => {
+      const slots: Array<{ el: MaybeElem, apply: (w: number, h: number) => void }> = []
+      if (opts?.x?.left)
+        slots.push({ el: opts.x.left, apply: (w) => { states.offset.x.left = safePrecicion(w + gap) } })
+      if (opts?.x?.bottom)
+        slots.push({ el: opts.x.bottom, apply: (_w, h) => { states.offset.x.bottom = safePrecicion(h + gap) } })
+      if (opts?.y?.right)
+        slots.push({ el: opts.y.right, apply: (w) => { states.offset.y.right = safePrecicion(w + gap) } })
+      if (opts?.y?.top)
+        slots.push({ el: opts.y.top, apply: (_w, h) => { states.offset.y.top = safePrecicion(h + gap) } })
+
+      for (const slot of slots) {
+        const { width, height } = useElementSize(slot.el, undefined, { box: 'border-box' })
+        watchEffect(() => {
+          slot.apply(width.value, height.value)
+        })
+      }
     })
   }
 
@@ -201,11 +199,27 @@ export default function useScrollbar(
     if (typeof document === 'undefined')
       return
 
+    // 先回收再校验：中途抛错时不会留下「半新半旧」副作用
+    stopHover?.()
+    stopHover = null
+    stopOffset?.()
+    stopOffset = null
+    initScope?.stop()
+    initScope = null
+    states.isDragging.x = states.isDragging.y = false
+
     opts.mount = opts.mount!
     opts.content = Array.isArray(opts.content) ? opts.content : [opts.content]
     opts.content = opts.content.filter(notEmpty) as MaybeElem[]
-    // 显式标注参数类型：TS 5.9 对 opts.content 连续赋值 + as 断言后的 CFA 收窄会丢失元素类型
-    opts.wrapper = opts.wrapper || opts.content.map((x: MaybeElem) => unrefElement(x)!.parentElement)
+    // 未解析的 template ref（ref(null)）不得解引用 parentElement
+    const resolvedParents = opts.content
+      .map((x: MaybeElem) => unrefElement(x)?.parentElement ?? null)
+      .filter(notEmpty) as HTMLElement[]
+    if (!opts.wrapper && resolvedParents.length === 0 && opts.content.length > 0) {
+      console.error('[ERR] init: content refs unresolved and no wrapper provided')
+      return
+    }
+    opts.wrapper = opts.wrapper || resolvedParents
     opts.wrapper = Array.isArray(opts.wrapper) ? opts.wrapper : [opts.wrapper]
     opts.wrapper = opts.wrapper.filter(notEmpty) as MaybeElem[]
     opts.viewport = Array.isArray(opts.viewport)
@@ -214,12 +228,7 @@ export default function useScrollbar(
         ? [opts.viewport]
         : opts.wrapper
     opts.viewport = opts.viewport.filter(notEmpty) as MaybeElem[]
-    // console.log('[debug] init opts', opts)
 
-    // 先回收上一次 init 的 hover 监听器与全部响应式副作用，再在独立 scope 内重建
-    stopHover?.()
-    stopHover = null
-    initScope?.stop()
     initScope = effectScope()
     initScope.run(() => setup(opts as NormalizedInitOpts))
   }
@@ -258,18 +267,34 @@ export default function useScrollbar(
       })
     }
     if (opts.content.length) {
+      // RO 给 border-box；当 content 即滚动容器本身时还需 scrollWidth/Height
+      // （自动初始化走 content=[$wrapper]），否则多子节点 Math.max(RO) 会低估总高
       const ws = [] as Ref<number>[]
       const hs = [] as Ref<number>[]
+      const els = [] as MaybeElem[]
       opts.content.forEach(($elm: MaybeElem) => {
         const { width, height } = useElementSize($elm, undefined, { box: 'border-box' })
         ws.push(width)
         hs.push(height)
+        els.push($elm)
       })
       watchEffect(() => {
-        contentW.value = Math.max(...ws.map(unref))
+        contentW.value = Math.max(
+          ...els.map(($elm, i) => {
+            const el = unrefElement($elm as MaybeElem) as HTMLElement | null | undefined
+            const ro = unref(ws[i])
+            return el ? Math.max(ro, el.scrollWidth || 0) : ro
+          }),
+        )
       })
       watchEffect(() => {
-        contentH.value = Math.max(...hs.map(unref))
+        contentH.value = Math.max(
+          ...els.map(($elm, i) => {
+            const el = unrefElement($elm as MaybeElem) as HTMLElement | null | undefined
+            const ro = unref(hs[i])
+            return el ? Math.max(ro, el.scrollHeight || 0) : ro
+          }),
+        )
       })
     }
     if (opts.wrapper.length) {
@@ -322,17 +347,24 @@ export default function useScrollbar(
      * 1. 当内容不超过一屏时，不显示滚动条
      * 2. 当内容超出一屏，但超出量在一屏以内时，尺寸从 size.max 逼近 size.base
      * 3. 当内容超出更多，尺寸从 size.base 逼近 size.min
-     * @FIXME 当容器尺寸大于滚动条尺寸时
+     * thumb 长度与 path 必须同参照面：轨道行程 = viewport - GAP×2，
+     * min/max 按轨道裁剪，保证 path 恒 ≥ 0（旧实现用 mountOn 算长度、viewport 算 path，
+     * mount≠viewport 或小视口时 path 变负，拖拽与跟随全死）
      */
+    const MIN_PATH = 1
     watchEffect(() => {
       const top = states.offset.y.top || 0
-      const base = Math.min(config.size.base, states.mountOnH - top)
-      const max = Math.min(config.size.max, states.mountOnH - top)
-      let height = config.size.base
+      const track = Math.max(0, viewportH.value - SCROLLBAR_GAP * 2)
+      const maxByMount = Math.max(0, states.mountOnH - top - SCROLLBAR_GAP * 2)
+      const maxByTrack = Math.max(0, track - MIN_PATH)
+      const max = Math.min(config.size.max, maxByMount, maxByTrack)
+      const min = Math.min(config.size.min, max)
+      const base = Math.min(config.size.base, max)
+      let height = base
       const hiddenY = contentH.value <= viewportH.value
       states.isHidden.y = hiddenY
 
-      const isBaseNearMax = Math.abs(base - max) / max < 0.1
+      const isBaseNearMax = max > 0 && Math.abs(base - max) / max < 0.1
       if (isBaseNearMax) {
         height *= 0.7
       }
@@ -343,25 +375,28 @@ export default function useScrollbar(
         const unset = max - base
         const offset = (1 - overflow / viewportH.value) * unset
         height += offset
-        // console.log('[debug]', states.mountOnH, top, base, max, unset, height, overflow, offset)
       }
       else {
         const overflowSQRT = Math.min(Math.sqrt(overflow), viewportH.value) * 10
         const ratio = 1 - overflowSQRT / viewportH.value
         height *= safeRatio(ratio)
       }
-      const safeHeight = Math.min(Math.max(height, config.size.min), max)
+      const safeHeight = Math.min(Math.max(height, min), max)
       states.size.y.height = safeHeight
     })
     watchEffect(() => {
       const left = states.offset.x.left || 0
-      const base = Math.min(config.size.base, states.mountOnW - left)
-      const max = Math.min(config.size.max, states.mountOnW - left)
-      let width = config.size.base
+      const track = Math.max(0, viewportW.value - SCROLLBAR_GAP * 2)
+      const maxByMount = Math.max(0, states.mountOnW - left - SCROLLBAR_GAP * 2)
+      const maxByTrack = Math.max(0, track - MIN_PATH)
+      const max = Math.min(config.size.max, maxByMount, maxByTrack)
+      const min = Math.min(config.size.min, max)
+      const base = Math.min(config.size.base, max)
+      let width = base
       const hiddenX = contentW.value <= viewportW.value
       states.isHidden.x = hiddenX
 
-      const isBaseNearMax = Math.abs(base - max) / max < 0.1
+      const isBaseNearMax = max > 0 && Math.abs(base - max) / max < 0.1
       if (isBaseNearMax) {
         width *= 0.7
       }
@@ -378,19 +413,17 @@ export default function useScrollbar(
         const ratio = 1 - overflowSQRT / viewportW.value
         width *= safeRatio(ratio)
       }
-      const safeWidth = Math.min(Math.max(width, config.size.min), max)
+      const safeWidth = Math.min(Math.max(width, min), max)
       states.size.x.width = safeWidth
     })
 
     /* 滚动条轨道高度 */
 
     watchEffect(() => {
-      states.size.y.path = viewportH.value - states.size.y.height - SCROLLBAR_GAP * 2
-      // console.log("[debug] scrollbar y path", viewportH.value, states.size.y.height);
+      states.size.y.path = Math.max(0, viewportH.value - states.size.y.height - SCROLLBAR_GAP * 2)
     })
     watchEffect(() => {
-      states.size.x.path = viewportW.value - states.size.x.width - SCROLLBAR_GAP * 2
-      // console.log("[debug] scrollbar x path", viewportW.value, states.size.x.width);
+      states.size.x.path = Math.max(0, viewportW.value - states.size.x.width - SCROLLBAR_GAP * 2)
     })
 
     /* 滚动条距离顶部的比例 */
@@ -438,6 +471,7 @@ export default function useScrollbar(
       clearTimeout(scrollXTimer)
       scrollXTimer = setTimeout(() => {
         scrollingX.value = false
+      // x 轴 idle 取 6 帧、y 取 3 帧：历史引入无依据记录；保留分方向语义供 is-scrolling-x/y 消费
       }, 17 * 6) as unknown as number
     })
     watch(scrollTop, () => {
@@ -586,6 +620,9 @@ export default function useScrollbar(
       states.scrollTo(targetScroll, states.scrollTop)
     }
   }
+  // 仅在本库写入过 onselectstart 后才恢复；避免 destroy/首次 clean
+  // 把宿主页面的 handler 清成 null（selectEventRaw 初值 undefined）
+  const selectStartOwned = ref(false)
   const onMouseUp = () => {
     clean()
     states.isDragging.x = states.isDragging.y = false
@@ -596,17 +633,21 @@ export default function useScrollbar(
       return
 
     // console.log("[debug] onMouseDown", e);
+    // 先捕获宿主 handler，再 clean——clean 只在 owned 时恢复，顺序安全
+    if (!selectStartOwned.value)
+      selectEventRaw.value = document.onselectstart
+
     clean()
     e.stopPropagation()
     e.stopImmediatePropagation()
     window.getSelection()?.removeAllRanges()
 
-    selectEventRaw.value = document.onselectstart
     document.onselectstart = () => {
       // eslint-disable-next-line no-console -- 拖拽期的信息追踪，故意保留（库本体仅此处输出）
       console.log('[info] temporarily disable select when dragging scrollbars')
       return false
     }
+    selectStartOwned.value = true
 
     states.isDragging[direction.value] = true
     mouseOffsetYStart.value = e.clientY
@@ -631,10 +672,12 @@ export default function useScrollbar(
       dragRafId = 0
     }
 
-    // 从未 mousedown 时 selectEventRaw 为 undefined，恢复时回落 null（EventHandler 初态）
-    // SSR 的 unmount 路径没有 document，跳过恢复
-    if (typeof document !== 'undefined')
+    // 仅恢复本库写入过的 onselectstart；从未拖拽时 destroy→clean 不得抹宿主 handler
+    if (typeof document !== 'undefined' && selectStartOwned.value) {
       document.onselectstart = selectEventRaw.value ?? null
+      selectStartOwned.value = false
+      selectEventRaw.value = undefined
+    }
 
     while (clean.todos.length) {
       const cleanJob = clean.todos.pop()
@@ -653,11 +696,11 @@ export default function useScrollbar(
 
   function onDragY(e: MouseEvent) {
     direction.value = 'y'
-    onMouseDown.bind(e)(e)
+    onMouseDown(e)
   }
   function onDragX(e: MouseEvent) {
     direction.value = 'x'
-    onMouseDown.bind(e)(e)
+    onMouseDown(e)
   }
 
   // 将滚动条挂载在某个 DOM 节点。
@@ -681,25 +724,49 @@ export default function useScrollbar(
   /* ----------------------------------------------------------- */
 
   if (initOn) {
-    const initOnRef = ref(initOn)
+    // 直接跟踪解引用结果：ref(initOn) 会把 getter 函数本身存成静态值，
+    // 元素晚就绪（v-if / 异步挂载）时 watcher 永不重跑
+    let retryRo: ResizeObserver | null = null
+    const stopRetry = () => {
+      retryRo?.disconnect()
+      retryRo = null
+    }
+    tryOnScopeDispose(stopRetry)
+
+    const tryInitFrom = ($elm: HTMLElement) => {
+      const $wrapper = findScrollElement($elm)
+      if (!$wrapper) {
+        // 异步内容到达前探测 miss：挂一次性 RO，尺寸变化后再试
+        if (typeof ResizeObserver !== 'undefined' && !retryRo) {
+          retryRo = new ResizeObserver(() => {
+            const found = findScrollElement($elm)
+            if (found) {
+              stopRetry()
+              tryInitFrom($elm)
+            }
+          })
+          retryRo.observe($elm)
+        }
+        return
+      }
+      stopRetry()
+      init({
+        mount: $elm,
+        wrapper: [$wrapper as HTMLElement],
+        content: [$wrapper as HTMLElement],
+      })
+    }
+
     watch(
-      initOnRef,
-      (x) => {
-        const $elm = unrefElement(x as any) as HTMLElement
+      () => unrefElement(initOn),
+      ($elm) => {
+        stopRetry()
         if ($elm) {
           try {
-            const $wrapper = findScrollElement($elm) as HTMLElement
-            const $content = Array.from($wrapper.children) as HTMLElement[]
-            // hover 注册由 init() 内的 mount watch 统一负责（stopHover 链管理）；
-            // 此处再注册会与其重复，且返回值无人持有，initOn 切换时残留监听器
-            init({
-              mount: $elm,
-              wrapper: [$wrapper!],
-              content: $content,
-            })
+            tryInitFrom($elm as HTMLElement)
           }
           catch (err) {
-            console.error('[ERR] error in init virtual scrollbar', x, err)
+            console.error('[ERR] error in init virtual scrollbar', initOn, err)
           }
         }
       },

@@ -3,6 +3,7 @@ import type { Fn } from '@vueuse/shared'
 
 import type { Ref } from 'vue'
 import { unrefElement, useEventListener } from '@vueuse/core'
+import { tryOnUnmounted } from '@vueuse/shared'
 import { ref, watch } from 'vue'
 
 export default function useElementHover(
@@ -15,10 +16,15 @@ export default function useElementHover(
 
   const cleanup = ref<Fn[]>([])
 
+  const stopAll = () => {
+    cleanup.value.map(stop => stop())
+    cleanup.value = []
+  }
+
   watch(
     targetRef,
     (value) => {
-      cleanup.value.map(stop => stop())
+      stopAll()
       if (value) {
         cleanup.value = [
           useEventListener(
@@ -45,6 +51,8 @@ export default function useElementHover(
       flush: 'post',
     },
   )
+
+  tryOnUnmounted(stopAll)
 
   return isHovered
 }

@@ -23,21 +23,33 @@ export const safePrecicion = (n = 0) => +safe(+n).toFixed(3)
 
 /** ********************************************************************* DOM */
 
-export function findScrollElement($el: Element) {
+function isScrollable($c: Element) {
+  return (
+    $c.scrollHeight > $c.clientHeight
+    || $c.scrollWidth > $c.clientWidth
+  )
+}
+
+/**
+ * 在子树中找可滚容器：先认自身，再认直接子，再递归。
+ * 横纵任一轴溢出即命中（纯横向表也要能自动初始化）。
+ */
+export function findScrollElement($el: Element): Element | null {
+  if (isScrollable($el))
+    return $el
+
   const $children = Array.from($el.children)
-  const $long = $children.find($c => $c.scrollHeight > $c.clientHeight)
-  if ($long) {
+  const $long = $children.find(isScrollable)
+  if ($long)
     return $long
+
+  if (!$children.length)
+    return null
+
+  for (const $c of $children) {
+    const nested = findScrollElement($c)
+    if (nested)
+      return nested
   }
-  else if ($children.length) {
-    const $longInChild = $children
-      .map($c => findScrollElement($c))
-      .find(notEmpty) as Element | null
-    if ($longInChild) {
-      return $longInChild
-    }
-    else {
-      return null
-    }
-  }
+  return null
 }
