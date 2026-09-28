@@ -714,16 +714,16 @@ export default function useScrollbar(
   /* ----------------------------------------------------------- */
 
   if (initOn) {
-    const initOnRef = ref(initOn)
+    // 直接跟踪解引用结果：ref(initOn) 会把 getter 函数本身存成静态值，
+    // 元素晚就绪（v-if / 异步挂载）时 watcher 永不重跑
     watch(
-      initOnRef,
-      (x) => {
-        const $elm = unrefElement(x as any) as HTMLElement
+      () => unrefElement(initOn),
+      ($elm) => {
         if ($elm) {
           try {
             const $wrapper = findScrollElement($elm)
             if (!$wrapper) {
-              console.error('[ERR] no scrollable element under', x)
+              console.error('[ERR] no scrollable element under', initOn)
               return
             }
             // 自动路径：content 取滚动容器自身（用 scrollHeight 量总高），
@@ -735,7 +735,7 @@ export default function useScrollbar(
             })
           }
           catch (err) {
-            console.error('[ERR] error in init virtual scrollbar', x, err)
+            console.error('[ERR] error in init virtual scrollbar', initOn, err)
           }
         }
       },
