@@ -16,7 +16,6 @@ import './index.less'
 export * from './type'
 
 type MaybeElem = MaybeRef<MaybeElement>
-type MaybeElemOrNumber = MaybeRef<MaybeElement>
 type Direction = 'x' | 'y'
 
 /**
@@ -102,8 +101,11 @@ export default function useScrollbar(
     // 拖拽可能正在进行：先复位拖拽副作用（挂起的 rAF、document 监听器、onselectstart），
     // 否则卸载路径无人触发 mouseup，这些资源会残留至页面结束
     clean()
+    states.isDragging.x = states.isDragging.y = false
     stopHover?.()
     stopHover = null
+    stopOffset?.()
+    stopOffset = null
     initScope?.stop()
     initScope = null
     instance.value?.destroy?.()
@@ -138,48 +140,44 @@ export default function useScrollbar(
     }
   }
 
-  // 使用元素 x 的宽度作为滚动条的 offset.left 或 offset.right，
-  // 使用元素 y 的高度作为滚动条的 offset.top 或 offset.bottom
-  // TODO padding of opts.mount
+  // 使用元素尺寸驱动 offset 的 4 个有效槽位（与 CSS 锚定一致：
+  // y 锚 top+right，x 锚 left+bottom）。其余槽位曾被类型接纳但无落点。
+  let stopOffset: (() => void) | null = null
   function setOffset(opts: {
     x?: {
-      left?: MaybeElemOrNumber
-      bottom?: MaybeElemOrNumber
-      top?: MaybeElemOrNumber
-      right?: MaybeElemOrNumber
+      left?: MaybeElem
+      bottom?: MaybeElem
     }
     y?: {
-      top?: MaybeElemOrNumber
-      right?: MaybeElemOrNumber
-      left?: MaybeElemOrNumber
-      bottom?: MaybeElemOrNumber
+      top?: MaybeElem
+      right?: MaybeElem
     }
   }) {
+    stopOffset?.()
+    stopOffset = null
     const gap = SCROLLBAR_GAP
-    const args = [
-      opts?.x?.left,
-      opts?.x?.right,
-      opts?.x?.top,
-      opts?.x?.bottom,
-      opts?.y?.left,
-      opts?.y?.right,
-      opts?.y?.top,
-      opts?.y?.bottom,
-    ]
-    // TODO number
-    const $elms = args.filter(notEmpty)
-    $elms.forEach(($elm) => {
-      const { width, height } = useElementSize($elm, undefined, { box: 'border-box' })
-      watchEffect(() => {
-        if (opts?.x?.left === $elm)
-          states.offset.x.left = safePrecicion(width.value + gap)
-        if (opts?.x?.bottom === $elm)
-          states.offset.x.bottom = safePrecicion(height.value + gap)
-        if (opts?.y?.right === $elm)
-          states.offset.y.right = safePrecicion(width.value + gap)
-        if (opts?.y?.top === $elm)
-          states.offset.y.top = safePrecicion(height.value + gap)
-      })
+    const scope = effectScope()
+    stopOffset = () => {
+      scope.stop()
+      stopOffset = null
+    }
+    scope.run(() => {
+      const slots: Array<{ el: MaybeElem, apply: (w: number, h: number) => void }> = []
+      if (opts?.x?.left)
+        slots.push({ el: opts.x.left, apply: (w) => { states.offset.x.left = safePrecicion(w + gap) } })
+      if (opts?.x?.bottom)
+        slots.push({ el: opts.x.bottom, apply: (_w, h) => { states.offset.x.bottom = safePrecicion(h + gap) } })
+      if (opts?.y?.right)
+        slots.push({ el: opts.y.right, apply: (w) => { states.offset.y.right = safePrecicion(w + gap) } })
+      if (opts?.y?.top)
+        slots.push({ el: opts.y.top, apply: (_w, h) => { states.offset.y.top = safePrecicion(h + gap) } })
+
+      for (const slot of slots) {
+        const { width, height } = useElementSize(slot.el, undefined, { box: 'border-box' })
+        watchEffect(() => {
+          slot.apply(width.value, height.value)
+        })
+      }
     })
   }
 
@@ -201,11 +199,27 @@ export default function useScrollbar(
     if (typeof document === 'undefined')
       return
 
+    // 先回收再校验：中途抛错时不会留下「半新半旧」副作用
+    stopHover?.()
+    stopHover = null
+    stopOffset?.()
+    stopOffset = null
+    initScope?.stop()
+    initScope = null
+    states.isDragging.x = states.isDragging.y = false
+
     opts.mount = opts.mount!
     opts.content = Array.isArray(opts.content) ? opts.content : [opts.content]
     opts.content = opts.content.filter(notEmpty) as MaybeElem[]
-    // 显式标注参数类型：TS 5.9 对 opts.content 连续赋值 + as 断言后的 CFA 收窄会丢失元素类型
-    opts.wrapper = opts.wrapper || opts.content.map((x: MaybeElem) => unrefElement(x)!.parentElement)
+    // 未解析的 template ref（ref(null)）不得解引用 parentElement
+    const resolvedParents = opts.content
+      .map((x: MaybeElem) => unrefElement(x)?.parentElement ?? null)
+      .filter(notEmpty) as HTMLElement[]
+    if (!opts.wrapper && resolvedParents.length === 0 && opts.content.length > 0) {
+      console.error('[ERR] init: content refs unresolved and no wrapper provided')
+      return
+    }
+    opts.wrapper = opts.wrapper || resolvedParents
     opts.wrapper = Array.isArray(opts.wrapper) ? opts.wrapper : [opts.wrapper]
     opts.wrapper = opts.wrapper.filter(notEmpty) as MaybeElem[]
     opts.viewport = Array.isArray(opts.viewport)
@@ -214,12 +228,7 @@ export default function useScrollbar(
         ? [opts.viewport]
         : opts.wrapper
     opts.viewport = opts.viewport.filter(notEmpty) as MaybeElem[]
-    // console.log('[debug] init opts', opts)
 
-    // 先回收上一次 init 的 hover 监听器与全部响应式副作用，再在独立 scope 内重建
-    stopHover?.()
-    stopHover = null
-    initScope?.stop()
     initScope = effectScope()
     initScope.run(() => setup(opts as NormalizedInitOpts))
   }
@@ -462,6 +471,7 @@ export default function useScrollbar(
       clearTimeout(scrollXTimer)
       scrollXTimer = setTimeout(() => {
         scrollingX.value = false
+      // x 轴 idle 取 6 帧、y 取 3 帧：历史引入无依据记录；保留分方向语义供 is-scrolling-x/y 消费
       }, 17 * 6) as unknown as number
     })
     watch(scrollTop, () => {
@@ -686,11 +696,11 @@ export default function useScrollbar(
 
   function onDragY(e: MouseEvent) {
     direction.value = 'y'
-    onMouseDown.bind(e)(e)
+    onMouseDown(e)
   }
   function onDragX(e: MouseEvent) {
     direction.value = 'x'
-    onMouseDown.bind(e)(e)
+    onMouseDown(e)
   }
 
   // 将滚动条挂载在某个 DOM 节点。
@@ -716,23 +726,44 @@ export default function useScrollbar(
   if (initOn) {
     // 直接跟踪解引用结果：ref(initOn) 会把 getter 函数本身存成静态值，
     // 元素晚就绪（v-if / 异步挂载）时 watcher 永不重跑
+    let retryRo: ResizeObserver | null = null
+    const stopRetry = () => {
+      retryRo?.disconnect()
+      retryRo = null
+    }
+    tryOnScopeDispose(stopRetry)
+
+    const tryInitFrom = ($elm: HTMLElement) => {
+      const $wrapper = findScrollElement($elm)
+      if (!$wrapper) {
+        // 异步内容到达前探测 miss：挂一次性 RO，尺寸变化后再试
+        if (typeof ResizeObserver !== 'undefined' && !retryRo) {
+          retryRo = new ResizeObserver(() => {
+            const found = findScrollElement($elm)
+            if (found) {
+              stopRetry()
+              tryInitFrom($elm)
+            }
+          })
+          retryRo.observe($elm)
+        }
+        return
+      }
+      stopRetry()
+      init({
+        mount: $elm,
+        wrapper: [$wrapper as HTMLElement],
+        content: [$wrapper as HTMLElement],
+      })
+    }
+
     watch(
       () => unrefElement(initOn),
       ($elm) => {
+        stopRetry()
         if ($elm) {
           try {
-            const $wrapper = findScrollElement($elm)
-            if (!$wrapper) {
-              console.error('[ERR] no scrollable element under', initOn)
-              return
-            }
-            // 自动路径：content 取滚动容器自身（用 scrollHeight 量总高），
-            // 不再把每个直接子节点当 content 喂给 Math.max——堆叠子项会被低估
-            init({
-              mount: $elm,
-              wrapper: [$wrapper as HTMLElement],
-              content: [$wrapper as HTMLElement],
-            })
+            tryInitFrom($elm as HTMLElement)
           }
           catch (err) {
             console.error('[ERR] error in init virtual scrollbar', initOn, err)

@@ -49,7 +49,7 @@
 | 组件 | 职责 | 文件 |
 | --- | --- | --- |
 | `useScrollbar` | 主组合式函数：挂载虚拟滚动条，计算滑块几何与位置，绑定拖拽事件 | `src/hooks/useScrollbar/index.ts` |
-| `createComponent` | 通过 `vue-demi` VNode API 渲染实际滚动条 DOM 节点并命令式挂载 | `src/hooks/useScrollbar/scrollbars.ts` |
+| `createComponent` | 通过 `vue` VNode API 渲染实际滚动条 DOM 节点并命令式挂载 | `src/hooks/useScrollbar/scrollbars.ts` |
 | `getOpts` | 为 `useScrollbar` 与 DOM 组件生成 consumed 响应式状态对象 | `src/hooks/useScrollbar/states.ts` |
 | `useScroll` | 面向性能的 `@vueuse/core/useScroll` 替代方案；暴露可写的 `x`/`y` computed refs | `src/hooks/useScroll/index.ts` |
 | `useElementSize` | 包装 `ResizeObserver` 并具备 SVG 降级方案；用于测量 mount/viewport/content 元素 | `src/hooks/useElementSize/index.ts` |

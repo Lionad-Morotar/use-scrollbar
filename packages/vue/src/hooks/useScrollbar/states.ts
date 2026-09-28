@@ -4,11 +4,12 @@ import { SCROLLBAR_GAP } from './utils'
 
 const HALF_GAP = SCROLLBAR_GAP / 2
 
-// TODO group by readonly states and mutable states
+// 注：对外字段未按只读/可写分组；isHidden 由尺寸 effect 派生覆盖，
+// 写入仅短暂生效（见 visible 公式：拖拽优先于 isHidden）
 function getOpts() {
   return {
     theme: 'normal' as Theme,
-    // 是否隐藏滚动条（优先级应当高于 visible）
+    // 派生：内容是否不足一屏。写入会被尺寸 effect 覆盖；优先级实际低于 isDragging
     isHidden: {
       x: false,
       y: false,
