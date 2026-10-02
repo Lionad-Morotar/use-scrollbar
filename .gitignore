@@ -28,3 +28,5 @@ pnpm-debug.log*
 *.sln
 *.sw?
 
+
+.claude/worktrees/

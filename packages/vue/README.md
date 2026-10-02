@@ -90,7 +90,8 @@ LTR 下 `right`/`bottom` 被忽略，恒铺满容器）。想给滚动条贴边�
 
 如果传入多个 wrapper，那么 scrollTop 属性等同于这几个 wrapper 对应 DOM 元素的最大的哪个 scrollTop 属性。
 
-`scrollTop` / `scrollLeft` 是只读镜像（由内部滚动位置同步写出）。程序化滚动请使用 `barStates.scrollTo(x, y)`；给 `scrollTop` 赋值不会驱动内容滚动。`scrollLeft` 同理。
+`scrollTop` / `scrollLeft` 是只读镜像（由内部滚动位置同步写出）。程序化滚动请使用 `barStates.scrollTo(x, y)`；给 `scrollTop` 赋值不会驱动内容滚动。
+`scrollLeft` 同理。
 
 #### barStates.isDragging
 
