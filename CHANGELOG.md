@@ -6,6 +6,32 @@ monorepo 内各包独立版本，版本段以包名标注。
 
 ## [Unreleased]
 
+## [@lionad/use-scrollbar 0.5.0] - 2026-10-02
+
+0.5.0 系列 prerelease（alpha.1 至 alpha.3）经消费方验证后毕业为首个稳定版，本段收敛 0.5.0-alpha.0 以来面向使用方的全部变更。
+
+### Changed
+
+- 滑块最小长度钳制由 75 提升至 160：内容远超一屏时滑块按比例缩短，旧下限会让滑块缩成一个点，拖拽命中区与视觉可辨识度都不够；容器本身小于 160 时仍由上界钳制兜住，滑块不会溢出轨道
+
+### Fixed
+
+- mount 自身即滚动容器（如自定义指令形态）时，轨道与滑块不再随滚动量飞出可视区、滚到底不再整体消失
+- 指令宿主等无组件实例场景调用 useScrollbar 不再产生 onUnmounted 警告
+- 滑块长度与拖拽行程统一按视口轨道计算：容器极小或内容极长时拖拽不再出现死区
+- 自动初始化改以滚动容器自身判定溢出：mount 自身滚动、横向滚动、堆叠子项场景下，滚动条不再静默不出现或行程被低估
+- 初始化目标元素晚于初始化就绪时自动重试挂接，滚动条不再静默缺失；初始化时机过早也不再抛出 TypeError
+- 销毁路径收敛：拖拽状态复位、hover 监听清理、恢复文本选择时不再抹掉宿主自身的处理器，重复 init/destroy 无残留泄漏
+- css-tricks 主题下悬停显隐恢复正常：主题样式不再压过显隐切换
+
+## [@lionad/use-scrollbar-nuxt 0.2.0] - 2026-10-02
+
+0.2.0 系列唯一一次 prerelease（alpha.1）经消费方验证后毕业为稳定版。
+
+### Fixed
+
+- 自动导入收敛为库独有 API（`useScrollbar` / `useScrollbars` / `useNativeScrollbar`）：不再注册与 `@vueuse/core` 同名的 `useScroll` / `useElementSize` / `useElementHover`，避免静默替换消费方的 vueuse 自动导入为库内部残缺实现（`useScroll` 无 `arrivedState`/`onScroll`，`useElementHover` 无 `delay` 选项）
+
 ## [@lionad/use-scrollbar 0.5.0-alpha.3] - 2026-09-04
 
 ### Changed
